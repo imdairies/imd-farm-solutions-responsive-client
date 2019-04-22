@@ -45,15 +45,20 @@ class SearchAnimalEvent extends Component {
       fadeIn: true,
       timeout: 300,
       eventlist: [],
+      eventSearchFilterlist: [],
+      eventCode: "ALL",
+      eventCodeID: "%",
       isLoaded: true,
       animalTag: "",
       messageColor: "muted",
       animaltaglist: [],
-      eventAdditionalMessage: "Enter search fields (you can use % for wild card searches) and press Search button"
+      eventAdditionalMessage: "Enter Animal Tag and press search button",
+      testDate: new Date()
     };
     this.handleAnimalTagChanged = this.handleAnimalTagChanged.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
     this.handleTabClick = this.handleTabClick.bind(this);
+    this.handleEventSelected = this.handleEventSelected.bind(this);
   }
 
   toggle(i) {
@@ -66,35 +71,53 @@ class SearchAnimalEvent extends Component {
   }
 
   componentDidMount() {
-    const parsed = queryString.parse(this.props.location.search);
-    this.setState({lookupValueCode: parsed.lookupValueCode});
-    this.setState({animaltaglist: [], isLoaded: false}); 
-    fetch('http://localhost:8080/imd-farm-management/animals/search', {
-        method: "POST",
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          "animalTag": "%",
-      })
-    })
+
+    // retrieve Event Dropdown values  
+    fetch('http://localhost:8080/imd-farm-management/lv-lifecycle-event/allactive')
     .then(response => response.json())
     .then(responseJson => {
       if (responseJson.error) {
-         this.setState({animaltaglist: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+         this.setState({eventSearchFilterlist: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
       }
-      else {
-         this.setState({animaltaglist: responseJson, isLoaded: true, eventAdditionalMessage: "", messageColor: "success"});         
+      else {     
+         this.setState({eventSearchFilterlist: responseJson, isLoaded: true, eventAdditionalMessage: "", messageColor: "success"});   
+         //alert(this.state.eventlist.length);      
       }
     })
     .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
+
+  //   const parsed = queryString.parse(this.props.location.search);
+  //   this.setState({lookupValueCode: parsed.lookupValueCode});
+  //   this.setState({animaltaglist: [], isLoaded: false}); 
+  //   fetch('http://localhost:8080/imd-farm-management/animals/search', {
+  //       method: "POST",
+  //       headers: {
+  //           'Accept': 'application/json',
+  //           'Content-Type': 'application/json'
+  //       },
+  //       body: JSON.stringify({
+  //         "animalTag": "%",
+  //     })
+  //   })
+  //   .then(response => response.json())
+  //   .then(responseJson => {
+  //     if (responseJson.error) {
+  //        this.setState({animaltaglist: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+  //     }
+  //     else {
+  //        this.setState({animaltaglist: responseJson, isLoaded: true, eventAdditionalMessage: "", messageColor: "success"});         
+  //     }
+  //   })
+  //   .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
 
    }
 
 
   handleAnimalTagChanged(event) {
     this.setState({animalTag: event.target.value});
+  }
+  handleEventSelected(event) {
+    this.setState({eventCode: event.target.value, eventCodeID: event.target.id});
   }
   handleTabClick(targetID) {
    //alert(targetID + " was clicked");
@@ -116,7 +139,8 @@ class SearchAnimalEvent extends Component {
           // body: JSON.stringify(jsonString)
 
           body: JSON.stringify({
-            "animalTag": this.state.animalTag
+            "animalTag": this.state.animalTag,
+            "eventCode": this.state.eventCodeID
         })
       })
       .then(response => response.json())
@@ -138,7 +162,7 @@ class SearchAnimalEvent extends Component {
   }
 
   render() {
-    var { isLoaded, eventlist, animaltaglist, eventAdditionalMessage, messageColor } = this.state;
+    var { isLoaded, eventlist, eventSearchFilterlist, animaltaglist, eventAdditionalMessage, messageColor } = this.state;
     let recordCount = 0;
     return (
       <div className="animated fadeIn">
@@ -184,6 +208,29 @@ class SearchAnimalEvent extends Component {
                             </InputGroup>
                           </Col>
                         </FormGroup>
+                        <FormGroup row>
+                          <Col md ="6">
+                            <InputGroup>
+                              <InputGroupText>
+                                <i className="fa icon-list fa-lg mt-1"></i>
+                              </InputGroupText>
+                              <Dropdown isOpen={this.state.dropdownOpen[0]} toggle={() => {
+                                this.toggle(0);
+                              }}>
+                                <DropdownToggle caret>
+                                  {this.state.eventCode}
+                                </DropdownToggle>
+
+                                <DropdownMenu id="eventCode" onClick={this.handleEventSelected}>
+                                  <DropdownItem id="%" value="ALL" >ALL</DropdownItem>                                  
+                                  {eventSearchFilterlist.map(item => (
+                                  <DropdownItem id={item.eventCode} value={item.eventShortDescription} >{item.eventShortDescription}</DropdownItem>
+                               ))}
+                                  </DropdownMenu>
+                                </Dropdown> 
+                            </InputGroup>
+                          </Col>
+                        </FormGroup>
                         <FormText color={messageColor}>&nbsp;{eventAdditionalMessage}</FormText>
                       </Form>
                     </CardBody>
@@ -214,6 +261,8 @@ class SearchAnimalEvent extends Component {
                                 <th>Timestamp</th>
                                 <th>Type</th>
                                 <th>Operator</th>
+                                <th>Day Ago</th>
+                                <th>Age</th>
                                 <th>Comments</th>
                               </tr> 
                            </thead>
@@ -224,6 +273,8 @@ class SearchAnimalEvent extends Component {
                                    <td data-toggle="tooltip" title={item.eventTimeStamp.substring(item.eventTimeStamp.length-8).trim()}>{item.eventTimeStamp.substring(0,item.eventTimeStamp.length-8).trim()}</td>
                                    <td><Link to={'/animal/event/update?eventTransactionID=' + item.eventTransactionID} >{item.eventShortDescription}</Link></td>
                                    <td>{item.eventOperator}</td>
+                                   <td>{item.daysFromToday}</td>
+                                   <td>{item.ageWhenOccurred}</td>
                                    <td>{item.eventComments + " " + item.auxField1Value + " " + item.auxField2Value}</td>
                                </tr>
                                ))}
