@@ -1,0 +1,6 @@
+{
+  "name": "AddAnimalEvent",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./AddAnimalEvent.js"
+}

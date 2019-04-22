@@ -1,0 +1,6 @@
+{
+  "name": "AddDailyMilk",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./AddDailyMilk.js"
+}

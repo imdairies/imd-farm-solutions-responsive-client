@@ -1,0 +1,6 @@
+{
+  "name": "SearchLookup",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./SearchLookup.js"
+}

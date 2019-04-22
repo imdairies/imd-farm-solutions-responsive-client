@@ -1,0 +1,6 @@
+{
+  "name": "AddFarmEvent",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./AddFarmEvent.js"
+}

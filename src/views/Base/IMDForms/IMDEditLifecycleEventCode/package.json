@@ -1,0 +1,6 @@
+{
+  "name": "IMDEditLifecycleEventCode",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./IMDEditLifecycleEventCode.js"
+}

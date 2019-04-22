@@ -1,0 +1,6 @@
+{
+  "name": "SearchAnimal",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./SearchAnimal.js"
+}
