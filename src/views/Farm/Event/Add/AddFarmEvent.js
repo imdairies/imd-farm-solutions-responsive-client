@@ -663,8 +663,8 @@ handleField1DropdownValueChanged(event) {
                         <FormGroup row style={field1YesNoDisplay} >
                           <Label sm="4" htmlFor="input-normal" >{this.state.field1Label}</Label>
                           <Col sm="6">
-                            <Dropdown  isOpen={this.state.dropdownOpen[2]} toggle={() => {
-                              this.toggle(2);}}>
+                            <Dropdown  isOpen={this.state.dropdownOpen[3]} toggle={() => {
+                              this.toggle(3);}}>
                               <DropdownToggle caret>{this.state.field1Value}</DropdownToggle>
                               <DropdownMenu id="field1" onClick={this.handleField1Changed}>
                                 <DropdownItem id="field1_YES" value="YES">Yes</DropdownItem>
@@ -732,8 +732,8 @@ handleField1DropdownValueChanged(event) {
                         <FormGroup row style={field2YesNoDisplay} >
                           <Label sm="4" htmlFor="input-normal" >{this.state.field2Label}</Label>
                           <Col sm="6">
-                            <Dropdown isOpen={this.state.dropdownOpen[3]} toggle={() => {
-                              this.toggle(3);}}>
+                            <Dropdown isOpen={this.state.dropdownOpen[5]} toggle={() => {
+                              this.toggle(5);}}>
                               <DropdownToggle caret>{this.state.field2Value}</DropdownToggle>
                               <DropdownMenu id="field2" onClick={this.handleField2Changed}>
                                 <DropdownItem id="field2_YES" value="YES">Yes</DropdownItem>
@@ -750,8 +750,8 @@ handleField1DropdownValueChanged(event) {
                           <Label sm="4" htmlFor="input-normal" >{this.state.field2Label}</Label>
                           <Col sm="6">
                             <InputGroup>
-                              <Dropdown isOpen={this.state.dropdownOpen[5]} toggle={() => {
-                                this.toggle(5);
+                              <Dropdown isOpen={this.state.dropdownOpen[6]} toggle={() => {
+                                this.toggle(6);
                               }}>
                                 <DropdownToggle caret>
                                   {this.state.field2DropdownDisplayValue}
