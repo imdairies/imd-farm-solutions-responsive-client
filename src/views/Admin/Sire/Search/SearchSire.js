@@ -163,7 +163,7 @@ class SearchSire extends Component {
                           </NavItem>
                           <NavItem>
                             <NavLink id="add-tab" className={classnames({ active: false })} onClick={this.handleTabClick("add-tab")} >
-                              <Link to={'/animal/milking/add'}><i className="fa fa-plus"></i></Link><strong>{' '}Add</strong>
+                              <Link to={'/admin/sire/add'}><i className="fa fa-plus"></i></Link><strong>{' '}Add</strong>
                             </NavLink>
                           </NavItem>
                         </Nav>
@@ -171,7 +171,8 @@ class SearchSire extends Component {
                            <thead>
                               <tr>
                                 <th>#</th>
-                                <th>Sire</th>
+                                <th>Name</th>
+                                <th>Code</th>
                                 <th>Controller</th>
                                 <th>Data Sheet</th>
                                 <th>photo</th>
@@ -181,10 +182,11 @@ class SearchSire extends Component {
                              {items.map(item => (
                                  <tr key="{item.animalTag}">
                                    <td>{++recordCount}</td>
-                                   <td><Link to={'/animal/milking/view?orgID=IMD&&animalTag=' + item.animalTag}>{item.alias + " (" + item.animalTag + ")" }</Link></td>
+                                   <td>{item.alias}</td>
+                                   <td>{item.animalTag}</td>
                                    <td>{item.controller}</td>
-                                   <td><a target="_blank" rel="noopener noreferrer" href={item.sireDataSheet}>View Data Sheet</a></td>
-                                   <td><img src={item.sirePhoto} width="100" height="60" /></td>
+                                   <td width="25%"><a target="_blank" rel="noopener noreferrer" href={item.sireDataSheet}>View Data Sheet</a></td>
+                                   <td><a target="_blank" rel="noopener noreferrer" href={item.sirePhoto} ><img src={item.sirePhoto} width="100" height="60" /></a></td>
                                </tr>
                                ))}
                            </tbody>

@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import SearchSire from './SearchSire';
+import AddSire from './AddSire';
 
 it('renders without crashing', () => {
   const div = document.createElement('div');
-  ReactDOM.render(<SearchSire />, div);
+  ReactDOM.render(<AddSire />, div);
   ReactDOM.unmountComponentAtNode(div);
 });

@@ -64,6 +64,7 @@ const ViewInseminationInfo = React.lazy(() => import('./views/Farm/Insemination'
 
 
 const SearchSire = React.lazy(() => import('./views/Admin/Sire/Search'));
+const AddSire    = React.lazy(() => import('./views/Admin/Sire/Add'));
 
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
@@ -122,6 +123,7 @@ const routes = [
 
 
   { path: '/admin/sire/search/', name: 'SearchSire', component: SearchSire },
+  { path: '/admin/sire/add/'   , name: 'AddSire'   , component: AddSire    },
 
   { path: '/animal/event/search', name: 'SearchAnimalEvent', component: SearchAnimalEvent },
   { path: '/animal/event/add', name: 'AddAnimalEvent', component: AddAnimalEvent },

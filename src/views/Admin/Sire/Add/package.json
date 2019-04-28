@@ -1,0 +1,6 @@
+{
+  "name": "AddSire",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./AddSire.js"
+}

@@ -34,7 +34,7 @@ class AddAnimal extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      dropdownOpen: new Array(6).fill(false),
+      dropdownOpen: new Array(7).fill(false),
       collapse: true,
       warning: false,
       fadeIn: true,
@@ -43,6 +43,8 @@ class AddAnimal extends Component {
       timeout: 300,
       animalTag : "" ,
       alias: "",
+      breed: "",
+      breedList: [],
       longdescription: "",
       animaltypelist: [],
       gender : "-- Select Gender --",
@@ -70,11 +72,12 @@ class AddAnimal extends Component {
     this.handleSireChange = this.handleSireChange.bind(this);
     this.handleDamChange = this.handleDamChange.bind(this);
     this.handleAIIndicatorChanged = this.handleAIIndicatorChanged.bind(this);
+    this.handleBreedSelected = this.handleBreedSelected.bind(this);
 
   }
 
   componentDidMount() {
-    this.setState({animaltypelist: [], isLoaded: false}); 
+    this.setState({animaltypelist: [], breedList: [], isLoaded: false}); 
     fetch('http://localhost:8080/imd-farm-management/lookupvalues/search', {
         method: "POST",
         headers: {
@@ -96,6 +99,29 @@ class AddAnimal extends Component {
       }
     })
     .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
+
+    fetch('http://localhost:8080/imd-farm-management/lookupvalues/search', {
+        method: "POST",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          "categoryCode": "BREED",
+          "activeIndicator": "Y",
+      })
+    })
+    .then(response => response.json())
+    .then(responseJson => {
+      if (responseJson.error) {
+         this.setState({breedList: [], isLoaded: true, message: responseJson.message, messageColor: "danger"});
+      }
+      else {
+         this.setState({breedList: responseJson, isLoaded: true, message: "", messageColor: "success"});         
+      }
+    })
+    .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
+
 
 
     fetch('http://localhost:8080/imd-farm-management/animals/retrieveaisire', {
@@ -193,12 +219,10 @@ class AddAnimal extends Component {
       this.setState({animalTag: event.target.value});
     else if (event.target.id === "alias")
       this.setState({alias:event.target.value});
-    // if (event.target.id === "alias")
-    //   this.setState({alias: event.target.value});
-    // if (event.target.id === "longdescription")
-    //   this.setState({longdescription: event.target.value});
-    // if (event.target.id === "active")
-    //   this.setState({activeIndicator: (event.target.checked ? "Y": "N")});
+  }
+
+  handleBreedSelected(event) {
+    this.setState({breed: event.target.value});
   }
 
 
@@ -211,6 +235,7 @@ class AddAnimal extends Component {
     event.preventDefault();
     let animalTag = document.getElementById("animalTag").value;
     let alias = document.getElementById("alias").value;
+    let breed = this.state.breed;
     let gender = this.state.gender;
 
     if (animalTag.length === 0) {
@@ -218,6 +243,8 @@ class AddAnimal extends Component {
       document.getElementById("animalTag").focus();
     } else if (gender === "-- Select Gender --" || gender.length === 0) {
       this.setState({messageColor: "danger", message: "Please select the animal gender"});
+    } else if (breed === "-- Select Breed --" || breed.length === 0) {
+      this.setState({messageColor: "danger", message: "Please select the animal breed"});
     } else {
       this.setState({message: "Processing ..."
       });
@@ -230,6 +257,7 @@ class AddAnimal extends Component {
           body: JSON.stringify({
             "animalTag": this.state.animalTag,
             "alias": alias,
+            "breed" : breed,
             "gender" : (this.state.gender == "Female" ? "F" : "M"),
             "dobAccuracyInd" : (this.state.dobAccuracyInd == "Yes" ? "Y" : "N"),
             "sire" : (this.state.animalSireAlias == "-- Select Sire --"  ? null : this.state.animalSireTag),
@@ -265,7 +293,7 @@ class AddAnimal extends Component {
 
 
   render() {
-    var { message, messageColor, animaltypelist, sireList, damList} = this.state;
+    var { message, messageColor, animaltypelist, sireList, damList, breedList} = this.state;
     let recordCount = 0;
     let damRecordCount = 0;
     return (
@@ -306,6 +334,26 @@ class AddAnimal extends Component {
                           <Label sm="4" htmlFor="input-normal">Animal Alias</Label>
                           <Col sm="8">
                               <Input id="alias" type="text" maxLength="75" value={this.state.alias} onChange={this.handleChange} placeholder="Animal Alias"  />
+                          </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                          <Label sm="4" htmlFor="input-normal">Breed</Label>
+                          <Col>
+                            <InputGroup>
+                              <Dropdown isOpen={this.state.dropdownOpen[6]} toggle={() => {
+                                this.toggle(6);
+                              }}>
+                                <DropdownToggle caret>
+                                  {this.state.breed}
+                                </DropdownToggle>
+
+                                <DropdownMenu onClick={this.handleBreedSelected}>
+                                  {breedList.map(breeds => (
+                                  <DropdownItem id={breeds.lookupValueCode} value={breeds.lookupValueCode} >{breeds.lookupValueCode + " - " + breeds.shortDescription}</DropdownItem>
+                               ))}
+                                  </DropdownMenu>
+                                </Dropdown>
+                            </InputGroup>
                           </Col>
                         </FormGroup>
                         <FormGroup row>
