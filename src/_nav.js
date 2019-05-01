@@ -29,14 +29,17 @@ export default {
         {
           name: '360° View',
           url: '/animal/search',
+          icon: 'icon-globe'
         },
         {
           name: 'Event',
           url: '/animal/event/search',
+          icon: 'icon-bell'
         },
         {
           name: 'Milking',
           url: '/animal/milking/search',
+          icon: 'icon-drop'
         },
       ],
     },
@@ -48,14 +51,28 @@ export default {
         {
           name: 'Event',
           url: '/farm/event/add',
+          icon: 'icon-bell'
         },
         {
           name: 'Milking',
           url: '/farm/milking/add',
+          icon: 'icon-drop'
         },
         {
           name: 'Insemination',
           url: '/farm/insemination',
+        }
+      ],
+    },
+    {  
+      name: 'Inventory',
+      url: '/base',
+      icon: 'icon-basket-loaded',
+      children: [
+        {
+          name: 'Semen',
+          url: '/inventory/sire/addsemeninventory',
+        //  icon: 'fa-address-book'
         }
       ],
     },

@@ -125,7 +125,6 @@ class AddSire extends Component {
       }
     })
     .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
-
   }
 
   handleSireOriginSelected(event) {
