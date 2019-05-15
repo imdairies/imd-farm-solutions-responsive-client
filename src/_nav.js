@@ -71,7 +71,7 @@ export default {
       children: [
         {
           name: 'Semen',
-          url: '/inventory/sire/addsemeninventory',
+          url: '/inventory/sire/search/searchsemenInventory',
         //  icon: 'fa-address-book'
         }
       ],

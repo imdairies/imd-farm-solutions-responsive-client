@@ -1,0 +1,6 @@
+{
+  "name": "SearchSemenInventory",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./SearchSemenInventory.js"
+}

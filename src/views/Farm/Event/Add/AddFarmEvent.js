@@ -582,10 +582,6 @@ handleField1DropdownValueChanged(event) {
                       <Form action="" method="post" className="form-horizontal">
                         <FormText color={messageColor}>&nbsp;{eventAdditionalMessage}</FormText>
                         <FormGroup row>
-                          <Col>&nbsp;
-                          </Col>
-                        </FormGroup>
-                        <FormGroup row>
                           <Label sm="4" htmlFor="input-normal">Event</Label>
                           <Col sm="8">
                             <InputGroup>

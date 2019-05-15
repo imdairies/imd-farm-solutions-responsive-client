@@ -36,7 +36,7 @@ class AddAnimalEvent extends Component {
     super(props);
     this.state = {
       collapse: true,
-      dropdownOpen: new Array(7).fill(false),
+      dropdownOpen: new Array(12).fill(false),
       warning: false,
       fadeIn: true,
       isLoaded: false,
@@ -76,6 +76,29 @@ class AddAnimalEvent extends Component {
       field2NumberDisplay : false,
       field2YesNoDisplay : false,
 
+      field3Label: "",
+      field3Value: "",
+      field3DropdownDisplayValue: "",
+      field3DataUnit: "",
+      field3list: [],
+      field3TextDisplay : false,
+      field3TextAreaDisplay: false,
+      field3NumberDisplay : false,
+      field3YesNoDisplay : false,
+
+      field4Label: "",
+      field4Value: "",
+      field4DropdownDisplayValue: "",
+      field4DataUnit: "",
+      field4list: [],
+      field4TextDisplay : false,
+      field4TextAreaDisplay: false,
+      field4NumberDisplay : false,
+      field4YesNoDisplay : false,
+
+      inventoryUpdateLabel: "",
+      shouldUpdateInventoryValue: "",
+
       commentsFieldDisplay: false,
       commentsValue: "",
 
@@ -90,6 +113,8 @@ class AddAnimalEvent extends Component {
     this.handleTimestampChanged = this.handleTimestampChanged.bind(this);
     this.handleField1Changed = this.handleField1Changed.bind(this);
     this.handleField2Changed = this.handleField2Changed.bind(this);
+    this.handleField3Changed = this.handleField3Changed.bind(this);
+    this.handleField4Changed = this.handleField4Changed.bind(this);
     this.handleDateChanged = this.handleDateChanged.bind(this);
     this.handleOperatorSelected = this.handleOperatorSelected.bind(this);
     this.handleAdd = this.handleAdd.bind(this);
@@ -98,6 +123,10 @@ class AddAnimalEvent extends Component {
     this.handleLifecycleStageValueChanged = this.handleLifecycleStageValueChanged.bind(this);
     this.handleField1DropdownValueChanged = this.handleField1DropdownValueChanged.bind(this);
     this.handleField2DropdownValueChanged = this.handleField2DropdownValueChanged.bind(this);
+    this.handleField3DropdownValueChanged = this.handleField3DropdownValueChanged.bind(this);
+    this.handleField4DropdownValueChanged = this.handleField4DropdownValueChanged.bind(this);
+    this.handleShouldUpdateInventoryChanged = this.handleShouldUpdateInventoryChanged.bind(this);
+
   }
 
   handleLifecycleStageValueChanged(event){
@@ -107,13 +136,15 @@ class AddAnimalEvent extends Component {
   handleCommentsChanged(event) {
       this.setState({commentsValue: event.target.value});
   }
+  handleShouldUpdateInventoryChanged(event) {
+      this.setState({shouldUpdateInventoryValue: event.target.value});
+  }
 
   handleDateChanged(event) {
       this.setState({eventDate: event.target.value});
   }
 
   handleTabClick(targetID) {
-   //alert(targetID + " was clicked");
   }
 
   handleTimestampChanged(newValue) {
@@ -133,14 +164,32 @@ class AddAnimalEvent extends Component {
     this.setState({field2Value: event.target.value,
       field2DropdownDisplayValue: dropDownDisplayValue});
   }
+  handleField3DropdownValueChanged(event) {
+    let item = this.state.field3list[event.target.id];
+    let dropDownDisplayValue = (item.description ? item.description : "") + (item.shortDescription ? item.shortDescription : "") + " (" + (item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode  : "") + ")";
+    this.setState({field3Value: event.target.value,
+      field3DropdownDisplayValue: dropDownDisplayValue});
+  }
+  handleField4DropdownValueChanged(event) {
+    let item = this.state.field4list[event.target.id];
+    let dropDownDisplayValue = (item.description ? item.description : "") + (item.shortDescription ? item.shortDescription : "") + " (" + (item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode  : "") + ")";
+    this.setState({field4Value: event.target.value,
+      field4DropdownDisplayValue: dropDownDisplayValue});
+  }
 
   handleField1Changed(event) {
     this.setState({field1Value: event.target.value});
   }
  
   handleField2Changed(event) {
-    // alert(event.target.value);
     this.setState({field2Value: event.target.value});
+  }
+  handleField3Changed(event) {
+    // alert(event.target.value);
+    this.setState({field3Value: event.target.value});
+  }
+  handleField4Changed(event) {
+    this.setState({field4Value: event.target.value});
   }
 
   componentDidMount() {
@@ -214,7 +263,17 @@ class AddAnimalEvent extends Component {
     let field2DataType = this.state.eventlist[arrayIndex].eventField2DataType;
     let field2DataUnit = this.state.eventlist[arrayIndex].eventField2DataUnit;
 
+    let field3Label = this.state.eventlist[arrayIndex].eventField3Label;
+    let field3DataType = this.state.eventlist[arrayIndex].eventField3DataType;
+    let field3DataUnit = this.state.eventlist[arrayIndex].eventField3DataUnit;
+
+    let field4Label = this.state.eventlist[arrayIndex].eventField4Label;
+    let field4DataType = this.state.eventlist[arrayIndex].eventField4DataType;
+    let field4DataUnit = this.state.eventlist[arrayIndex].eventField4DataUnit;
+
     let nextLifecycleStageList = this.state.eventlist[arrayIndex].nextLifecycleStage;
+
+    let inventoryUpdateLabel = this.state.eventlist[arrayIndex].inventoryUpdateLabel;
 
     let messageColor = "";
     let eventAdditionalMessage = "";
@@ -232,6 +291,18 @@ class AddAnimalEvent extends Component {
     let field2NumberDisplay = false;
     let field2YesNoDisplay = false;
     let field2DropdownDisplay = false;
+
+    let field3TextDisplay = false;
+    let field3TextAreaDisplay = false;
+    let field3NumberDisplay = false;
+    let field3YesNoDisplay = false;
+    let field3DropdownDisplay = false;
+
+    let field4TextDisplay = false;
+    let field4TextAreaDisplay = false;
+    let field4NumberDisplay = false;
+    let field4YesNoDisplay = false;
+    let field4DropdownDisplay = false;
 
 
     if (field1DataType === "TEXT")
@@ -356,6 +427,138 @@ class AddAnimalEvent extends Component {
       field2TextDisplay = true;
     }
 
+
+
+
+
+    if (field3DataType === "TEXT")
+      field3TextDisplay = true;
+    else if (field3DataType === "TEXTAREA")
+      field3TextAreaDisplay = true;
+    else if (field3DataType === "FLOAT")
+      field3NumberDisplay = true;
+    else if (field3DataType === "YESNO")
+      field3YesNoDisplay = true;
+    else if (field3DataType.indexOf("LV:") == 0) {
+      // dropdown data type.
+      field3DropdownDisplay = true;
+      apiUrlPostfix =  field3DataType.substring(3);
+      // alert('http://localhost:8080/imd-farm-management/lv-lifecycle-event' + apiUrlPostfix);
+
+      fetch('http://localhost:8080/imd-farm-management/lv-lifecycle-event' + apiUrlPostfix, {
+          method: "POST",
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            "animalTag": "%"
+        })
+      })
+      .then(response => response.json())
+      .then(responseJson => {
+        if (responseJson.error) {
+           this.setState({field3list:[], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+        }
+        else {
+           this.setState({field3list: responseJson, isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "success"});         
+        }
+      })
+      .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
+    } else if (field3DataType === "CATEGORY_CD") {
+      field3DropdownDisplay = true;
+      fetch('http://localhost:8080/imd-farm-management/lookupvalues/search', {
+          method: "POST",
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+          "categoryCode": field3DataUnit,
+          "lookupValueCode": "%"
+        })
+      })
+      .then(response => response.json())
+      .then(responseJson => {
+        if (responseJson.error) {
+           this.setState({field3list:[], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+        }
+        else {
+           this.setState({field3list: responseJson, isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "success"});         
+        }
+      })
+      .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
+    } else if (field3DataType !== "") {
+      // unknown datatype, probably because this data type is not yet implemented
+      field3TextDisplay = true;
+    }
+
+
+
+  if (field4DataType === "TEXT")
+      field4TextDisplay = true;
+    else if (field4DataType === "TEXTAREA")
+      field4TextAreaDisplay = true;
+    else if (field4DataType === "FLOAT")
+      field4NumberDisplay = true;
+    else if (field4DataType === "YESNO")
+      field4YesNoDisplay = true;
+    else if (field4DataType.indexOf("LV:") == 0) {
+      // dropdown data type.
+      field4DropdownDisplay = true;
+      apiUrlPostfix =  field4DataType.substring(3);
+      // alert('http://localhost:8080/imd-farm-management/lv-lifecycle-event' + apiUrlPostfix);
+
+      fetch('http://localhost:8080/imd-farm-management/lv-lifecycle-event' + apiUrlPostfix, {
+          method: "POST",
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            "animalTag": "%"
+        })
+      })
+      .then(response => response.json())
+      .then(responseJson => {
+        if (responseJson.error) {
+           this.setState({field4list:[], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+        }
+        else {
+           this.setState({field4list: responseJson, isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "success"});         
+        }
+      })
+      .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
+    } else if (field4DataType === "CATEGORY_CD") {
+      field4DropdownDisplay = true;
+      fetch('http://localhost:8080/imd-farm-management/lookupvalues/search', {
+          method: "POST",
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+          "categoryCode": field4DataUnit,
+          "lookupValueCode": "%"
+        })
+      })
+      .then(response => response.json())
+      .then(responseJson => {
+        if (responseJson.error) {
+           this.setState({field4list:[], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+        }
+        else {
+           this.setState({field4list: responseJson, isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "success"});         
+        }
+      })
+      .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
+    } else if (field4DataType !== "") {
+      // unknown datatype, probably because this data type is not yet implemented
+      field4TextDisplay = true;
+    }
+
+
+
     // if (field1Label === "" && field2Label === "") {
     //   messageColor = "danger";
     //   eventAdditionalMessage = "It seems that the selected event has not been configured properly. Please contact your administrator";
@@ -372,7 +575,6 @@ class AddAnimalEvent extends Component {
 
       field1Label: field1Label,
       field1DataUnit: field1DataUnit,
-
       field1TextDisplay : field1TextDisplay,
       field1TextAreaDisplay : field1TextAreaDisplay,
       field1NumberDisplay : field1NumberDisplay,
@@ -384,9 +586,27 @@ class AddAnimalEvent extends Component {
       field2NumberDisplay : field2NumberDisplay,
       field2YesNoDisplay : field2YesNoDisplay,
       field2DropdownDisplay: field2DropdownDisplay,
-
       field2Label: field2Label,
       field2DataUnit: field2DataUnit,
+
+      field3TextDisplay : field3TextDisplay,
+      field3TextAreaDisplay: field3TextAreaDisplay,
+      field3NumberDisplay : field3NumberDisplay,
+      field3YesNoDisplay : field3YesNoDisplay,
+      field3DropdownDisplay: field3DropdownDisplay,
+      field3Label: field3Label,
+      field3DataUnit: field3DataUnit,
+
+      field4TextDisplay : field4TextDisplay,
+      field4TextAreaDisplay: field4TextAreaDisplay,
+      field4NumberDisplay : field4NumberDisplay,
+      field4YesNoDisplay : field4YesNoDisplay,
+      field4DropdownDisplay: field4DropdownDisplay,
+      field4Label: field4Label,
+      field4DataUnit: field4DataUnit,
+
+      inventoryUpdateLabel: inventoryUpdateLabel,
+
       nextLifecycleStageList: nextLifecycleStageList,
       nextLifecycleStageDisplay: (nextLifecycleStageList.length > 0)
     });
@@ -404,19 +624,25 @@ class AddAnimalEvent extends Component {
 
   handleAdd(event) {
     event.preventDefault();
-    let mustEnterComments = (this.state.field2Label === "" && this.state.field2Label === "");
+    let mustEnterComments = true;
 
     if (this.state.animalTag.length === 0) {
       this.setState({messageColor: "danger", eventAdditionalMessage: "Please specify an Animal Tag"});
       document.getElementById("animalTag").focus();
     } else if (this.state.eventCode.length === 0 || this.state.eventCode === "-- Select Event --") {
       this.setState({messageColor: "danger", eventAdditionalMessage: "Please select an Event"});
-    } else if (this.state.field2Label !== "" && this.state.field1Value === "") {
+    } else if (this.state.field1Label !== "" && this.state.field1Value === "") {
       this.setState({messageColor: "danger", eventAdditionalMessage: "Please enter " + this.state.field1Label});
     } else if (this.state.field2Label !== "" && this.state.field2Value === "") {
       this.setState({messageColor: "danger", eventAdditionalMessage: "Please enter " + this.state.field2Label});
+    } else if (this.state.field3Label !== "" && this.state.field3Value === "") {
+      this.setState({messageColor: "danger", eventAdditionalMessage: "Please enter " + this.state.field3Label});
+    } else if (this.state.field4Label !== "" && this.state.field4Value === "") {
+      this.setState({messageColor: "danger", eventAdditionalMessage: "Please enter " + this.state.field4Label});
     } else if (mustEnterComments && this.state.commentsValue === "") {
       this.setState({messageColor: "danger", eventAdditionalMessage: "Please enter Comments"});
+    } else if (this.state.inventoryUpdateLabel !== "" && this.state.shouldUpdateInventoryValue === "") {
+      this.setState({messageColor: "danger", eventAdditionalMessage: "Please specify \"" + this.state.inventoryUpdateLabel + "\""});
     } else {
       this.setState({eventAdditionalMessage: "Processing ..."
       });
@@ -430,9 +656,12 @@ class AddAnimalEvent extends Component {
             "animalTag": this.state.animalTag,
             "eventCode": this.state.eventCodeID,
             "eventTimeStamp": this.state.timestamp.toLocaleString(),
+            "shouldUpdateInventory": this.state.shouldUpdateInventoryValue,
             "eventComments": this.state.commentsValue,
             "auxField1Value": this.state.field1Value,
             "auxField2Value": this.state.field2Value,
+            "auxField3Value": this.state.field3Value,
+            "auxField4Value": this.state.field4Value,
             "nextLifeCycleStage": (this.state.nextLifecycleStageValue === "--Select Next Lifecycle Stage--" ? "":this.state.nextLifecycleStageValue),
             "operatorID": this.state.operatorID
         })
@@ -451,10 +680,12 @@ class AddAnimalEvent extends Component {
   }
 
   render() {
-    var { field1list, field2list, nextLifecycleStageList, eventAdditionalMessage, messageColor, animaltaglist, eventlist, operatorlist} = this.state;
+    var { field1list, field2list,field3list,field4list, nextLifecycleStageList, eventAdditionalMessage, messageColor, animaltaglist, eventlist, operatorlist} = this.state;
     let eventCount = 0;
     let field1Count = 0;
     let field2Count = 0;
+    let field3Count = 0;
+    let field4Count = 0;
 
     let field1TextDisplay = this.state.field1TextDisplay ? {} : {display : 'none'};
     let field1TextAreaDisplay = this.state.field1TextAreaDisplay ? {} : {display : 'none'};
@@ -468,7 +699,24 @@ class AddAnimalEvent extends Component {
     let field2YesNoDisplay  = this.state.field2YesNoDisplay ? {} : {display : 'none'};
     let field2DropdownDisplay = this.state.field2DropdownDisplay ? {} : {display : 'none'};
 
+
+    let field3TextDisplay  = this.state.field3TextDisplay ? {} : {display : 'none'};
+    let field3TextAreaDisplay = this.state.field3TextAreaDisplay ? {} : {display : 'none'};
+    let field3NumberDisplay  = this.state.field3NumberDisplay ? {} : {display : 'none'};
+    let field3YesNoDisplay  = this.state.field3YesNoDisplay ? {} : {display : 'none'};
+    let field3DropdownDisplay = this.state.field3DropdownDisplay ? {} : {display : 'none'};
+
+
+    let field4TextDisplay  = this.state.field4TextDisplay ? {} : {display : 'none'};
+    let field4TextAreaDisplay = this.state.field4TextAreaDisplay ? {} : {display : 'none'};
+    let field4NumberDisplay  = this.state.field4NumberDisplay ? {} : {display : 'none'};
+    let field4YesNoDisplay  = this.state.field4YesNoDisplay ? {} : {display : 'none'};
+    let field4DropdownDisplay = this.state.field4DropdownDisplay ? {} : {display : 'none'};
+
     let commentsFieldDisplay  = this.state.commentsFieldDisplay ? {} : {display : 'none'};
+
+    let shouldUpdateInventoryDisplay = this.state.inventoryUpdateLabel ? {} : {display : 'none'};
+
     let nextLifecycleStageDisplay = (this.state.nextLifecycleStageDisplay ? {} : {display : 'none'});
 
     return (
@@ -609,15 +857,15 @@ class AddAnimalEvent extends Component {
                           <Label sm="4" htmlFor="input-normal" >{this.state.field1Label}</Label>
                           <Col sm="6">
                             <InputGroup>
-                              <Dropdown isOpen={this.state.dropdownOpen[4]} toggle={() => {
-                                this.toggle(4);
+                              <Dropdown isOpen={this.state.dropdownOpen[3]} toggle={() => {
+                                this.toggle(3);
                               }}>
                                 <DropdownToggle caret>
                                   {this.state.field1DropdownDisplayValue}
                                 </DropdownToggle>
                               <DropdownMenu id="field1" onClick={this.handleField1DropdownValueChanged}>
                                   {field1list.map(item => (
-                                  <DropdownItem id={field1Count++} value={(item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode : "")} >{(item.description ? item.description : "") + (item.shortDescription ? item.shortDescription : "") + " (" + (item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode  : "") + ")"}</DropdownItem>
+                                  <DropdownItem id={field1Count++} value={(item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode : "")} >{(item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode  : "") + " " + (item.description ? item.description : "") + (item.shortDescription ? item.shortDescription : "") }</DropdownItem>
                                ))}
                                   </DropdownMenu>
                                 </Dropdown> 
@@ -661,8 +909,8 @@ class AddAnimalEvent extends Component {
                         <FormGroup row style={field2YesNoDisplay} >
                           <Label sm="4" htmlFor="input-normal" >{this.state.field2Label}</Label>
                           <Col sm="6">
-                            <Dropdown isOpen={this.state.dropdownOpen[3]} toggle={() => {
-                              this.toggle(3);}}>
+                            <Dropdown isOpen={this.state.dropdownOpen[4]} toggle={() => {
+                              this.toggle(4);}}>
                               <DropdownToggle caret>{this.state.field2Value}</DropdownToggle>
                               <DropdownMenu id="field2" onClick={this.handleField2Changed}>
                                 <DropdownItem id="field2_YES" value="YES">Yes</DropdownItem>
@@ -671,7 +919,7 @@ class AddAnimalEvent extends Component {
                             </Dropdown>
                           </Col>
                           <Col sm="2">
-                            {this.state.field1DataUnit}
+                            {this.state.field2DataUnit}
                           </Col>
                         </FormGroup>
 
@@ -687,7 +935,7 @@ class AddAnimalEvent extends Component {
                                 </DropdownToggle>
                               <DropdownMenu id="field2" onClick={this.handleField2DropdownValueChanged}>
                                   {field2list.map(item => (
-                                  <DropdownItem id={field2Count++} value={(item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode : "")} >{(item.description ? item.description : "") + (item.shortDescription ? item.shortDescription : "") + " (" + (item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode  : "") + ")"}</DropdownItem>
+                                  <DropdownItem id={field2Count++} value={(item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode : "")} >{(item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode  : "") + " " + (item.description ? item.description : "") + (item.shortDescription ? item.shortDescription : "")}</DropdownItem>
                                ))}
                                   </DropdownMenu>
                                 </Dropdown> 
@@ -698,6 +946,155 @@ class AddAnimalEvent extends Component {
                           </Col>
                         </FormGroup>
 
+
+
+
+
+
+
+                        <FormGroup row style={field3TextAreaDisplay} >
+                          <Label sm="4" htmlFor="input-normal" >{this.state.field3Label}</Label>
+                          <Col sm="6">
+                            <Input id="field3" type="textarea" name={this.state.field3Label} rows="2" value={this.state.field3Value} onChange={this.handleField3Changed} />
+                          </Col>
+                          <Col sm="2">
+                            {this.state.field3DataUnit}
+                          </Col>
+                        </FormGroup>
+                        <FormGroup row style={field3TextDisplay} >
+                          <Label sm="4" htmlFor="input-normal" >{this.state.field3Label}</Label>
+                          <Col sm="6">
+                            <Input id="field3" type="text"  name={this.state.field3Label} value={this.state.field3Value} onChange={this.handleField3Changed} />
+                          </Col>
+                          <Col sm="2">
+                            {this.state.field3DataUnit}
+                          </Col>
+                        </FormGroup>
+                        <FormGroup row style={field3NumberDisplay} >
+                          <Label sm="4" htmlFor="input-normal" >{this.state.field3Label}</Label>
+                          <Col sm="6">
+                            <Input id="field3" type="Number" name={this.state.field3Label} rows="3" value={this.state.field3Value} onChange={this.handleField3Changed} />
+                          </Col>
+                          <Col sm="2">
+                            {this.state.field3DataUnit}
+                          </Col>
+                        </FormGroup>
+                        <FormGroup row style={field3YesNoDisplay} >
+                          <Label sm="4" htmlFor="input-normal" >{this.state.field3Label}</Label>
+                          <Col sm="6">
+                            <Dropdown isOpen={this.state.dropdownOpen[6]} toggle={() => {
+                              this.toggle(6);}}>
+                              <DropdownToggle caret>{this.state.field3Value}</DropdownToggle>
+                              <DropdownMenu id="field3" onClick={this.handleField3Changed}>
+                                <DropdownItem id="field3_YES" value="YES">Yes</DropdownItem>
+                                <DropdownItem id="field3_NO" value="NO">No</DropdownItem>
+                              </DropdownMenu>
+                            </Dropdown>
+                          </Col>
+                          <Col sm="2">
+                            {this.state.field3DataUnit}
+                          </Col>
+                        </FormGroup>
+
+                        <FormGroup row style={field3DropdownDisplay} >
+                          <Label sm="4" htmlFor="input-normal" >{this.state.field3Label}</Label>
+                          <Col sm="6">
+                            <InputGroup>
+                              <Dropdown isOpen={this.state.dropdownOpen[7]} toggle={() => {
+                                this.toggle(7);
+                              }}>
+                                <DropdownToggle caret>
+                                  {this.state.field3DropdownDisplayValue}
+                                </DropdownToggle>
+                              <DropdownMenu id="field3" onClick={this.handleField3DropdownValueChanged}>
+                                  {field3list.map(item => (
+                                  <DropdownItem id={field3Count++} value={(item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode : "")} >{(item.description ? item.description : "") + (item.shortDescription ? item.shortDescription : "") + " (" + (item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode  : "") + ")"}</DropdownItem>
+                               ))}
+                                  </DropdownMenu>
+                                </Dropdown> 
+                            </InputGroup>
+                          </Col>
+                          <Col sm="2">
+                            {this.state.field3DataUnit}
+                          </Col>
+                        </FormGroup>
+
+
+
+
+
+                        <FormGroup row style={field4TextAreaDisplay} >
+                          <Label sm="4" htmlFor="input-normal" >{this.state.field4Label}</Label>
+                          <Col sm="6">
+                            <Input id="field4" type="textarea" name={this.state.field4Label} rows="2" value={this.state.field4Value} onChange={this.handleField4Changed} />
+                          </Col>
+                          <Col sm="2">
+                            {this.state.field4DataUnit}
+                          </Col>
+                        </FormGroup>
+                        <FormGroup row style={field4TextDisplay} >
+                          <Label sm="4" htmlFor="input-normal" >{this.state.field4Label}</Label>
+                          <Col sm="6">
+                            <Input id="field4" type="text"  name={this.state.field4Label} value={this.state.field4Value} onChange={this.handleField4Changed} />
+                          </Col>
+                          <Col sm="2">
+                            {this.state.field4DataUnit}
+                          </Col>
+                        </FormGroup>
+                        <FormGroup row style={field4NumberDisplay} >
+                          <Label sm="4" htmlFor="input-normal" >{this.state.field4Label}</Label>
+                          <Col sm="6">
+                            <Input id="field4" type="Number" name={this.state.field4Label} rows="3" value={this.state.field4Value} onChange={this.handleField4Changed} />
+                          </Col>
+                          <Col sm="2">
+                            {this.state.field4DataUnit}
+                          </Col>
+                        </FormGroup>
+                        <FormGroup row style={field4YesNoDisplay} >
+                          <Label sm="4" htmlFor="input-normal" >{this.state.field4Label}</Label>
+                          <Col sm="6">
+                            <Dropdown isOpen={this.state.dropdownOpen[8]} toggle={() => {
+                              this.toggle(8);}}>
+                              <DropdownToggle caret>{this.state.field4Value}</DropdownToggle>
+                              <DropdownMenu id="field4" onClick={this.handleField4Changed}>
+                                <DropdownItem id="field4_YES" value="YES">Yes</DropdownItem>
+                                <DropdownItem id="field4_NO" value="NO">No</DropdownItem>
+                              </DropdownMenu>
+                            </Dropdown>
+                          </Col>
+                          <Col sm="2">
+                            {this.state.field4DataUnit}
+                          </Col>
+                        </FormGroup>
+
+                        <FormGroup row style={field4DropdownDisplay} >
+                          <Label sm="4" htmlFor="input-normal" >{this.state.field4Label}</Label>
+                          <Col sm="6">
+                            <InputGroup>
+                              <Dropdown isOpen={this.state.dropdownOpen[9]} toggle={() => {
+                                this.toggle(9);
+                              }}>
+                                <DropdownToggle caret>
+                                  {this.state.field4DropdownDisplayValue}
+                                </DropdownToggle>
+                              <DropdownMenu id="field4" onClick={this.handleField4DropdownValueChanged}>
+                                  {field4list.map(item => (
+                                  <DropdownItem id={field4Count++} value={(item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode : "")} >{(item.description ? item.description : "") + (item.shortDescription ? item.shortDescription : "") + " (" + (item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode  : "") + ")"}</DropdownItem>
+                               ))}
+                                  </DropdownMenu>
+                                </Dropdown> 
+                            </InputGroup>
+                          </Col>
+                          <Col sm="2">
+                            {this.state.field4DataUnit}
+                          </Col>
+                        </FormGroup>
+
+
+
+
+
+
                         <FormGroup row style={commentsFieldDisplay} >
                           <Label sm="4" htmlFor="input-normal" >Comments</Label>
                           <Col sm="6">
@@ -705,15 +1102,27 @@ class AddAnimalEvent extends Component {
                           </Col>
                         </FormGroup>
 
-
+                        <FormGroup row style={shouldUpdateInventoryDisplay} >
+                          <Label sm="4" htmlFor="input-normal" >{this.state.inventoryUpdateLabel}</Label>
+                          <Col sm="6">
+                            <Dropdown isOpen={this.state.dropdownOpen[11]} toggle={() => {
+                              this.toggle(11);}}>
+                              <DropdownToggle caret>{this.state.shouldUpdateInventoryValue}</DropdownToggle>
+                              <DropdownMenu id="inventoryUpdateLabel" onClick={this.handleShouldUpdateInventoryChanged}>
+                                <DropdownItem id="inventoryUpdateLabel_YES" value="YES">Yes</DropdownItem>
+                                <DropdownItem id="inventoryUpdateLabel_NO" value="NO">No</DropdownItem>
+                              </DropdownMenu>
+                            </Dropdown>
+                          </Col>
+                        </FormGroup>
 
 
                         <FormGroup row style={nextLifecycleStageDisplay} >
                           <Label sm="4" htmlFor="input-normal" >Next Stages:</Label>
                           <Col sm="6">
                             <InputGroup>
-                              <Dropdown isOpen={this.state.dropdownOpen[6]} toggle={() => {
-                                this.toggle(6);
+                              <Dropdown isOpen={this.state.dropdownOpen[10]} toggle={() => {
+                                this.toggle(10);
                               }}>
                                 <DropdownToggle caret>
                                   {this.state.nextLifecycleStageValue}

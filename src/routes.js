@@ -67,6 +67,7 @@ const SearchSire = React.lazy(() => import('./views/Admin/Sire/Search'));
 const AddSire    = React.lazy(() => import('./views/Admin/Sire/Add'));
 
 const AddSemenInventory    = React.lazy(() => import('./views/Inventory/Sire/AddSemenInventory'));
+const SearchSemenInventory    = React.lazy(() => import('./views/Inventory/Sire/Search/SearchSemenInventory'));
 
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
@@ -141,6 +142,8 @@ const routes = [
 
 
   { path: '/inventory/sire/addsemeninventory', name: 'AddSemenInventory', component: AddSemenInventory },
+  { path: '/inventory/sire/search/searchsemenInventory', name: 'SearchSemenInventory', component: SearchSemenInventory},
+  
 
 ];
 

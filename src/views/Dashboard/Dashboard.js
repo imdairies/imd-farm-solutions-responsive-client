@@ -556,13 +556,13 @@ class Dashboard extends Component {
       .then(response => response.json())
       .then(responseJson => {
         if (responseJson.error) {
-           this.setState({herdSize: -999, activeAnimalWidgetMessage: responseJson.message});
+          this.setState({herdSize: -999, activeAnimalWidgetMessage: responseJson.message});
         }
         else {
-           this.setState({herdSize: responseJson.length,  activeAnimalWidgetMessage: "Herd Size"});
+           this.setState({herdSize: responseJson.length,  activeAnimalWidgetMessage: ""});
         }
       })
-      .catch(error => this.setState({herdSize: -999,  activeAnimalWidgetMessage: error.toString()}));
+      .catch(error => this.setState({herdSize: -999,  activeAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : error.toString())}));
 
 
       fetch('http://localhost:8080/imd-farm-management/animals/lactatingcows', {
@@ -584,7 +584,7 @@ class Dashboard extends Component {
              this.setState({lactatingAnimalCount: responseJson.length,  lactatingAnimalWidgetMessage: "Lactating Herd"});         
           }
         })
-        .catch(error => this.setState({lactatingAnimalCount: -999,  lactatingAnimalWidgetMessage: error.toString()}));
+        .catch(error => this.setState({lactatingAnimalCount: -999,  lactatingAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : error.toString())}));
 
 
     fetch('http://localhost:8080/imd-farm-management/animals/pregnantcows', {
@@ -606,7 +606,7 @@ class Dashboard extends Component {
              this.setState({pregnantCount: responseJson.length,  pregnantAnimalWidgetMessage: "Pregnant Herd"});         
           }
         })
-        .catch(error => this.setState({pregnantCount: -999,  pregnantAnimalWidgetMessage: error.toString()}));
+        .catch(error => this.setState({pregnantCount: -999,  pregnantAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : error.toString())}));
 
     fetch('http://localhost:8080/imd-farm-management/animals/heifers', {
               method: "POST",
@@ -627,7 +627,7 @@ class Dashboard extends Component {
              this.setState({heiferCount: responseJson.length,  heiferWidgetMessage: "Heifers"});         
           }
         })
-        .catch(error => this.setState({heiferCount: -999,  heiferWidgetMessage: error.toString()}));
+        .catch(error => this.setState({heiferCount: -999,  heiferWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : error.toString())}));
 
 
     fetch('http://localhost:8080/imd-farm-management/animals/femalecalves', {
@@ -649,7 +649,7 @@ class Dashboard extends Component {
              this.setState({femaleCalfCount: responseJson.length,  femaleCalfWidgetMessage: "Female Progney"});         
           }
         })
-        .catch(error => this.setState({femaleCalfCount: -999,  femaleCalfWidgetMessage: error.toString()}));
+        .catch(error => this.setState({femaleCalfCount: -999,  femaleCalfWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : error.toString())}));
 
 
 
@@ -683,7 +683,7 @@ class Dashboard extends Component {
              this.setState({monthVolumes: responseJson[0].volumes, monthDays:responseJson[0].days});
           }
         })
-        .catch(error => this.setState({lactatingAnimalCount: -999,  lactatingAnimalWidgetMessage: error.toString()}));
+        .catch(error => this.setState({lactatingAnimalCount: -999,  lactatingAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : error.toString())}));
    }
 
 
@@ -878,7 +878,7 @@ class Dashboard extends Component {
                     </DropdownMenu>
                   </ButtonDropdown>
                 </ButtonGroup>
-                <div className="text-value">{this.state.herdSize}</div>
+                <div className="text-value">{this.state.herdSize + " " + this.state.activeAnimalWidgetMessage}</div>
                 <div> <Link to={"/animal/search?searchCode=lactatingcows"} style={{color: '#FFF' }} > <i className="fa fa-arrow-circle-right"></i></Link> {this.state.lactatingAnimalWidgetMessage + ': '} {this.state.lactatingAnimalCount} </div>
                 <div> <Link to={"/animal/search?searchCode=pregnantcows"} style={{color: '#FFF' }} >  <i className="fa fa-arrow-circle-right"></i></Link> {this.state.pregnantAnimalWidgetMessage  + ': '} {this.state.pregnantCount} </div>
                 <div> <Link to={"/animal/search?searchCode=heifers"} style={{color: '#FFF' }} >      <i className="fa fa-arrow-circle-right"></i></Link> {this.state.heiferWidgetMessage + ': '} {this.state.heiferCount} </div>

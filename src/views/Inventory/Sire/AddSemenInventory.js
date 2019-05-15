@@ -139,8 +139,8 @@ class AddSemenInventory extends Component {
       }
     }
     else if (event.target.id === "discount") {
-      if (event.target.value > 100) {
-        this.setState({message: "Please specify a discount value between 0 and 1", messageColor:"danger"});        
+      if (event.target.value > 100 || event.target.value < 0) {
+        this.setState({message: "Please specify a discount value between 0 and 100", messageColor:"danger"});        
       } else {
         this.setState({discount: event.target.value});
         this.calculateInvoice(this.state.price, event.target.value, this.state.quantity);
@@ -208,10 +208,10 @@ class AddSemenInventory extends Component {
            this.setState({message: responseJson.message, messageColor: "danger"});
         }
         else {
-           this.setState({message: "", messageColor: "success"});         
+           this.setState({message: responseJson.message, messageColor: "success"});         
         }
       })
-      .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
+      .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
 
     }
   }
@@ -255,14 +255,14 @@ class AddSemenInventory extends Component {
                       <NavLink id="Sire-List"
                         className={classnames({ active: false })}
                       >
-                         <Link to={'/admin/sire/search'}><i className="fa fa-list"></i>{' '}</Link><strong>Sire List</strong>
+                         <Link to={'/inventory/sire/search/searchsemenInventory'}><i className="fa fa-list"></i>{' '}</Link><strong>Semen Inv</strong>
                       </NavLink>
                     </NavItem>
                     <NavItem>
                       <NavLink id="add-tab"
                         className={classnames({ active: true })}
                       >
-                         <i className="fa fa-plus"></i><strong>{' '}Add</strong>
+                         <i className="fa fa-plus"></i><strong>{' '}Add Semen Inv</strong>
                       </NavLink>
                     </NavItem>
                   </Nav>
