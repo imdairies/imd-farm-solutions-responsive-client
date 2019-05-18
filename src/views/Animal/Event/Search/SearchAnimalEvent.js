@@ -249,9 +249,6 @@ class SearchAnimalEvent extends Component {
                   <Card>
                      <CardHeader>
                      <i className="fa fa-align-justify"></i> Life Events of Tag # {this.state.animalTag} {(isLoaded ? "": " (Loading ...)")}
-                       <div className="card-header-actions">
-                         <Button color="link" className="card-header-action btn-minimize" data-target="#animaldata" ></Button>
-                       </div>
                      </CardHeader>
                        <CardBody>
                          <Table hover bordered striped responsive size="sm">
@@ -261,8 +258,8 @@ class SearchAnimalEvent extends Component {
                                 <th>Timestamp</th>
                                 <th>Type</th>
                                 <th>Operator</th>
-                                <th>Day Ago</th>
-                                <th>Age</th>
+                                <th>Day(s) Ago</th>
+                                <th>Age at Event</th>
                                 <th>Comments</th>
                               </tr> 
                            </thead>

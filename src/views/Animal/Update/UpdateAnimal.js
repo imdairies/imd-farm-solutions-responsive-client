@@ -46,13 +46,69 @@ class UpdateAnimal extends Component {
       animalSireURL: "",
       eventAdditionalMessage: "Loading events ...",
       genericMessage: "Processing ...",
-      eventMessageColor: "muted"
+      eventMessageColor: "muted",
+      month1MilkingRecord: [],
+      month1Date: "",
+      month2Date: "",
+      month2MilkingRecord: [],
+      genericMessage1: "Processing ...",
+      genericMessage2: "Processing ...",
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleUpdate = this.handleUpdate.bind(this);
     this.handleTabClick = this.handleTabClick.bind(this);   
     this.handleLifecycleStage = this.handleLifecycleStage.bind(this); 
     this.handleSireChange = this.handleSireChange.bind(this);
+    this.loadMilkingData = this.loadMilkingData.bind(this);
+    this.handlePrevious = this.handlePrevious.bind(this);
+    this.handleNext = this.handleNext.bind(this);
+
+
+  }
+
+  handlePrevious(event) {
+    let recordDate = this.state.previousDate;
+    let prevDate = null;
+    let previousDate = null;
+    let nextDate = null;
+
+    recordDate.setMonth(recordDate.getMonth()+1);
+
+    prevDate = new Date(recordDate);
+    prevDate.setMonth(recordDate.getMonth() - 1);
+    previousDate = new Date(prevDate);
+    previousDate.setMonth(previousDate.getMonth()-1);
+
+    nextDate = new Date(recordDate);
+    nextDate.setMonth(nextDate.getMonth()+1);
+
+    this.setState({month1MilkingRecord: [], month2MilkingRecord: [], isLoaded: false, genericMessage: "Processing..."}); 
+    this.setState({month1Date : prevDate.toLocaleString('en-us', { month: 'short'}) + " " + prevDate.getFullYear(), month2Date: recordDate.toLocaleString('en-us', { month: 'short'}) + " " + recordDate.getFullYear()});
+    this.setState({previousMonth: previousDate.getMonth()+1, previousYear: previousDate.getFullYear(), nextMonth: nextDate.getMonth()+1, nextYear: nextDate.getFullYear()});
+    this.loadMilkingData(prevDate, recordDate,this.state.animalTag);
+    this.setState({previousDate: previousDate, nextDate: nextDate});
+  }
+
+  handleNext() {
+    let recordDate = this.state.nextDate;
+    let prevDate = null;
+    let previousDate = null;
+    let nextDate = null;
+
+    prevDate = new Date(recordDate);
+    prevDate.setMonth(recordDate.getMonth() - 1);
+    previousDate = new Date(prevDate);
+    previousDate.setMonth(previousDate.getMonth()-1);
+
+    nextDate = new Date(recordDate);
+    nextDate.setMonth(nextDate.getMonth()+1);
+
+    this.setState({month1MilkingRecord: [], month2MilkingRecord: [], isLoaded: false, genericMessage: "Processing..."}); 
+    this.setState({month1Date : prevDate.toLocaleString('en-us', { month: 'short'}) + " " + prevDate.getFullYear(), month2Date: recordDate.toLocaleString('en-us', { month: 'short'}) + " " + recordDate.getFullYear()});
+    this.setState({previousMonth: previousDate.getMonth()+1, previousYear: previousDate.getFullYear(), nextMonth: nextDate.getMonth()+1, nextYear: nextDate.getFullYear()});
+    // milking information month 1
+   this.loadMilkingData(prevDate, recordDate, this.state.animalTag);
+    this.setState({previousDate: previousDate, nextDate: nextDate});
   }
 
   onExiting() {
@@ -96,8 +152,29 @@ class UpdateAnimal extends Component {
   componentDidMount() {
     const parsed = queryString.parse(this.props.location.search);
     this.setState({animalTag: parsed.animalTag, lifecycleStageList: [], orgID: parsed.orgID, invalidAccess: (parsed.animalTag ? false : true)});
-
+    this.setState({month1MilkingRecord: [], month2MilkingRecord: [], genericMessage1: "Processing...",genericMessage2: "Processing..."}); 
     this.setState({items: [], eventlist: [], isLoaded: false, genericMessage: "Processing...", eventAdditionalMessage: "Loading events ..."}); 
+
+    var recordDate = new Date();
+    var prevDate = null;
+    var previousDate = null;
+    var nextDate = null;
+    var recYear = (parsed.recYear ? parsed.recYear : recordDate.getFullYear() );
+    var recMonth = (parsed.recMonth  ? parsed.recMonth : recordDate.getMonth()+1);
+
+    if (parsed.recYear && parsed.recMonth) {
+      recordDate = new Date(recYear, recMonth, 1);
+    }
+
+    prevDate = new Date(recordDate);
+    prevDate.setMonth(recordDate.getMonth() - 1);
+    previousDate = new Date(prevDate);
+    previousDate.setMonth(previousDate.getMonth()-1);
+
+    nextDate = new Date(recordDate);
+    nextDate.setMonth(nextDate.getMonth()+1);
+
+
     fetch('http://localhost:8080/imd-farm-management/animals/search', {
         method: "POST",
         headers: {
@@ -193,31 +270,85 @@ class UpdateAnimal extends Component {
 
 
     // lifecycle event
-      this.setState({eventlist: [], isLoaded: false}); 
-      fetch('http://localhost:8080/imd-farm-management/animalevent/search', {
-          method: "POST",
-          headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            "animalTag": parsed.animalTag
-        })
-      })
-      .then(response => response.json())
-      .then(responseJson => {
-        if (responseJson.error) {
-           this.setState({eventlist: [], isLoaded: true, eventAdditionalMessage: responseJson.message, eventMessageColor: "danger"});
-        }
-        else {
-           this.setState({eventlist: responseJson, isLoaded: true, eventAdditionalMessage: (responseJson.length === 1 ? responseJson.length + " life time event found" : responseJson.length + " life time events found"), eventMessageColor: "success"});         
-        }
-      })
-      .catch(error => this.setState({eventAdditionalMessage: error.toString(), eventMessageColor: "danger"}));
+    this.setState({eventlist: [], isLoaded: false}); 
+    fetch('http://localhost:8080/imd-farm-management/animalevent/search', {
+        method: "POST",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        // body: JSON.stringify(jsonString)
 
+        body: JSON.stringify({
+          "animalTag": parsed.animalTag
+      })
+    })
+    .then(response => response.json())
+    .then(responseJson => {
+      if (responseJson.error) {
+         this.setState({eventlist: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+      }
+      else {
+         this.setState({eventlist: responseJson, isLoaded: true, eventAdditionalMessage: (responseJson.length === 1 ? responseJson.length + " life time event found" : responseJson.length + " life time events found"), messageColor: "success"});         
+      }
+    })
+    .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
 
+    this.setState({previousMonth: previousDate.getMonth()+1, previousYear: previousDate.getFullYear(), nextMonth: nextDate.getMonth()+1, nextYear: nextDate.getFullYear()});
+    this.loadMilkingData(prevDate, recordDate, parsed.animalTag);
+    this.setState({previousDate: previousDate, nextDate: nextDate});
 
   }
+
+  loadMilkingData(prevDate, recordDate, animalTag){
+    // milking information month 1
+    fetch('http://localhost:8080/imd-farm-management/animals/monthlymilkingrecord', {
+        method: "POST",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          "animalTag": animalTag,
+          "milkingDateStr": prevDate.getFullYear() + "-" + (prevDate.getMonth()+1) + "-" + "01"
+      })
+    })
+    .then(response => response.json())
+    .then(responseJson => {
+      if (responseJson.error) {
+         this.setState({month1MilkingRecord: [], isLoaded: true, genericMessage1: "Following error occurred while processing the request: " + responseJson.message, message1Color: "danger"});
+      }
+      else {
+         this.setState({month1MilkingRecord: responseJson, isLoaded: true, genericMessage1: (responseJson.length === 1 ? responseJson.length + " record found" : responseJson.length + " records found"), message1Color: "success"});         
+      }
+    })
+    .catch(error => this.setState({genericMessage1: "Following error occurred while processing the request: " + error.toString(), message1Color: "danger"}));
+
+    // milking information month 2
+    fetch('http://localhost:8080/imd-farm-management/animals/monthlymilkingrecord', {
+        method: "POST",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          "animalTag": animalTag,
+          "milkingDateStr": recordDate.getFullYear() + "-" + (recordDate.getMonth()+1) + "-" + "01"
+      })
+    })
+    .then(response => response.json())
+    .then(responseJson => {
+      if (responseJson.error) {
+         this.setState({month2MilkingRecord: [], isLoaded: true, genericMessage2: "Following error occurred while processing the request: " + responseJson.message, message2Color: "danger"});
+      }
+      else {
+         this.setState({month2MilkingRecord: responseJson, isLoaded: true, genericMessage2: (responseJson.length === 1 ? responseJson.length + " record found" : responseJson.length + " records found"), message2Color: "success"});         
+      }
+    })
+    .catch(error => this.setState({genericMessage2: "Following error occurred while processing the request: " + error.toString(), message2Color: "danger"}));
+
+  }
+
 
   handleLifecycleStage(event) {
     this.setState({animalType: event.target.value});
@@ -249,6 +380,7 @@ class UpdateAnimal extends Component {
 
   render() {
     var { activeIndex, invalidAccess, lifecycleStageList, sireList, eventAdditionalMessage, genericMessage, eventMessageColor, messageColor, items, eventlist} = this.state;
+    var { genericMessage1, genericMessage2, month1MilkingRecord, month2MilkingRecord, message1Color, message2Color} = this.state;
     let recordCount = 0;
     let eventRecordCount = 0;
     if (invalidAccess)
@@ -344,65 +476,122 @@ class UpdateAnimal extends Component {
                   </Card>
                 </Col>
               </Row>
-              <Row>
-                <Col md="8">
-                  <Card>
-                    <CardHeader><strong>Lifetime Production Information</strong></CardHeader>
-                    <CardBody>
-                      <Form action="" method="post" className="form-horizontal">
-                        <FormGroup row>
-                          <Label sm="4" htmlFor="input-normal">Lifetime Max</Label>
-                          <Col sm="8"> 39 liters (3 day average)
+
+
+        <Row size="sm">
+          <Col md="8">
+            <Card>
+              <CardHeader><strong>Milk Information # {this.state.animalTag}</strong></CardHeader>
+              <CardBody>
+                <Row>
+                  <Col sm="6">
+                    <Card>
+                      <FormText color={message1Color}>&nbsp;{genericMessage1}</FormText>
+                      <CardBody>
+                          <Row>
+                            <Col>
+                             <Table hover bordered striped responsive size="sm">
+                              <tr>
+                                <td colspan="5" align="center"> <a onClick={this.handlePrevious}><u>&lt;&lt;</u></a>&nbsp;&nbsp;<strong>{this.state.month1Date}</strong></td>
+                              </tr> 
+                              <tr>
+                                <th>Day</th>
+                                <th>1</th>
+                                <th>2</th>
+                                <th>3</th>
+                                <th>Total</th>
+                              </tr> 
+                               <tbody>
+                                 {month1MilkingRecord.map(milkingDayRec => (
+                                     <tr key="{milkingDayRec.milkingDate}">
+                                       <td>{milkingDayRec.milkingDate}</td>
+                                       <td title={milkingDayRec.event1Time + ", " + milkingDayRec.event1Temperature + " °C, " + milkingDayRec.event1Humidity + "%\n" + milkingDayRec.event1Comments}>{milkingDayRec.milkVol1}</td>
+                                       <td title={milkingDayRec.event2Time + ", " +milkingDayRec.event2Temperature + " °C, " + milkingDayRec.event2Humidity + "%\n" + milkingDayRec.event2Comments}>{milkingDayRec.milkVol2}</td>
+                                       <td title={milkingDayRec.event3Time + ", " +milkingDayRec.event3Temperature + " °C, " + milkingDayRec.event3Humidity + "%\n" + milkingDayRec.event3Comments}>{milkingDayRec.milkVol3}</td>
+                                       <td>{milkingDayRec.milkVol1 + milkingDayRec.milkVol2 + milkingDayRec.milkVol3}</td>                                       
+                                   </tr>
+                                   ))}
+                               </tbody>
+
+                             </Table>
                           </Col>
-                        </FormGroup>
-                        <FormGroup row>
-                          <Label sm="4" htmlFor="input-normal">Lifetime Average</Label>
-                          <Col sm="8">25 lpd
+                        </Row>
+                      </CardBody>
+                    </Card>
+                  </Col>
+                  <Col sm="6">
+                    <Card>
+                      <FormText color={message2Color}>&nbsp;{genericMessage2}</FormText>
+                      <CardBody>
+                          <Row>
+                            <Col>
+                               <Table hover bordered striped responsive size="sm">
+                                <tr>
+                                  <td colspan="5" align="center"><strong>{this.state.month2Date}</strong>&nbsp;&nbsp;<a onClick={this.handleNext} ><u>&gt;&gt;</u></a></td>
+                                </tr> 
+                                <tr>
+                                  <th>Day</th>
+                                  <th>1</th>
+                                  <th>2</th>
+                                  <th>3</th>
+                                  <th>Total</th>
+                                </tr> 
+                               <tbody>
+                                 {month2MilkingRecord.map(milkingDayRec => (
+                                     <tr key="{milkingDayRec.milkingDate}">
+                                       <td>{milkingDayRec.milkingDate}</td>
+                                       <td title={milkingDayRec.event1Time + ", " + milkingDayRec.event1Temperature + " °C, " + milkingDayRec.event1Humidity + "%\n" + milkingDayRec.event1Comments}>{milkingDayRec.milkVol1}</td>
+                                       <td title={milkingDayRec.event2Time + ", " +milkingDayRec.event2Temperature + " °C, " + milkingDayRec.event2Humidity + "%\n" + milkingDayRec.event2Comments}>{milkingDayRec.milkVol2}</td>
+                                       <td title={milkingDayRec.event3Time + ", " +milkingDayRec.event3Temperature + " °C, " + milkingDayRec.event3Humidity + "%\n" + milkingDayRec.event3Comments}>{milkingDayRec.milkVol3}</td>
+                                       <td>{milkingDayRec.milkVol1 + milkingDayRec.milkVol2 + milkingDayRec.milkVol3}</td>                                       
+                                   </tr>
+                                   ))}
+                               </tbody>
+
+                             </Table>
                           </Col>
-                        </FormGroup>
-                        <FormGroup row>
-                          <Label sm="10" htmlFor="input-normal">
-                            <a target="_blank" rel="noopener noreferrer" href={"/#/animal/milking/view?orgID=IMD&&animalTag=" + this.state.animalTag}>Click to view lifetime milking information</a>
-                          </Label>
-                        </FormGroup>
-                      </Form>                  
+                      </Row>
                     </CardBody>
                   </Card>
-                </Col>
-              </Row>
+                  </Col>
+                </Row>
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+
               <Row>
-                <Col md="12">
+                <Col md="10">
                   <Card>
                       <CardHeader>
-                      <i className="fa fa-align-justify"></i> Life Events<FormText color={eventMessageColor}>&nbsp;{eventAdditionalMessage}</FormText>
-                       <div className="card-header-actions">
-                         <Button color="link" className="card-header-action btn-minimize" data-target="#animaldata" ></Button>
-                       </div>
+                        <i className="fa fa-align-justify"></i>{"Life Events " + this.state.animalTag}<FormText color={eventMessageColor}>&nbsp;{eventAdditionalMessage}</FormText>
                       </CardHeader>
                       <CardBody>
                          <Table hover bordered striped responsive size="sm">
-                           <thead>
+                          <thead>
                               <tr>
                                 <th>#</th>
                                 <th>Timestamp</th>
                                 <th>Type</th>
                                 <th>Operator</th>
+                                <th>Day(s) Ago</th>
+                                <th>Age at Event</th>
                                 <th>Comments</th>
-                                <th>Additional Info</th>
                               </tr> 
-                           </thead>
-                           <tbody>
+                          </thead>
+                          <tbody>
                              {eventlist.map(item => (
                                  <tr key="{item.animalTag}">
                                    <td>{eventlist.length - ++eventRecordCount + 1}</td>
-                                   <td data-toggle="tooltip" title={item.eventTimeStamp.substring(item.eventTimeStamp.length-8).trim()}>{item.eventTimeStamp.substring(0,item.eventTimeStamp.length-8).trim()}</td>
-                                   <td>{item.eventShortDescription}</td>
+                                   <td width="10%" data-toggle="tooltip" title={item.eventTimeStamp.substring(item.eventTimeStamp.length-8).trim()}>{item.eventTimeStamp.substring(0,item.eventTimeStamp.length-8).trim()}</td>
+                                   <td><Link to={'/animal/event/update?eventTransactionID=' + item.eventTransactionID} >{item.eventShortDescription}</Link></td>
                                    <td>{item.eventOperator}</td>
-                                   <td>{item.eventComments}</td>
-                                   <td>{item.auxField1Value}</td>
+                                   <td>{item.daysFromToday}</td>
+                                   <td>{item.ageWhenOccurred}</td>
+                                   <td width="50%">{item.eventComments + " " + item.auxField1Value + " " + item.auxField2Value}</td>
                                </tr>
                                ))}
-                           </tbody>
+                          </tbody>
                          </Table>
                       </CardBody>
                   </Card>
