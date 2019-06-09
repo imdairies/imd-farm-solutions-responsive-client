@@ -173,6 +173,7 @@ class SearchSire extends Component {
                                 <th>#</th>
                                 <th>Name</th>
                                 <th>Code</th>
+                                <th>Use Count</th>
                                 <th>Controller</th>
                                 <th>Data Sheet</th>
                                 <th>photo</th>
@@ -184,6 +185,7 @@ class SearchSire extends Component {
                                    <td>{++recordCount}</td>
                                    <td>{item.alias}</td>
                                    <td>{item.animalTag}</td>
+                                   <th>xxx</th>
                                    <td>{item.controller}</td>
                                    <td width="25%"><a target="_blank" rel="noopener noreferrer" href={item.sireDataSheet}>View Data Sheet</a></td>
                                    <td><a target="_blank" rel="noopener noreferrer" href={item.sirePhoto} ><img src={item.sirePhoto} width="100" height="60" /></a></td>

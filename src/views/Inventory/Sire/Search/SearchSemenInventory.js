@@ -45,15 +45,17 @@ class SearchSemenInventory extends Component {
       fadeIn: true,
       timeout: 300,
       items: [],
+      allItems: [],
+      inStockItems: [],
       isLoaded: true,
       animalTag: "",
-      activeOnly: false,
+      instockOnly: false,
       messageColor: "muted",
       animaltypelist: [],
       eventAdditionalMessage: "Enter search fields (you can use % for wild card searches) and press Search button"
     };
     this.handleAnimalTagValue = this.handleAnimalTagValue.bind(this);
-    this.handleActiveOnly = this.handleActiveOnly.bind(this);
+    this.handleInstockOnly = this.handleInstockOnly.bind(this);
     this.handleAnimalTypeSelected = this.handleAnimalTypeSelected.bind(this);
     this.handleTabClick = this.handleTabClick.bind(this);
   }
@@ -67,12 +69,19 @@ class SearchSemenInventory extends Component {
     });
   }
 
-  handleActiveOnly() {
-    this.setState({activeOnly: !this.state.activeOnly});
+  handleInstockOnly() {
+    // alert(this.state.instockOnly);
+    this.setState({instockOnly: !this.state.instockOnly});
+    let index;
+    if (this.state.instockOnly)
+      this.setState({items: this.state.allItems});
+    else
+      this.setState({items: this.state.inStockItems});
   }
 
   componentDidMount() {
-    this.setState({items: [], isLoaded: false}); 
+    this.setState({items: [], inStockItems: [], allItems: [], isLoaded: false});
+    let inStockItems = [];
     fetch('http://localhost:8080/imd-farm-management/inventory/retrievallsiresinventory', {
         method: "POST",
         headers: {
@@ -89,10 +98,14 @@ class SearchSemenInventory extends Component {
     .then(response => response.json())
     .then(responseJson => {
       if (responseJson.error) {
-         this.setState({items: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
-      }
-      else {
-         this.setState({items: responseJson, isLoaded: true, eventAdditionalMessage: (responseJson.length === 1 ? responseJson.length + " matching record found" : responseJson.length + " matching records found"), messageColor: "success"});         
+         this.setState({items: [], allItems: [], inStockItems: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+      } else {
+        this.setState({items: responseJson, allItems: responseJson, isLoaded: true, eventAdditionalMessage: (responseJson.length === 1 ? responseJson.length + " matching record found" : responseJson.length + " matching records found"), messageColor: "success"});
+        for (let index = 0; index < responseJson.length; index++) {
+          if (responseJson[index].conventionalStock > 0 || responseJson[index].sexedStock > 0)
+            inStockItems.push(responseJson[index]);
+        }
+        this.setState({inStockItems: inStockItems});
       }
     })
     .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -116,12 +129,12 @@ class SearchSemenInventory extends Component {
   }
 
   render() {
-    var { isLoaded, items, animaltypelist, eventAdditionalMessage, messageColor } = this.state;
+    var { isLoaded, items, inStockItems, allItems, animaltypelist, eventAdditionalMessage, messageColor } = this.state;
     let recordCount = 0;
     return (
       <div className="animated fadeIn">
          <Row>
-            <Col xs="6" md="8">
+            <Col xs="6" md="10">
                <Fade timeout={this.state.timeout} in={this.state.fadeIn}>
                   <Card>
                        <CardBody>
@@ -140,30 +153,14 @@ class SearchSemenInventory extends Component {
                           </NavItem>
                         </Nav>
                         <Card>
-                          <CardHeader><strong>In Stock</strong></CardHeader>
-                          <CardBody>
-                            <Table hover bordered responsive size="sm">
-                              <thead>
-                                <tr>
-                                  <th width="10">Total:</th>
-                                  <th width="10">nn</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr>
-                                  <td width="10">Conventional:</td>
-                                  <td width="10">nn</td>
-                                </tr>
-                                <tr>
-                                  <td width="10">Sexed:</td>
-                                  <td width="10">nn</td>
-                                </tr>
-                              </tbody>
-                            </Table>
-                          </CardBody>
-                        </Card>
-                        <Card>
-                          <CardHeader><strong>Stock Detail</strong></CardHeader>
+                          <CardHeader>
+                          <FormGroup check className="checkbox" row>
+                          <Col>
+                            <Input className="form-check-input" type="checkbox" id="instockOnly" name="instockOnly" value="instockOnly"  onClick={this.handleInstockOnly} />
+                            <Label check className="form-check-label" htmlFor="checkbox1">Show in-stock only</Label>
+                          </Col>
+                          </FormGroup>
+                          </CardHeader>
                           <CardBody>
                            <Table hover bordered striped responsive size="sm">
                              <thead>
@@ -174,6 +171,8 @@ class SearchSemenInventory extends Component {
                                   <th>Controller</th>
                                   <th>Stock Conv</th>
                                   <th>Stock Sexed</th>
+                                  <th>Successful</th>
+                                  <th>Failed</th>
                                   <th>Data Sheet</th>
                                   <th>photo</th>
                                 </tr> 
@@ -187,6 +186,8 @@ class SearchSemenInventory extends Component {
                                      <td>{item.controller}</td>
                                      <td><font color={item.conventionalStock > 0 ? "blue" : ""}>{item.conventionalStock > 0 ? item.conventionalStock: "-"}</font></td>
                                      <td><font color={item.sexedStock > 0 ? "blue" : ""}>{item.sexedStock > 0 ? item.sexedStock: "-"}</font></td>
+                                     <td>XXX</td>
+                                     <td>YYY</td>
                                      <td width="25%"><a target="_blank" rel="noopener noreferrer" href={item.sireDataSheet}>View Data Sheet</a></td>
                                      <td><a target="_blank" rel="noopener noreferrer" href={item.sirePhoto} ><img src={item.sirePhoto} width="100" height="60" /></a></td>
                                  </tr>

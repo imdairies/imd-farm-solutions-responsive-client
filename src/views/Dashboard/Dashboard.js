@@ -148,20 +148,8 @@ const currentHerdChartOpts = {
   },
 };
 
-// Card Chart 3
-const currentHeifersChart = {
-  labels: ['March', 'April', 'May', 'June', 'July','August','September','October','November','December','January', 'February'],
-  datasets: [
-    {
-      label: 'Total Active Herd',
-      backgroundColor: 'rgba(255,255,255,.2)',
-      borderColor: 'rgba(255,255,255,.55)',
-      data: [31,31,30,29,31,31, 35, 35, 35, 34, 34, 36],
-    },
-  ],
-};
 
-const currentHeifersChartOpts = {
+var herdSizeHistoryOpts = {
   tooltips: {
     enabled: false,
     custom: CustomTooltips
@@ -367,16 +355,19 @@ function random(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
+// Card Chart 3
+
+
   var elements = 31;
   var data1 = [];
   var data2 = [];
   var data3 = [];
 
-  for (var i = 0; i <= elements; i++) {
-    data1.push(random(10, 24));
-    data2.push(random(10, 24));
-    data3.push(18);
-  }
+  // for (var i = 0; i <= elements; i++) {
+  //   data1.push(random(10, 24));
+  //   data2.push(random(10, 24));
+  //   data3.push(18);
+  // }
 
 var mainChart = {
   labels: [],
@@ -551,6 +542,18 @@ class Dashboard extends Component {
 
   componentDidMount() {
       let now =  new Date();
+      let herdSizeHistory = {
+        datasets: [
+          {
+            label: 'Active Herd Size',
+            backgroundColor: 'rgba(255,255,255,.5)',
+            borderColor: 'rgba(255,255,255,0.55)',
+            // data: [0,2,46,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,0,64,66,68,70,72],
+          },
+        ],
+      };
+      // this.setState({herdSizeTrend: herdSizeHistory});
+
 
       fetch('http://localhost:8080/imd-farm-management/animals/allactive')
       .then(response => response.json())
@@ -684,6 +687,35 @@ class Dashboard extends Component {
           }
         })
         .catch(error => this.setState({lactatingAnimalCount: -999,  lactatingAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : error.toString())}));
+
+        // background graph that shows herd size growth trend
+      fetch('http://localhost:8080/imd-farm-management/farm/herdsizehistory', {
+              method: "POST",
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                "start": "2017-01-01",
+                "end": now.getFullYear() + "-" + (now.getMonth()+1) + "-1",
+                "steps": 0
+            })
+          })
+       .then(response => response.json())
+        .then(responseJson => {
+          if (responseJson.error) {
+            this.setState({herdSize: -999, activeAnimalWidgetMessage: responseJson.message});
+          }
+          else {
+            // alert(responseJson.months);
+            herdSizeHistory.labels = responseJson.months;
+            herdSizeHistory.datasets[0].data = responseJson.herdCounts;
+            this.setState({herdSizeTrend: herdSizeHistory});
+          }
+        })
+        .catch(error => this.setState({herdSize: -999,  activeAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : error.toString())}));
+
+
    }
 
 
@@ -860,7 +892,7 @@ class Dashboard extends Component {
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
 
   render() {
-    var {previousPreviousMonth, previsousMonth, currentMonth, currentYear} = this.state;
+    var {herdSizeTrend, previousPreviousMonth, previsousMonth, currentMonth, currentYear} = this.state;
 
     return (
       <div className="animated fadeIn">
@@ -881,11 +913,9 @@ class Dashboard extends Component {
                 <div className="text-value">{this.state.herdSize + " " + this.state.activeAnimalWidgetMessage}</div>
                 <div> <Link to={"/animal/search?searchCode=lactatingcows"} style={{color: '#FFF' }} > <i className="fa fa-arrow-circle-right"></i></Link> {this.state.lactatingAnimalWidgetMessage + ': '} {this.state.lactatingAnimalCount} </div>
                 <div> <Link to={"/animal/search?searchCode=pregnantcows"} style={{color: '#FFF' }} >  <i className="fa fa-arrow-circle-right"></i></Link> {this.state.pregnantAnimalWidgetMessage  + ': '} {this.state.pregnantCount} </div>
-                <div> <Link to={"/animal/search?searchCode=heifers"} style={{color: '#FFF' }} >      <i className="fa fa-arrow-circle-right"></i></Link> {this.state.heiferWidgetMessage + ': '} {this.state.heiferCount} </div>
-                <div> <Link to={"/animal/search?searchTypeCD=FEMALECALF"} style={{color: '#FFF' }} > <i className="fa fa-arrow-circle-right"></i></Link> {this.state.femaleCalfWidgetMessage + ': '}<strong> {this.state.femaleCalfCount + '  '}</strong> </div>
               </CardBody>
-              <div className="chart-wrapper" style={{ height: '30px' }}>
-                <Line data={currentHeifersChart} options={currentHeifersChartOpts} height={30} />
+              <div className="chart-wrapper" style={{ height: '50px' }}>
+                <Line data={herdSizeTrend} options={herdSizeHistoryOpts} height={30} />
               </div>
             </Card>
           </Col>

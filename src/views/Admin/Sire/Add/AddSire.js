@@ -223,7 +223,7 @@ class AddSire extends Component {
     if (event.target.id === "animalTag")
       this.setState({animalTag: event.target.value});
     else if (event.target.id === "alias")
-      this.setState({alias:event.target.value});
+      this.setState({alias:event.target.value.toUpperCase()});
     else if (event.target.id === "recordURL")
       this.setState({recordURL: event.target.value});
     else if (event.target.id === "photoURL")
@@ -303,15 +303,15 @@ setupFarmSireInformation() {
 
   handleAdd(event) {
     event.preventDefault();
-    let animalTag = document.getElementById("animalTag").value;
-    let alias = document.getElementById("alias").value;
-    let controller = this.state.controller;
 
-    if (controller === "") {
+    if (this.state.sireOrignDescription === ""){
+      this.setState({messageColor: "danger", message: "Please enter a valid Sire Origin"});
+    } else if (this.state.animalTag === "") {
+      this.setState({messageColor: "danger", message: "Please enter a valid Sire Code/Tag"});
+    } else if (this.state.alias === "") {
+      this.setState({messageColor: "danger", message: "Please enter sire name/alias"});
+    } else if (this.state.controller === "") {
       this.setState({messageColor: "danger", message: "Please select a controller"});
-    } else if (animalTag === "") {
-      this.setState({messageColor: "danger", message: "Please enter a valid Animal Tag"});
-      document.getElementById("animalTag").focus();
     } else {
       this.setState({message: "Processing ..."
       });
@@ -323,7 +323,7 @@ setupFarmSireInformation() {
           },
           body: JSON.stringify({
             "animalTag": this.state.animalTag,
-            "alias": alias,
+            "alias": this.state.alias.toUpperCase(),
             "breed": this.state.breed,
             "semenInd": (this.state.isExternalSire ? "Y" : "N"),
             "recordURL" : this.state.recordURL,

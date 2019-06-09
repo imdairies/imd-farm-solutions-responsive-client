@@ -6,6 +6,7 @@ import {
   Label,  Dropdown, DropdownToggle, DropdownMenu, Table, DropdownItem,
   Carousel, UncontrolledCarousel, CarouselCaption, CarouselControl, CarouselIndicators, CarouselItem
 } from 'reactstrap';
+// import ViewMilking  from '../Milking/View';
 import { Redirect } from 'react-router-dom';
 import queryString from 'query-string';
 import { Link } from 'react-router-dom';
@@ -53,6 +54,7 @@ class UpdateAnimal extends Component {
       month2MilkingRecord: [],
       genericMessage1: "Processing ...",
       genericMessage2: "Processing ...",
+      feedCohort: "",
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleUpdate = this.handleUpdate.bind(this);
@@ -294,9 +296,39 @@ class UpdateAnimal extends Component {
     })
     .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
 
+
+  // Feed Analysis
+    this.setState({feedCohort: "Undetermined"}); 
+    fetch('http://localhost:8080/imd-farm-management/feed/determineanimalfeed', {
+        method: "POST",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          "animalTag": parsed.animalTag
+      })
+    })
+    .then(response => response.json())
+    .then(responseJson => {
+      if (responseJson.error) {
+         this.setState({feedAnalysisMessage: responseJson.message, feedAnalysisMessageColor: "danger"});
+      }
+      else {
+         this.setState({feedCohort: responseJson[0].animalFeedCohortDeterminatationMessage, feedAnalysisMessage: "", feedAnalysisMessageColor: "success"});         
+      }
+    })
+    .catch(error => this.setState({feedAnalysisMessage: error.toString(), feedAnalysisMessageColor: "danger"}));
+
+
+
+
     this.setState({previousMonth: previousDate.getMonth()+1, previousYear: previousDate.getFullYear(), nextMonth: nextDate.getMonth()+1, nextYear: nextDate.getFullYear()});
     this.loadMilkingData(prevDate, recordDate, parsed.animalTag);
     this.setState({previousDate: previousDate, nextDate: nextDate});
+
+
+
 
   }
 
@@ -379,7 +411,7 @@ class UpdateAnimal extends Component {
 
 
   render() {
-    var { activeIndex, invalidAccess, lifecycleStageList, sireList, eventAdditionalMessage, genericMessage, eventMessageColor, messageColor, items, eventlist} = this.state;
+    var { activeIndex, invalidAccess, lifecycleStageList, sireList, feedAnalysisMessageColor, feedAnalysisMessage, eventAdditionalMessage, genericMessage, eventMessageColor, messageColor, items, eventlist} = this.state;
     var { genericMessage1, genericMessage2, month1MilkingRecord, month2MilkingRecord, message1Color, message2Color} = this.state;
     let recordCount = 0;
     let eventRecordCount = 0;
@@ -476,7 +508,22 @@ class UpdateAnimal extends Component {
                   </Card>
                 </Col>
               </Row>
-
+              <Row>
+                <Col md="8">
+                  <Card>
+                    <CardHeader>
+                      <i className="fa fa-align-justify"></i><strong>Feed Information</strong><FormText color={feedAnalysisMessageColor}>&nbsp;{feedAnalysisMessage}</FormText>
+                    </CardHeader>
+                    <CardBody>
+                      <Form action="" method="post" className="form-horizontal">
+                        <FormGroup row>
+                          <Col sm="10">{this.state.feedCohort}</Col>
+                        </FormGroup>
+                      </Form>
+                    </CardBody>
+                  </Card>
+                </Col>
+              </Row>
 
         <Row size="sm">
           <Col md="8">

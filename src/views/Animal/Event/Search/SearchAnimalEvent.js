@@ -149,7 +149,7 @@ class SearchAnimalEvent extends Component {
            this.setState({eventlist: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
         }
         else {
-           this.setState({eventlist: responseJson, isLoaded: true, eventAdditionalMessage: (responseJson.length === 1 ? responseJson.length + " life time event found" : responseJson.length + " life time events found"), messageColor: "success"});         
+           this.setState({eventlist: responseJson, isLoaded: true, eventAdditionalMessage: (responseJson.length === 1 ? responseJson.length + " life time event found" : responseJson.length + " life time events found"), messageColor: "success"});
         }
       })
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -260,6 +260,7 @@ class SearchAnimalEvent extends Component {
                                 <th>Operator</th>
                                 <th>Day(s) Ago</th>
                                 <th>Age at Event</th>
+                                <th>Auxilliary Info</th>
                                 <th>Comments</th>
                               </tr> 
                            </thead>
@@ -272,7 +273,8 @@ class SearchAnimalEvent extends Component {
                                    <td>{item.eventOperator}</td>
                                    <td>{item.daysFromToday}</td>
                                    <td>{item.ageWhenOccurred}</td>
-                                   <td width="50%">{item.eventComments + " " + item.auxField1Value + " " + item.auxField2Value}</td>
+                                   <td>{item.formattedComments}</td>
+                                   <td width="50%">{item.eventComments}</td>
                                </tr>
                                ))}
                            </tbody>

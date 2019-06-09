@@ -849,7 +849,7 @@ class AddAnimalEvent extends Component {
                             </Dropdown>
                           </Col>
                           <Col sm="2">
-                            {this.state.field1DataUnit}
+                            &nbsp;
                           </Col>
                         </FormGroup>
 
@@ -872,7 +872,7 @@ class AddAnimalEvent extends Component {
                             </InputGroup>
                           </Col>
                           <Col sm="2">
-                            {this.state.field1DataUnit}
+                            &nbsp;
                           </Col>
                         </FormGroup>
 
@@ -919,7 +919,7 @@ class AddAnimalEvent extends Component {
                             </Dropdown>
                           </Col>
                           <Col sm="2">
-                            {this.state.field2DataUnit}
+                            &nbsp;
                           </Col>
                         </FormGroup>
 
@@ -942,7 +942,7 @@ class AddAnimalEvent extends Component {
                             </InputGroup>
                           </Col>
                           <Col sm="2">
-                            {this.state.field2DataUnit}
+                            &nbsp;
                           </Col>
                         </FormGroup>
 
@@ -992,7 +992,7 @@ class AddAnimalEvent extends Component {
                             </Dropdown>
                           </Col>
                           <Col sm="2">
-                            {this.state.field3DataUnit}
+                            &nbsp;
                           </Col>
                         </FormGroup>
 
@@ -1015,7 +1015,7 @@ class AddAnimalEvent extends Component {
                             </InputGroup>
                           </Col>
                           <Col sm="2">
-                            {this.state.field3DataUnit}
+                            &nbsp;
                           </Col>
                         </FormGroup>
 
@@ -1063,7 +1063,7 @@ class AddAnimalEvent extends Component {
                             </Dropdown>
                           </Col>
                           <Col sm="2">
-                            {this.state.field4DataUnit}
+                            &nbsp;
                           </Col>
                         </FormGroup>
 
@@ -1086,19 +1086,14 @@ class AddAnimalEvent extends Component {
                             </InputGroup>
                           </Col>
                           <Col sm="2">
-                            {this.state.field4DataUnit}
+                            &nbsp;
                           </Col>
                         </FormGroup>
-
-
-
-
-
 
                         <FormGroup row style={commentsFieldDisplay} >
                           <Label sm="4" htmlFor="input-normal" >Comments</Label>
                           <Col sm="6">
-                            <Input id="field2" type="textarea" name="comments" rows="2" value={this.state.commentsValue} onChange={this.handleCommentsChanged} />
+                            <Input id="eventComments" type="textarea" name="comments" rows="2" value={this.state.commentsValue} onChange={this.handleCommentsChanged} />
                           </Col>
                         </FormGroup>
 

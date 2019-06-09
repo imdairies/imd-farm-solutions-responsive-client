@@ -50,6 +50,7 @@ class AddAnimal extends Component {
       gender : "-- Select Gender --",
       dobAccuracyInd: "No",
       timestampOfBirth: new Date(),
+      timestampOfJoining: new Date(),
       sireList:[],
       animalSireAlias: "-- Select Sire --",
       animalSireTag: "",
@@ -66,6 +67,7 @@ class AddAnimal extends Component {
     this.handleAdd = this.handleAdd.bind(this);
     this.handleTabClick = this.handleTabClick.bind(this);   
     this.handleTimestampChanged = this.handleTimestampChanged.bind(this);
+    this.handleJoiningTimestampChanged = this.handleJoiningTimestampChanged.bind(this);
     this.handleAnimalTypeSelected = this.handleAnimalTypeSelected.bind(this);
     this.handleGenderChanged = this.handleGenderChanged.bind(this);
     this.handleDOBAccuracyIndChanged = this.handleDOBAccuracyIndChanged.bind(this);
@@ -211,6 +213,11 @@ class AddAnimal extends Component {
   handleTabClick(targetID) {
    //alert(targetID + " was clicked");
   }
+
+  handleJoiningTimestampChanged(newValue) {
+    this.setState({timestampOfJoining: newValue});    
+  }
+
   handleTimestampChanged(newValue) {
     this.setState({timestampOfBirth: newValue});
   }
@@ -233,18 +240,16 @@ class AddAnimal extends Component {
 
   handleAdd(event) {
     event.preventDefault();
-    let animalTag = document.getElementById("animalTag").value;
-    let alias = document.getElementById("alias").value;
-    let breed = this.state.breed;
-    let gender = this.state.gender;
-
-    if (animalTag.length === 0) {
-      this.setState({messageColor: "danger", message: "Please enter a valid Animal Tag"});
+ 
+    if (this.state.animalTag === "" || this.state.animalTag.trim().length === 0) {
+      this.setState({messageColor: "danger", message: "Please enter a valid animal Tag"});
       document.getElementById("animalTag").focus();
-    } else if (gender === "-- Select Gender --" || gender.length === 0) {
-      this.setState({messageColor: "danger", message: "Please select the animal gender"});
-    } else if (breed === "-- Select Breed --" || breed.length === 0) {
+    } else if (this.state.breed === "-- Select Breed --" || this.state.breed.length === 0) {
       this.setState({messageColor: "danger", message: "Please select the animal breed"});
+    } else if (this.state.gender === "-- Select Gender --" || this.state.gender.length === 0) {
+      this.setState({messageColor: "danger", message: "Please select the animal gender"});
+    } else if (this.state.animalType === "-- Select Gender --" || this.state.animalType.length === 0) {
+      this.setState({messageColor: "danger", message: "Please select the animal type"});
     } else {
       this.setState({message: "Processing ..."
       });
@@ -256,13 +261,14 @@ class AddAnimal extends Component {
           },
           body: JSON.stringify({
             "animalTag": this.state.animalTag,
-            "alias": alias,
-            "breed" : breed,
+            "alias": this.state.alias,
+            "breed" : this.state.breed,
             "gender" : (this.state.gender == "Female" ? "F" : "M"),
             "dobAccuracyInd" : (this.state.dobAccuracyInd == "Yes" ? "Y" : "N"),
             "sire" : (this.state.animalSireAlias == "-- Select Sire --"  ? null : this.state.animalSireTag),
             "dam" : (this.state.animalDamTag == "-- Select Dam --"  ? null : this.state.animalDamTag),
             "dateOfBirthStr": this.state.timestampOfBirth.toLocaleString(),
+            "herdJoiningDttmStr": this.state.timestampOfJoining.toLocaleString(),
             "aiInd": this.state.aiIndicator,
             "animalType": (this.state.animalType === "-- Animal Type --" ? null : this.state.animalType)
             // "eventLongDescription": longDescr,
@@ -380,6 +386,14 @@ class AddAnimal extends Component {
                             </InputGroup>
                           </Col>
                         </FormGroup>
+
+                        <FormGroup row>
+                          <Label sm="4" htmlFor="input-normal">Herd Joining Date</Label>
+                          <Col sm="8">
+                            <DateTimePicker onChange={this.handleJoiningTimestampChanged} value={this.state.timestampOfJoining} required showLeadingZeros />
+                          </Col>
+                        </FormGroup>
+
                         <FormGroup row>
                           <Label sm="4" htmlFor="input-normal">Animal Type</Label>
                           <Col>

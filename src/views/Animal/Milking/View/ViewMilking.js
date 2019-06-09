@@ -1,11 +1,17 @@
 import React, { Component } from 'react';
+import { Bar, Line } from 'react-chartjs-2';
+
 
 import {
   Button,
+  ButtonDropdown,
+  ButtonGroup,
+  ButtonToolbar,
   Card,
   CardBody,
   CardFooter,
   CardHeader,
+  CardTitle,
   Col,
   Fade,
   Form,
@@ -26,8 +32,96 @@ import {
 import queryString from 'query-string';
 import classnames from 'classnames';
 import { Redirect, Link, Route } from 'react-router-dom';
+import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
+import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities'
+var data1 = [];
+var data2 = [];
+var data3 = [];
+const brandPrimary = getStyle('--primary')
+const brandSuccess = getStyle('--success')
+const brandInfo = getStyle('--info')
+const brandWarning = getStyle('--warning')
+const brandDanger = getStyle('--danger')
 
 
+var mainChart = {
+  labels: [],
+  datasets: [
+    {
+      label: 'ltr/day',
+      backgroundColor: hexToRgba(brandInfo, 10),
+      borderColor: brandInfo,
+      pointHoverBackgroundColor: '#fff',
+      borderWidth: 2,
+      data: data1
+    },
+    {
+      label: 'month avg',
+      backgroundColor: 'transparent',
+      borderColor: brandSuccess,
+      pointHoverBackgroundColor: '#fff',
+      borderWidth: 2,
+      data: data2
+    },
+    // {
+    //   label: 'Milk Volume',
+    //   backgroundColor: 'transparent',
+    //   borderColor: brandDanger,
+    //   pointHoverBackgroundColor: '#fff',
+    //   borderWidth: 1,
+    //   borderDash: [8, 5],
+    //   data: data3
+    //   // data: [],
+    // },
+  ],
+};
+
+
+var mainChartOpts = {
+  tooltips: {
+    enabled: false,
+    custom: CustomTooltips,
+    intersect: true,
+    mode: 'index',
+    position: 'nearest',
+    callbacks: {
+      labelColor: function(tooltipItem, chart) {
+        return { backgroundColor: chart.data.datasets[tooltipItem.datasetIndex].borderColor }
+      }
+    }
+  },
+  maintainAspectRatio: false,
+  legend: {
+    display: false,
+  },
+  scales: {
+    xAxes: [
+      {
+        gridLines: {
+          drawOnChartArea: false,
+        },
+      }],
+    yAxes: [
+      {
+        ticks: {
+          beginAtZero: true,
+          maxTicksLimit: 5,
+//          stepSize: Math.ceil(250 / 5),
+          stepSize: Math.ceil(2),
+          max: 40,
+          min: 0,
+        },
+      }],
+  },
+  elements: {
+    point: {
+      radius: 0,
+      hitRadius: 10,
+      hoverRadius: 4,
+      hoverBorderWidth: 3,
+    },
+  },
+};
 
 class ViewMilking extends Component {
   constructor(props) {
@@ -59,7 +153,9 @@ class ViewMilking extends Component {
    //alert(targetID + " was clicked");
   }
   componentDidMount() {
+
     const parsed = queryString.parse(this.props.location.search);
+    let now =  new Date();
     var recordDate = new Date();
     var prevDate = null;
     var previousDate = null;
@@ -88,6 +184,18 @@ class ViewMilking extends Component {
 
   }
   loadMilkingData(prevDate, recordDate, animalTag){
+    var max1 = 0.0;
+    var sum1 = 0.0;
+    var dayVolume1 = 0.0;
+    var average1 = 0.0;
+
+    var max2 = 0.0;
+    var sum2 = 0.0;
+    var dayVolume2 = 0.0;
+    var average2 = 0.0;
+
+    this.setState({month1MilkingRecord: [], month1Sum: sum1, month1Max: max1, month1Avg: average1, isLoaded: false, genericMessage1: ""});
+    this.setState({month2MilkingRecord: [], month2Sum: sum2, month2Max: max2, month2Avg: average2, isLoaded: false, genericMessage2: ""});
     // milking information month 1
     fetch('http://localhost:8080/imd-farm-management/animals/monthlymilkingrecord', {
         method: "POST",
@@ -106,10 +214,18 @@ class ViewMilking extends Component {
          this.setState({month1MilkingRecord: [], isLoaded: true, genericMessage1: "Following error occurred while processing the request: " + responseJson.message, message1Color: "danger"});
       }
       else {
-         this.setState({month1MilkingRecord: responseJson, isLoaded: true, genericMessage1: (responseJson.length === 1 ? responseJson.length + " record found" : responseJson.length + " records found"), message1Color: "success"});         
+        for (let i = 0; i<responseJson.length; i++) {
+          dayVolume1 = (responseJson[i].milkVol1 === "" ? 0 : responseJson[i].milkVol1) + (responseJson[i].milkVol2 === "" ? 0 : responseJson[i].milkVol2) + (responseJson[i].milkVol3 === "" ? 0 : responseJson[i].milkVol3);
+          sum1 = sum1 + dayVolume1;
+          if (dayVolume1 > max1) 
+            max1 = dayVolume1;
+        }
+        average1 = Math.round((sum1 / responseJson.length)*100)/100;
+        this.setState({month1MilkingRecord: responseJson, month1Sum: sum1, month1Max: max1, month1Avg: average1, isLoaded: true, genericMessage1: (responseJson.length === 1 ? responseJson.length + " record found" : responseJson.length + " records found"), message1Color: "success"});
       }
     })
     .catch(error => this.setState({genericMessage1: "Following error occurred while processing the request: " + error.toString(), message1Color: "danger"}));
+
 
     // milking information month 2
     fetch('http://localhost:8080/imd-farm-management/animals/monthlymilkingrecord', {
@@ -129,10 +245,67 @@ class ViewMilking extends Component {
          this.setState({month2MilkingRecord: [], isLoaded: true, genericMessage2: "Following error occurred while processing the request: " + responseJson.message, message2Color: "danger"});
       }
       else {
-         this.setState({month2MilkingRecord: responseJson, isLoaded: true, genericMessage2: (responseJson.length === 1 ? responseJson.length + " record found" : responseJson.length + " records found"), message2Color: "success"});         
+        for (let i = 0; i<responseJson.length; i++) {
+          dayVolume2 = (responseJson[i].milkVol1 === "" ? 0 : responseJson[i].milkVol1) + (responseJson[i].milkVol2 === "" ? 0 : responseJson[i].milkVol2) + (responseJson[i].milkVol3 === "" ? 0 : responseJson[i].milkVol3);
+          sum2 = sum2 + dayVolume2;
+          if (dayVolume2 > max2) 
+            max2 = dayVolume2;
+        }
+        // average = Math.round(((sum / responseJson.length)*10)/10);
+        average2 = Math.round((sum2 / responseJson.length)*100)/100;
+        this.setState({month2MilkingRecord: responseJson, month2Sum: sum2, month2Max: max2, month2Avg: average2, isLoaded: true, genericMessage2: (responseJson.length === 1 ? responseJson.length + " record found" : responseJson.length + " records found"), message2Color: "success"});
+        // this.setState({month2MilkingRecord: responseJson, isLoaded: true, genericMessage2: (responseJson.length === 1 ? responseJson.length + " record found" : responseJson.length + " records found"), message2Color: "success"});         
       }
     })
     .catch(error => this.setState({genericMessage2: "Following error occurred while processing the request: " + error.toString(), message2Color: "danger"}));
+
+
+    fetch('http://localhost:8080/imd-farm-management/milkinginfo/milkingrecordofananimalforspecifiedmonthpair', {
+            method: "POST",
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              "animalTag": animalTag,
+              "milkingDateStr": prevDate.getFullYear() + "-" + (prevDate.getMonth()+1) + "-" + "01"
+          })
+        })
+     .then(response => response.json())
+      .then(responseJson => {
+        if (responseJson.error) {
+           this.setState({genericMessage: responseJson.message});
+        }
+        else {
+          let averageMonth = [];
+          let day = 0;
+          let secondMonth = false;
+           for (let i = 0; i< responseJson[0].volumes.length; i++){
+              if (day > responseJson[0].days[i]) {
+                secondMonth = true;
+              } else {
+                day = responseJson[0].days[i];
+              }
+             averageMonth.push(secondMonth ? average2: average1);
+           }
+           mainChart.labels = responseJson[0].days;
+           mainChart.datasets[0].data = responseJson[0].volumes;
+           mainChart.datasets[1].data = averageMonth;
+           //mainChart.datasets[1].data = responseJson[0].volumes;
+           mainChartOpts.scales.yAxes = [{ ticks: {
+                                        beginAtZero: true,
+                                        maxTicksLimit: 5,
+                                        stepSize: 5,
+                                        max: 40,
+                                        min: 0,
+                                      },
+                                    }];
+           this.setState({monthVolumes: responseJson[0].volumes, monthDays:responseJson[0].days});
+
+        }
+      })
+      .catch(error => this.setState({genericMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : error.toString())}));
+
 
   }
 
@@ -183,7 +356,7 @@ class ViewMilking extends Component {
 
 
   render() {
-    var { invalidAccess, genericMessage1, genericMessage2, month1MilkingRecord, month2MilkingRecord, message1Color, message2Color} = this.state;
+    var { previousPreviousMonth, previsousMonth, currentMonth, currentYear, invalidAccess, genericMessage1, genericMessage2, month1MilkingRecord, month2MilkingRecord, message1Color, message2Color} = this.state;
     let recordCount = 0;
     let eventRecordCount = 0;
     // if (invalidAccess)
@@ -209,8 +382,26 @@ class ViewMilking extends Component {
               <CardHeader><strong>Milk Information # {this.state.animalTag}</strong></CardHeader>
               <CardBody>
                 <Row>
+                    <Col>
+                      <Card>
+                        <CardBody>
+                          <Row>
+                            <Col sm="5">
+                              <CardTitle className="mb-0">{this.state.chartTitle}</CardTitle>
+                              <div className="small text-muted">{this.state.chartSubTitle}</div>
+                            </Col>
+                          </Row>
+                        <div className="chart-wrapper" style={{ height: 300 + 'px', marginTop: 40 + 'px' }}>
+                          <Line data={mainChart} options={mainChartOpts} height={300} />
+                        </div>
+                      </CardBody>
+                    </Card>
+                  </Col>
+                </Row>
+                <Row>
                   <Col sm="6">
                     <Card>
+                      <FormGroup><strong>Total:</strong> {this.state.month1Sum}, <strong>Max:</strong> {this.state.month1Max}, <strong>Avg:</strong> {this.state.month1Avg}</FormGroup>
                       <FormText color={message1Color}>&nbsp;{genericMessage1}</FormText>
                       <CardBody>
                           <Row>
@@ -246,6 +437,7 @@ class ViewMilking extends Component {
                   </Col>
                   <Col sm="6">
                     <Card>
+                      <FormGroup><strong>Total:</strong> {this.state.month2Sum}, <strong>Max:</strong> {this.state.month2Max}, <strong>Avg:</strong> {this.state.month2Avg}</FormGroup>
                       <FormText color={message2Color}>&nbsp;{genericMessage2}</FormText>
                       <CardBody>
                           <Row>
