@@ -50,6 +50,7 @@ class AddAnimalEvent extends Component {
       operator: "-- Select Operator --",
       operatorID:"",
       alias: "",
+      dirty: false,
       longdescription: "",
       messageColor: "muted",
       timestamp: new Date(),
@@ -115,7 +116,6 @@ class AddAnimalEvent extends Component {
     this.handleField2Changed = this.handleField2Changed.bind(this);
     this.handleField3Changed = this.handleField3Changed.bind(this);
     this.handleField4Changed = this.handleField4Changed.bind(this);
-    this.handleDateChanged = this.handleDateChanged.bind(this);
     this.handleOperatorSelected = this.handleOperatorSelected.bind(this);
     this.handleAdd = this.handleAdd.bind(this);
     this.handleTabClick = this.handleTabClick.bind(this); 
@@ -140,15 +140,13 @@ class AddAnimalEvent extends Component {
       this.setState({shouldUpdateInventoryValue: event.target.value});
   }
 
-  handleDateChanged(event) {
-      this.setState({eventDate: event.target.value});
-  }
 
   handleTabClick(targetID) {
   }
 
   handleTimestampChanged(newValue) {
     this.setState({timestamp: newValue});
+    document.getElementById("addButton").disabled = false;
   }
   
   handleField1DropdownValueChanged(event) {
@@ -243,6 +241,7 @@ class AddAnimalEvent extends Component {
 
   handleAnimalTagChanged(event) {
     this.setState({animalTag: event.target.value});
+    document.getElementById("addButton").disabled = false;
   }
   handleOperatorSelected(event) {
     this.setState({operator: event.target.value, operatorID: event.target.id});
@@ -251,6 +250,7 @@ class AddAnimalEvent extends Component {
   handleEventSelected(event) {
 
     this.setState({field1Value: "", field2Value: "", field1DropdownDisplayValue: "", field2DropdownDisplayValue: ""});
+    document.getElementById("addButton").disabled = false;
 
     let arrayIndex = event.target.id
     let eventCode = this.state.eventlist[arrayIndex].eventCode;
@@ -672,7 +672,11 @@ class AddAnimalEvent extends Component {
            this.setState({isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
         }
         else {
-           this.setState({isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "success"});         
+          if (responseJson.message.indexOf("ERROR") >= 0)
+           this.setState({isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "warning"});
+          else
+           this.setState({isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "success"});
+           document.getElementById("addButton").disabled = true;
         }
       })
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -1136,7 +1140,7 @@ class AddAnimalEvent extends Component {
                       </Form>
                     </CardBody>
                     <CardFooter>
-                      <Button type="button" size="md" color="primary" onClick={this.handleAdd}><i className="fa fa-plus"></i>{' '}Add</Button>
+                      <Button id="addButton" type="button" size="md" color="primary" onClick={this.handleAdd}><i className="fa fa-plus"></i>{' '}Add</Button>
                     </CardFooter>
                   </Card>
                 </Col>

@@ -164,20 +164,26 @@ class SearchSemenInventory extends Component {
                           <CardBody>
                            <Table hover bordered striped responsive size="sm">
                              <thead>
-                                <tr>
-                                  <th>#</th>
-                                  <th>Name</th>
-                                  <th>Code</th>
-                                  <th>Controller</th>
-                                  <th>Stock Conv</th>
-                                  <th>Stock Sexed</th>
-                                  <th>Successful</th>
-                                  <th>Failed</th>
-                                  <th>Data Sheet</th>
-                                  <th>photo</th>
-                                </tr> 
-                             </thead>
-                             <tbody>
+                              <tr  align="center" valign="middle">
+                                <th rowspan="2">#</th>
+                                <th rowspan="2">Name</th>
+                                <th rowspan="2">Code</th>
+                                <th rowspan="2">Controller</th>
+                                <th colspan="2">Stock</th>
+                                <th colspan="4" align="right" >Semen Usage</th>
+                                <th rowspan="2">Data Sheet</th>
+                                <th rowspan="2">photo</th>
+                              </tr> 
+                              <tr>
+                                <th>Conv</th>
+                                <th>Sexed</th>
+                                <th>✌️</th>
+                                <th>✅</th>
+                                <th>❌</th>
+                                <th>⏳</th>
+                              </tr> 
+                            </thead>
+                            <tbody>
                                {items.map(item => (
                                    <tr key="{item.animalTag}">
                                      <td>{++recordCount}</td>
@@ -186,8 +192,10 @@ class SearchSemenInventory extends Component {
                                      <td>{item.controller}</td>
                                      <td><font color={item.conventionalStock > 0 ? "blue" : ""}>{item.conventionalStock > 0 ? item.conventionalStock: "-"}</font></td>
                                      <td><font color={item.sexedStock > 0 ? "blue" : ""}>{item.sexedStock > 0 ? item.sexedStock: "-"}</font></td>
-                                     <td>XXX</td>
-                                     <td>YYY</td>
+                                     <td>{isNaN(Math.round((item.semenSuccessCount / item.semenUsageCount) * 100)) ? "-" : Math.round((item.semenSuccessCount / item.semenUsageCount) * 100) + "%"}</td>
+                                     <td>{item.semenSuccessCount}</td>
+                                     <td>{item.semenFailureCount}</td>
+                                     <td>{item.semenTbdCount}</td>
                                      <td width="25%"><a target="_blank" rel="noopener noreferrer" href={item.sireDataSheet}>View Data Sheet</a></td>
                                      <td><a target="_blank" rel="noopener noreferrer" href={item.sirePhoto} ><img src={item.sirePhoto} width="100" height="60" /></a></td>
                                  </tr>

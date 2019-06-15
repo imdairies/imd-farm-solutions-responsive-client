@@ -696,9 +696,9 @@ class Dashboard extends Component {
                 'Content-Type': 'application/json'
               },
               body: JSON.stringify({
-                "start": "2017-01-01",
-                "end": now.getFullYear() + "-" + (now.getMonth()+1) + "-1",
-                "steps": 0
+                "start": "2017-01-31",
+                "end": now.getFullYear() + "-" + (now.getMonth()+1) + "-" + now.getDate(),
+                "steps": 1
             })
           })
        .then(response => response.json())

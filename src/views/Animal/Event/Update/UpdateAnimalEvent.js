@@ -760,6 +760,7 @@ handleField3DropdownValueChanged(event) {
             isLoaded: true, 
             eventAdditionalMessage: responseJson.message, messageColor: "success"});  
             this.hideEverything();
+
         }
       })
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -796,7 +797,9 @@ handleField3DropdownValueChanged(event) {
       animalTagDisplay: null,
       eventCodeDisplay: null,
 
-    });    
+    });
+    document.getElementById("updateButton").disabled = true;
+    document.getElementById("deleteButton").disabled = true;
   }
   handleUpdate(event) {
     event.preventDefault();
@@ -1239,8 +1242,8 @@ handleField3DropdownValueChanged(event) {
                       </Form>
                     </CardBody>
                     <CardFooter>
-                      <Button type="button" size="md" color="primary" onClick={this.handleUpdate}><i className="fa fa-edit"></i>{' '}Update</Button>&nbsp;&nbsp;
-                      <Button type="button" size="md" color="primary" onClick={this.handleDelete}><i className="fa fa-remove"></i>{' '}Delete</Button>
+                      <Button id="updateButton" type="button" size="md" color="primary" onClick={this.handleUpdate}><i className="fa fa-edit"></i>{' '}Update</Button>&nbsp;&nbsp;
+                      <Button id="deleteButton" type="button" size="md" color="primary" onClick={this.handleDelete}><i className="fa fa-remove"></i>{' '}Delete</Button>
                     </CardFooter>
                   </Card>
                 </Col>

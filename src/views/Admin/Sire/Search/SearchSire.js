@@ -169,14 +169,20 @@ class SearchSire extends Component {
                         </Nav>
                          <Table hover bordered striped responsive size="lg">
                            <thead>
+                              <tr  align="center" valign="middle">
+                                <th rowspan="2">#</th>
+                                <th rowspan="2">Name</th>
+                                <th rowspan="2">Code</th>
+                                <th colspan="4" align="right" >Semen Usage</th>
+                                <th rowspan="2">Controller</th>
+                                <th rowspan="2">Data Sheet</th>
+                                <th rowspan="2">photo</th>
+                              </tr> 
                               <tr>
-                                <th>#</th>
-                                <th>Name</th>
-                                <th>Code</th>
-                                <th>Use Count</th>
-                                <th>Controller</th>
-                                <th>Data Sheet</th>
-                                <th>photo</th>
+                                <th>✌️</th>
+                                <th>✅</th>
+                                <th>❌</th>
+                                <th>⏳</th>
                               </tr> 
                            </thead>
                            <tbody>
@@ -185,7 +191,10 @@ class SearchSire extends Component {
                                    <td>{++recordCount}</td>
                                    <td>{item.alias}</td>
                                    <td>{item.animalTag}</td>
-                                   <th>xxx</th>
+                                   <td>{isNaN(Math.round((item.semenSuccessCount / item.semenUsageCount) * 100)) ? "-" : Math.round((item.semenSuccessCount / item.semenUsageCount) * 100) + "%"}</td>
+                                   <td>{item.semenSuccessCount}</td>
+                                   <td>{item.semenFailureCount}</td>
+                                   <td>{item.semenTbdCount}</td>
                                    <td>{item.controller}</td>
                                    <td width="25%"><a target="_blank" rel="noopener noreferrer" href={item.sireDataSheet}>View Data Sheet</a></td>
                                    <td><a target="_blank" rel="noopener noreferrer" href={item.sirePhoto} ><img src={item.sirePhoto} width="100" height="60" /></a></td>

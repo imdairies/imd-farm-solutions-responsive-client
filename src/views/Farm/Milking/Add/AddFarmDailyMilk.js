@@ -151,7 +151,7 @@ class AddFarmDailyMilk extends Component {
     let previousTotalMilk = 0;
     let avgTotalMilk = 0;
     for (let i=0; i<items.length; i++){
-      totalMilk += parseFloat(items[i].milkVolume);
+      totalMilk += parseFloat((isNaN(items[i].milkVolume) || items[i].milkVolume === "") ? "0" : items[i].milkVolume);
       if (shouldCalculatePastAverages){
         avgTotalMilk += parseFloat(isNaN(items[i].SEQ_NBR_MONTHLY_AVERAGE) ? "0" : items[i].SEQ_NBR_MONTHLY_AVERAGE);
         previousTotalMilk += parseFloat(isNaN(items[i].YESTERDAY_SEQ_NBR_VOL) ? "0" : items[i].YESTERDAY_SEQ_NBR_VOL);

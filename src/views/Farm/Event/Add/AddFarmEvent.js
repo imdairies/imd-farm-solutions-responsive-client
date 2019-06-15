@@ -537,7 +537,10 @@ handleField1DropdownValueChanged(event) {
            this.setState({isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
         }
         else {
-           this.setState({isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "success"});         
+          if (responseJson.message.indexOf("ERROR") >= 0)
+           this.setState({isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "warning"});
+          else
+           this.setState({isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "success"});
         }
       })
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
