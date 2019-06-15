@@ -175,8 +175,8 @@ class SearchSemenInventory extends Component {
                                 <th rowspan="2">photo</th>
                               </tr> 
                               <tr>
-                                <th>Conv</th>
-                                <th>Sexed</th>
+                                <th>🚻</th>
+                                <th>🚺</th>
                                 <th>✌️</th>
                                 <th>✅</th>
                                 <th>❌</th>
