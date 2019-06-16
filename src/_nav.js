@@ -61,6 +61,10 @@ export default {
         {
           name: 'Insemination',
           url: '/farm/insemination',
+        },
+        {
+          name: 'Feed',
+          url: '/farm/feed/listing',
         }
       ],
     },
