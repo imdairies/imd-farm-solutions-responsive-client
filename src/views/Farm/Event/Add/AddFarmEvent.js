@@ -88,7 +88,8 @@ class AddFarmEvent extends Component {
       messageColor: "danger",
 
       animalListMessage: "",
-      animalListMessageColor: ""
+      animalListMessageColor: "",
+      selectedCount: 0
     };
     this.handleEventSelected = this.handleEventSelected.bind(this);
     this.handleTimestampChanged = this.handleTimestampChanged.bind(this);
@@ -153,15 +154,21 @@ handleField1DropdownValueChanged(event) {
 
   selectOrDeselectAll(shouldSelectAll) {
     let animalTempList = this.state.animalTagList;
+    let selectedCount = 0;
     let index = 0;
+   // alert(shouldSelectAll);
     for (index=0; index<animalTempList.length; index++){
       animalTempList[index].checked = shouldSelectAll;
+      if (shouldSelectAll)
+        selectedCount++;
     }
-    this.setState({animalTagList: animalTempList});
+    //alert(selectedCount);
+    this.setState({animalTagList: animalTempList, selectedCount: selectedCount});
   }
 
   handleAnimalChecked(event) {
     let animalTagTempList = this.state.animalTagList;
+    let selectedCount = 0;
     animalTagTempList[event.target.id].checked = !animalTagTempList[event.target.id].checked;
     // alert(animalTagTempList[event.target.id].checked);
     let index = 0;
@@ -169,10 +176,11 @@ handleField1DropdownValueChanged(event) {
     for (index=0; index<animalTagTempList.length; index++){
       if (!animalTagTempList[index].checked) {
         allSelected = false;
-        break;
+      } else {
+        selectedCount++;
       }
     }
-    this.setState({animalTagList: animalTagTempList, selectAll: allSelected});
+    this.setState({animalTagList: animalTagTempList, selectAll: allSelected, selectedCount: selectedCount});
   }
 
   handleAnimalTypeSelected(event) {
@@ -506,7 +514,7 @@ handleField1DropdownValueChanged(event) {
 
     if (this.state.eventCode.length === 0 || this.state.eventCode === "-- Select Event --") {
       this.setState({messageColor: "danger", eventAdditionalMessage: "Please select an Event"});
-    } else if (this.state.field1Value === "") {
+    } else if (this.state.field1Label !== "" && this.state.field1Value === "") {
       this.setState({messageColor: "danger", eventAdditionalMessage: "Please enter " + this.state.field1Label});
     } else if (this.state.field2Label !== "" && this.state.field2Value === "") {
       this.setState({messageColor: "danger", eventAdditionalMessage: "Please enter " + this.state.field2Label});
@@ -811,7 +819,7 @@ handleField1DropdownValueChanged(event) {
                        <thead>
                           <tr>
                             <th>&nbsp;&nbsp;&nbsp;&nbsp;
-                              <Input typeclassName="form-check-input" type="checkbox" checked={this.state.selectAll} name="selectionChk" onClick={this.toggleSelection} />Select
+                              <Input typeclassName="form-check-input" type="checkbox" checked={this.state.selectAll} name="selectionChk" onClick={this.toggleSelection} />Select {"(" + this.state.selectedCount + ")"}
                             </th>
                             <th>Tag#</th>
                             <th>Type</th>

@@ -47,6 +47,9 @@ const SearchAnimal = React.lazy(() => import('./views/Animal/Search'));
 const AddLookup    = React.lazy(() => import('./views/Admin/Lookup/Add'));
 const UpdateLookup = React.lazy(() => import('./views/Admin/Lookup/Update'));
 const SearchLookup = React.lazy(() => import('./views/Admin/Lookup/Search'));
+
+const UploadMilkRecord    = React.lazy(() => import('./views/Admin/MilkingRecord/Upload'));
+
  
 const SearchAnimalEvent = React.lazy(() => import('./views/Animal/Event/Search'));
 const AddAnimalEvent    = React.lazy(() => import('./views/Animal/Event/Add'));
@@ -127,6 +130,7 @@ const routes = [
   { path: '/admin/lookup/update', name: 'UpdateLookup', component: UpdateLookup },
   { path: '/admin/lookup/search', name: 'SearchLookup', component: SearchLookup },
 
+  { path: '/admin/milkingrecord/upload', name: 'UploadMilkRecord', component: UploadMilkRecord },
 
   { path: '/admin/sire/search/', name: 'SearchSire', component: SearchSire },
   { path: '/admin/sire/add/'   , name: 'AddSire'   , component: AddSire    },

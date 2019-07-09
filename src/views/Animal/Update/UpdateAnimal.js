@@ -55,6 +55,7 @@ class UpdateAnimal extends Component {
       genericMessage1: "Processing ...",
       genericMessage2: "Processing ...",
       feedCohort: "",
+      planAnalysisComments: ""
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleUpdate = this.handleUpdate.bind(this);
@@ -315,7 +316,9 @@ class UpdateAnimal extends Component {
          this.setState({feedAnalysisMessage: responseJson.message, feedAnalysisMessageColor: "danger"});
       }
       else {
-         this.setState({feedCohort: responseJson[0].animalFeedCohortDeterminatationMessage, feedAnalysisMessage: "", feedAnalysisMessageColor: "success"});         
+         this.setState({feedCohort: responseJson[0].animalFeedCohortDeterminatationMessage,
+                        planAnalysisComments: responseJson[0].planAnalysisComments,
+                        feedAnalysisMessage: "", feedAnalysisMessageColor: "success"});         
       }
     })
     .catch(error => this.setState({feedAnalysisMessage: error.toString(), feedAnalysisMessageColor: "danger"}));
@@ -518,6 +521,9 @@ class UpdateAnimal extends Component {
                       <Form action="" method="post" className="form-horizontal">
                         <FormGroup row>
                           <Col sm="10">{this.state.feedCohort}</Col>
+                        </FormGroup>
+                        <FormGroup row>
+                          <Col sm="10">{this.state.planAnalysisComments}</Col>                          
                         </FormGroup>
                       </Form>
                     </CardBody>

@@ -455,6 +455,11 @@ class Dashboard extends Component {
     this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
     this.loadCurrentYearData = this.loadCurrentYearData.bind(this);
     this.loadCurrentMonthData = this.loadCurrentMonthData.bind(this);
+    this.retrieveLactatingCount = this.retrieveLactatingCount.bind(this);
+    this.retrieveHeiferCount = this.retrieveHeiferCount.bind(this);
+    this.retrieveFemaleCalvesCount = this.retrieveFemaleCalvesCount.bind(this);
+    this.retrieveHerdSizeHistory = this.retrieveHerdSizeHistory.bind(this);
+    this.retrieveMilkingRecordOfMonth = this.retrieveMilkingRecordOfMonth.bind(this);
 
     this.state = {
       dropdownOpen: false,
@@ -541,182 +546,208 @@ class Dashboard extends Component {
   }
 
   componentDidMount() {
-      let now =  new Date();
-      let herdSizeHistory = {
-        datasets: [
-          {
-            label: 'Active Herd Size',
-            backgroundColor: 'rgba(255,255,255,.5)',
-            borderColor: 'rgba(255,255,255,0.55)',
-            // data: [0,2,46,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,0,64,66,68,70,72],
-          },
-        ],
-      };
-      // this.setState({herdSizeTrend: herdSizeHistory});
 
+      this.retrieveActiveHerdCount();
+      this.retrieveLactatingCount();
+      this.retrievePregnantCount();
+      this.retrieveHerdSizeHistory();
+      this.retrieveMilkingRecordOfMonth();
 
-      fetch('http://localhost:8080/imd-farm-management/animals/allactive')
-      .then(response => response.json())
-      .then(responseJson => {
-        if (responseJson.error) {
-          this.setState({herdSize: -999, activeAnimalWidgetMessage: responseJson.message});
-        }
-        else {
-           this.setState({herdSize: responseJson.length,  activeAnimalWidgetMessage: ""});
-        }
-      })
-      .catch(error => this.setState({herdSize: -999,  activeAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : error.toString())}));
-
-
-      fetch('http://localhost:8080/imd-farm-management/animals/lactatingcows', {
-              method: "POST",
-              headers: {
-                  'Accept': 'application/json',
-                  'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                  "animalTag": "%"
-            })
-          })
-       .then(response => response.json())
-        .then(responseJson => {
-          if (responseJson.error) {
-             this.setState({lactatingAnimalCount: -999, lactatingAnimalWidgetMessage: responseJson.message});
-          }
-          else {
-             this.setState({lactatingAnimalCount: responseJson.length,  lactatingAnimalWidgetMessage: "Lactating Herd"});         
-          }
-        })
-        .catch(error => this.setState({lactatingAnimalCount: -999,  lactatingAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : error.toString())}));
-
-
-    fetch('http://localhost:8080/imd-farm-management/animals/pregnantcows', {
-              method: "POST",
-              headers: {
-                  'Accept': 'application/json',
-                  'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                  "animalTag": "%"
-            })
-          })
-       .then(response => response.json())
-        .then(responseJson => {
-          if (responseJson.error) {
-             this.setState({pregnantCount: -999, lactatingAnimalWidgetMessage: responseJson.message});
-          }
-          else {
-             this.setState({pregnantCount: responseJson.length,  pregnantAnimalWidgetMessage: "Pregnant Herd"});         
-          }
-        })
-        .catch(error => this.setState({pregnantCount: -999,  pregnantAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : error.toString())}));
-
-    fetch('http://localhost:8080/imd-farm-management/animals/heifers', {
-              method: "POST",
-              headers: {
-                  'Accept': 'application/json',
-                  'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                  "animalTag": "%"
-            })
-          })
-       .then(response => response.json())
-        .then(responseJson => {
-          if (responseJson.error) {
-             this.setState({heiferCount: -999, heiferWidgetMessage: responseJson.message});
-          }
-          else {
-             this.setState({heiferCount: responseJson.length,  heiferWidgetMessage: "Heifers"});         
-          }
-        })
-        .catch(error => this.setState({heiferCount: -999,  heiferWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : error.toString())}));
-
-
-    fetch('http://localhost:8080/imd-farm-management/animals/femalecalves', {
-              method: "POST",
-              headers: {
-                  'Accept': 'application/json',
-                  'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                  "animalTag": "%"
-            })
-          })
-       .then(response => response.json())
-        .then(responseJson => {
-          if (responseJson.error) {
-             this.setState({femaleCalfCount: -999, femaleCalfWidgetMessage: responseJson.message});
-          }
-          else {
-             this.setState({femaleCalfCount: responseJson.length,  femaleCalfWidgetMessage: "Female Progney"});         
-          }
-        })
-        .catch(error => this.setState({femaleCalfCount: -999,  femaleCalfWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : error.toString())}));
-
-
-
-      fetch('http://localhost:8080/imd-farm-management/milkinginfo/milkingrecordofmonth', {
-              method: "POST",
-              headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                "milkingDateStr": now.getFullYear() + "-" + (now.getMonth()+1) + "-1" 
-            })
-          })
-       .then(response => response.json())
-        .then(responseJson => {
-          if (responseJson.error) {
-             this.setState({lactatingAnimalCount: -999, lactatingAnimalWidgetMessage: responseJson.message});
-          }
-          else {
-             mainChart.labels = responseJson[0].days;
-             mainChart.datasets[0].data = responseJson[0].volumes;
-             mainChart.datasets[1].data = responseJson[0].averages;
-             mainChartOpts.scales.yAxes = [{ ticks: {
-                                          beginAtZero: true,
-                                          maxTicksLimit: 5,
-                                          stepSize: 25,
-                                          max: 450,
-                                          min: 200,
-                                        },
-                                      }];
-             this.setState({monthVolumes: responseJson[0].volumes, monthDays:responseJson[0].days});
-          }
-        })
-        .catch(error => this.setState({lactatingAnimalCount: -999,  lactatingAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : error.toString())}));
-
-        // background graph that shows herd size growth trend
-      fetch('http://localhost:8080/imd-farm-management/farm/herdsizehistory', {
-              method: "POST",
-              headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                "start": "2017-01-31",
-                "end": now.getFullYear() + "-" + (now.getMonth()+1) + "-" + now.getDate(),
-                "steps": 1
-            })
-          })
-       .then(response => response.json())
-        .then(responseJson => {
-          if (responseJson.error) {
-            this.setState({herdSize: -999, activeAnimalWidgetMessage: responseJson.message});
-          }
-          else {
-            // alert(responseJson.months);
-            herdSizeHistory.labels = responseJson.months;
-            herdSizeHistory.datasets[0].data = responseJson.herdCounts;
-            this.setState({herdSizeTrend: herdSizeHistory});
-          }
-        })
-        .catch(error => this.setState({herdSize: -999,  activeAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : error.toString())}));
-
-
+      // this.retrieveHeiferCount();
+      // this.retrieveFemaleCalvesCount();
    }
+
+retrieveActiveHerdCount(){
+  fetch('http://localhost:8080/imd-farm-management/animals/allactive')
+  .then(response => response.json())
+  .then(responseJson => {
+    if (responseJson.error) {
+      this.setState({herdSize: -999, activeAnimalWidgetMessage: "Error in retrieving active herd size: " + responseJson.message});
+    }
+    else {
+       this.setState({herdSize: responseJson.length,  activeAnimalWidgetMessage: ""});
+    }
+  })
+  .catch(error => this.setState({herdSize: -999,  activeAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : "Error in retrieving active herd size: " + error.toString())}));
+
+}
+
+retrieveMilkingRecordOfMonth(){
+  let now =  new Date();
+  fetch('http://localhost:8080/imd-farm-management/milkinginfo/milkingrecordofmonth', {
+      method: "POST",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        "milkingDateStr": now.getFullYear() + "-" + (now.getMonth()+1) + "-1" 
+    })
+  })
+  .then(response => response.json())
+  .then(responseJson => {
+  if (responseJson.error) {
+     this.setState({lactatingAnimalCount: -999, lactatingAnimalWidgetMessage:  "Error in retrieving milking record: " + responseJson.message});
+  }
+  else {
+     mainChart.labels = responseJson[0].days;
+     mainChart.datasets[0].data = responseJson[0].volumes;
+     mainChart.datasets[1].data = responseJson[0].averages;
+     mainChartOpts.scales.yAxes = [{ ticks: {
+                                  beginAtZero: true,
+                                  maxTicksLimit: 5,
+                                  stepSize: 25,
+                                  max: 450,
+                                  min: 200,
+                                },
+                              }];
+     this.setState({monthVolumes: responseJson[0].volumes, monthDays:responseJson[0].days});
+  }
+  })
+  .catch(error => this.setState({lactatingAnimalCount: -999,  lactatingAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" :  "Error in retrieving milking record: " + error.toString())}));
+
+}
+
+retrievePregnantCount(){
+  fetch('http://localhost:8080/imd-farm-management/animals/pregnantcows', {
+      method: "POST",
+      headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+          "animalTag": "%"
+    })
+  })
+  .then(response => response.json())
+  .then(responseJson => {
+  if (responseJson.error) {
+     this.setState({pregnantCount: -999, lactatingAnimalWidgetMessage:  "Error in retrieving active pregnant count: " + responseJson.message});
+  }
+  else {
+     this.setState({pregnantCount: responseJson.length,  pregnantAnimalWidgetMessage: "Pregnant Herd"});         
+  }
+  })
+  .catch(error => this.setState({pregnantCount: -999,  pregnantAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" :   "Error in retrieving active pregnant count: " + error.toString())}));
+
+
+}
+
+retrieveHeiferCount(){
+  fetch('http://localhost:8080/imd-farm-management/animals/heifers', {
+      method: "POST",
+      headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+          "animalTag": "%"
+    })
+  })
+  .then(response => response.json())
+  .then(responseJson => {
+  if (responseJson.error) {
+     this.setState({heiferCount: -999, heiferWidgetMessage:  "Error in retrieving active heifer count: " + responseJson.message});
+  }
+  else {
+     this.setState({heiferCount: responseJson.length,  heiferWidgetMessage: "Heifers"});         
+  }
+  })
+  .catch(error => this.setState({heiferCount: -999,  heiferWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" :  "Error in retrieving active heifer count: " + error.toString())}));
+
+}
+
+retrieveFemaleCalvesCount(){
+
+  fetch('http://localhost:8080/imd-farm-management/animals/femalecalves', {
+      method: "POST",
+      headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+          "animalTag": "%"
+    })
+  })
+  .then(response => response.json())
+  .then(responseJson => {
+  if (responseJson.error) {
+     this.setState({femaleCalfCount: -999, femaleCalfWidgetMessage:  "Error in retrieving active female calves count: " + responseJson.message});
+  }
+  else {
+     this.setState({femaleCalfCount: responseJson.length,  femaleCalfWidgetMessage: "Female Progney"});         
+  }
+  })
+  .catch(error => this.setState({femaleCalfCount: -999,  femaleCalfWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" :  "Error in retrieving active female calves count: " + error.toString())}));
+}
+
+retrieveHerdSizeHistory(){
+  let now =  new Date();
+  let herdSizeHistory = {
+    datasets: [
+      {
+        label: 'Active Herd Size',
+        backgroundColor: 'rgba(255,255,255,.5)',
+        borderColor: 'rgba(255,255,255,0.55)',
+        // data: [0,2,46,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,0,64,66,68,70,72],
+      },
+    ],
+  };
+  // this.setState({herdSizeTrend: herdSizeHistory});
+  // background graph that shows herd size growth trend
+  fetch('http://localhost:8080/imd-farm-management/farm/herdsizehistory', {
+      method: "POST",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        "start": "2017-01-31",
+        "end": now.getFullYear() + "-" + (now.getMonth()+1) + "-" + now.getDate(),
+        "steps": 1
+    })
+  })
+  .then(response => response.json())
+  .then(responseJson => {
+  if (responseJson.error) {
+    this.setState({herdSize: -999, activeAnimalWidgetMessage:  "Error in retrieving herd size history: " + responseJson.message});
+  }
+  else {
+    // alert(responseJson.months);
+    herdSizeHistory.labels = responseJson.months;
+    herdSizeHistory.datasets[0].data = responseJson.herdCounts;
+    this.setState({herdSizeTrend: herdSizeHistory});
+  }
+  })
+  .catch(error => this.setState({herdSize: -999,  activeAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" :  "Error in retrieving herd size history: " + error.toString())}));
+
+
+}
+
+retrieveLactatingCount() {
+
+  fetch('http://localhost:8080/imd-farm-management/animals/lactatingcows', {
+      method: "POST",
+      headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+          "animalTag": "%"
+    })
+  })
+  .then(response => response.json())
+  .then(responseJson => {
+  if (responseJson.error) {
+     this.setState({lactatingAnimalCount: -999, lactatingAnimalWidgetMessage:  "Error in retrieving active lactating count: " + responseJson.message});
+  }
+  else {
+     this.setState({lactatingAnimalCount: responseJson.length,  lactatingAnimalWidgetMessage: "Lactating Herd"});         
+  }
+  })
+  .catch(error => this.setState({lactatingAnimalCount: -999,  lactatingAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" :  "Error in retrieving active lactating count: " + error.toString())}));
+}
+
 
 
   toggle() {

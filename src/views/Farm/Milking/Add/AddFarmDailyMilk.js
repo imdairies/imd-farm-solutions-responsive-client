@@ -52,6 +52,7 @@ class AddFarmDailyMilk extends Component {
       addOrUpdate: "Add",
       comments: "",
       SNF: "",
+      TS: "",
       fatValue: "",
       lrValue: "",
       toxinValue: "",
@@ -60,7 +61,8 @@ class AddFarmDailyMilk extends Component {
       eventAdditionalMessage: "Specify desired values and press Add",
       totalMilkMessage: "",
       previousTotalMilkMessage: "",
-      avgTotalMilkMessage: ""
+      avgTotalMilkMessage: "",
+      farmAverageMonthInMilking: 0
     };
     this.handleAnimalTagSelected = this.handleAnimalTagSelected.bind(this);
     this.handleEventNumberSelected = this.handleEventNumberSelected.bind(this);
@@ -150,13 +152,16 @@ class AddFarmDailyMilk extends Component {
     let totalMilk = 0;
     let previousTotalMilk = 0;
     let avgTotalMilk = 0;
+    let totalDaysInMilking = 0;
     for (let i=0; i<items.length; i++){
       totalMilk += parseFloat((isNaN(items[i].milkVolume) || items[i].milkVolume === "") ? "0" : items[i].milkVolume);
+      totalDaysInMilking += parseFloat((isNaN(items[i].DAYS_IN_MILKING) || items[i].DAYS_IN_MILKING === "" || items[i].DAYS_IN_MILKING < 0) ? 0 : items[i].DAYS_IN_MILKING);
       if (shouldCalculatePastAverages){
         avgTotalMilk += parseFloat(isNaN(items[i].SEQ_NBR_MONTHLY_AVERAGE) ? "0" : items[i].SEQ_NBR_MONTHLY_AVERAGE);
         previousTotalMilk += parseFloat(isNaN(items[i].YESTERDAY_SEQ_NBR_VOL) ? "0" : items[i].YESTERDAY_SEQ_NBR_VOL);
       }
     }
+    this.setState({farmAverageMonthInMilking: items.length === 0 ? 0 : parseFloat(parseFloat(totalDaysInMilking/30)/items.length)});
     if (shouldDetermineAddOrUpdate)
       this.setState({totalMilkMessage: "" + totalMilk,
         addOrUpdate: (totalMilk === 0 ? "Add" : "Update")});
@@ -291,19 +296,18 @@ class AddFarmDailyMilk extends Component {
       this.setState({messageColor: "danger", eventAdditionalMessage: "Please enter temperature"});
       document.getElementById("temperatureInCentigrade").focus();
     } else {
-      this.setState({eventAdditionalMessage: "Processing ..."
-      });
-
+      this.setState({eventAdditionalMessage: "Processing ..."});
       let farmMilkingEventRecords = [];
-
-      let totalVolume = 0;
-
-
+      let totalVolume = 0.0;
+      // alert("cow tags " + this.state.animaltaglist.length);
       for (let i=0; i< this.state.animaltaglist.length; i++) {
         let item = this.state.animaltaglist[i];
-        totalVolume += parseFloat(this.state.animaltaglist[i].milkVolume);
+        let vol = parseFloat(item.milkVolume);
+        totalVolume += isNaN(vol) ? 0 : vol;
         farmMilkingEventRecords.push({tag:item.animalTag,volume:item.milkVolume, comments:item.comments, outcome:item.animalTag});
       }
+      // alert(totalVolume);
+      // alert(JSON.stringify(farmMilkingEventRecords));
       // if (isNaN(totalVolume)) {
       //   this.setState({eventAdditionalMessage: "One or more milk volume(s) is/are invalid. Please fix the problem before proceeding.", messageColor: "danger"});
       // } 
@@ -356,13 +360,13 @@ class AddFarmDailyMilk extends Component {
             }
           }
         })
-        .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
+        .catch(error => this.setState({eventAdditionalMessage: "Exception >> " + error.toString(), messageColor: "danger"}));
       }
     }
   }
 
   render() {
-    var { eventAdditionalMessage, messageColor, addOrUpdate, totalMilkMessage, animaltaglist, isLoaded, previousTotalMilkMessage, avgTotalMilkMessage} = this.state;
+    var { farmAverageMonthInMilking, eventAdditionalMessage, messageColor, addOrUpdate, totalMilkMessage, animaltaglist, isLoaded, previousTotalMilkMessage, avgTotalMilkMessage} = this.state;
     let recordCount = 0;
     //var yesterday = this.state.timestamp;
     let days = this.state.timestamp.getDate();
@@ -453,10 +457,10 @@ class AddFarmDailyMilk extends Component {
                             <Input id="lrValue" maxlength="5" type="number"  min={25} max={32} step={0.5} name="lrValue" value={this.state.lrValue} onChange={this.handleValueChanged} placeholder="LR"  />
                           </Col>
                           <Col sm="2">
-                            <Input id="toxinValue" maxlength="5" type="number" name="toxinValue"  min={0} max={1} step={0.01} value={this.state.toxinValue} onChange={this.handleValueChanged} placeholder="toxin"  />
+                            <strong>SNF:</strong>{Math.round(parseFloat(this.state.SNF)*100)/100 > 0.72 ? Math.round(parseFloat(this.state.SNF)*100)/100 : ""}
                           </Col>
                           <Col sm="2">
-                            <strong>SNF:</strong>{Math.round(this.state.SNF*100)/100}
+                            <strong>TS:</strong>{isNaN(Math.round((parseFloat(this.state.SNF) + parseFloat(this.state.fatValue))*100)/100) || (Math.round((parseFloat(this.state.SNF) + parseFloat(this.state.fatValue))*100)/100) <= 0.72   ? "" : Math.round((parseFloat(this.state.SNF) + parseFloat(this.state.fatValue))*100)/100}
                           </Col>
                         </FormGroup>
                         <FormGroup row>
@@ -487,6 +491,7 @@ class AddFarmDailyMilk extends Component {
                              <thead>
                                 <tr>
                                   <th>Tag</th>
+                                  <th>MiM</th>
                                   <th>Avg.</th>
                                   <th>{(yesterday.getDate()) + "/" + (yesterday.getMonth()+1)}</th>
                                   <th>Vol</th>
@@ -496,6 +501,9 @@ class AddFarmDailyMilk extends Component {
                              <tbody>
                                 <tr>
                                   <th></th>
+                                  <th>
+                                    <FormText color="success"><strong>&nbsp;{Math.round(farmAverageMonthInMilking*100)/100}</strong></FormText>
+                                  </th>
                                   <th>
                                     <FormText color="success"><b>&nbsp;{avgTotalMilkMessage}</b></FormText>
                                   </th>
@@ -510,18 +518,22 @@ class AddFarmDailyMilk extends Component {
                               {animaltaglist.map(animaltagitem => (
                                 <tr id={animaltagitem.animalTag}>
                                     <td width="9%"><Link  tabindex="-1" to={'/animal/update?animalTag?orgID=IMD&&animalTag=' + animaltagitem.animalTag}>{animaltagitem.animalTag}</Link></td>
+                                    <td width="5%">{parseFloat(Math.round(animaltagitem.DAYS_IN_MILKING /30 * 10)/10)}</td>
                                     <td width="8%">{animaltagitem.SEQ_NBR_MONTHLY_AVERAGE}</td>
                                     <td width="8%">{animaltagitem.YESTERDAY_SEQ_NBR_VOL}</td>
                                     <td width="30%">
                                       <Input id={recordCount} type="number" min={0} max={20} step={0.25} name={'"milkVolume' + animaltagitem.animalTag + '"'} value={animaltagitem.milkVolume} onChange={this.handleVolumeValueChanged} placeholder="ltr" />
                                     </td>
-                                    <td width="45%">
+                                    <td width="40%">
                                       <Input id={recordCount++} tabindex="-1" maxlength="50" size="5" type="text" name={'comments' + animaltagitem.animalTag} value={animaltagitem.comments} onChange={this.handleCommentsValueChanged} placeholder="comments" />
                                     </td>
                                   </tr>
                                  ))}
                                 <tr>
                                   <th></th>
+                                  <th>
+                                    <FormText color="success"><strong>&nbsp;{Math.round(farmAverageMonthInMilking*100)/100}</strong></FormText>
+                                  </th>
                                   <th>
                                     <FormText color="success"><b>&nbsp;{avgTotalMilkMessage}</b></FormText>
                                   </th>

@@ -19,6 +19,10 @@ export default {
           name: 'Sire',
           url: '/admin/sire/search',
         },
+        {
+          name: 'Upload Milking',
+          url: '/admin/milkingrecord/upload',
+        },
       ],
     },
     {  

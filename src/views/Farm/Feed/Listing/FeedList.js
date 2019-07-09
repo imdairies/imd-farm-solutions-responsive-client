@@ -123,7 +123,7 @@ class FeedList extends Component {
       <div className="animated fadeIn">
          
          <Row>
-          <Col xs="10" lg="12">
+          <Col >
              <Fade timeout={this.state.timeout} in={this.state.fadeIn}>
                 <Card>
                    <CardHeader>
@@ -133,26 +133,39 @@ class FeedList extends Component {
                      </div>
                    </CardHeader>
                      <CardBody>
-                       <Table hover bordered striped responsive size="lg">
+                       <Table hover bordered striped responsive size="sm">
                          <thead>
-                            <tr>
-                              <th>#</th>
-                              <th>Tag#</th>
-                              <th>Age</th>
-                              <th>Cohort</th>
-                              <th>Cohort Condition</th>
-                              <th>Comments</th>
+                            <tr  align="center" valign="middle">
+                              <th rowspan="2">#</th>
+                              <th rowspan="2">Tag#</th>
+                              <th rowspan="2">Age</th>
+                              <th rowspan="2">Cohort</th>
+                              <th rowspan="2">Weight (kg)</th>
+                              <th colspan="3">Target Needs</th>
+                              <th rowspan="2">Milk</th>
+                              <th rowspan="2">Alfa Hay</th>
+                              <th rowspan="2">Corn Silage</th>
+                              <th rowspan="2">Alfaalfa</th>
+                              <th rowspan="2">Water</th>
+                              <th rowspan="2">Vanda</th>
+                            </tr> 
+                            <tr  align="center" valign="middle">
+                              <th>DM (Kg)</th>
+                              <th>CP (Kg)</th>
+                              <th>ME (xx)</th>
                             </tr> 
                          </thead>
                          <tbody>
                            {items.map(item => (
                                <tr key="{item.animalTag}">
-                                 <td>{++recordCount}</td>
-                                 <td><Link to={'/animal/update?animalTag=' + item.animalTag + '&orgID=' + item.orgID} >{item.animalTag}</Link></td>
-                                 <td>{item.currentAge}</td>
-                                 <td>{item.feedCohortTypeCD}</td>
-                                 <td>{item.feedCohortDeterminatationCriteria}</td>
-                                 <td>{item.animalFeedCohortDeterminatationMessage}</td>
+                                 <td width="2%">{++recordCount}</td>
+                                 <td width="5%" title = {item.animalFeedCohortDeterminatationMessage} ><Link to={'/animal/update?animalTag=' + item.animalTag + '&orgID=' + item.orgID} >{item.animalTag}</Link></td>
+                                 <td width="22%">{item.currentAge}</td>
+                                 <td width="10%" title = {item.feedCohortDeterminatationCriteria}>{item.feedCohortTypeShortDescr}</td>
+                                 <td> {item.weight === "" ? "?" : item.weight}</td>
+                                 <td>{item.nutritionalNeedsDryMatter}</td>
+                                 <td>{item.nutritionalNeedsCrudeProtein}</td>
+                                 <td>{item.nutritionalNeedsMetabloizableEnergy}</td>
                              </tr>
                              ))}
                          </tbody>

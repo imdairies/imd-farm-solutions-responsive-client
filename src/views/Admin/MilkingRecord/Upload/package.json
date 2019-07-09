@@ -1,0 +1,6 @@
+{
+  "name": "UploadMilkRecord",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./UploadMilkRecord.js"
+}

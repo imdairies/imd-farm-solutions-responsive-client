@@ -195,7 +195,7 @@ class UpdateAnimalEvent extends Component {
           eventOperator: responseJson[0].eventOperator,
           operatorID: responseJson[0].eventOperatorID,
           commentsFieldDisplay:true,
-          timestamp: new Date(responseJson[0].eventTimeStamp), //new Date(),
+          timestamp: new Date(responseJson[0].eventTimeStamp),
           timestampPickerDisplay: true,
           eventOperatorDisplay: true,
           animalTagDisplay: true,
