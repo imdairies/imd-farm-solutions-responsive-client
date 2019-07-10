@@ -317,6 +317,7 @@ class UpdateAnimal extends Component {
       }
       else {
          this.setState({feedCohort: responseJson[0].animalFeedCohortDeterminatationMessage,
+                        feedCohortTypeShortDescr: responseJson[0].feedCohortTypeShortDescr,
                         planAnalysisComments: responseJson[0].planAnalysisComments,
                         feedAnalysisMessage: "", feedAnalysisMessageColor: "success"});         
       }
@@ -515,7 +516,7 @@ class UpdateAnimal extends Component {
                 <Col md="8">
                   <Card>
                     <CardHeader>
-                      <i className="fa fa-align-justify"></i><strong>Feed Information</strong><FormText color={feedAnalysisMessageColor}>&nbsp;{feedAnalysisMessage}</FormText>
+                      <i className="fa fa-align-justify"></i><strong>Feed Information</strong>{' (' + this.state.feedCohortTypeShortDescr + ')'}<FormText color={feedAnalysisMessageColor}>&nbsp;{feedAnalysisMessage}</FormText>
                     </CardHeader>
                     <CardBody>
                       <Form action="" method="post" className="form-horizontal">
@@ -561,7 +562,7 @@ class UpdateAnimal extends Component {
                                        <td title={milkingDayRec.event1Time + ", " + milkingDayRec.event1Temperature + " °C, " + milkingDayRec.event1Humidity + "%\n" + milkingDayRec.event1Comments}>{milkingDayRec.milkVol1}</td>
                                        <td title={milkingDayRec.event2Time + ", " +milkingDayRec.event2Temperature + " °C, " + milkingDayRec.event2Humidity + "%\n" + milkingDayRec.event2Comments}>{milkingDayRec.milkVol2}</td>
                                        <td title={milkingDayRec.event3Time + ", " +milkingDayRec.event3Temperature + " °C, " + milkingDayRec.event3Humidity + "%\n" + milkingDayRec.event3Comments}>{milkingDayRec.milkVol3}</td>
-                                       <td>{milkingDayRec.milkVol1 + milkingDayRec.milkVol2 + milkingDayRec.milkVol3}</td>                                       
+                                       <td>{(milkingDayRec.milkVol1==="" ? 0:milkingDayRec.milkVol1) + (milkingDayRec.milkVol2  === "" ? 0 : milkingDayRec.milkVol2) + (milkingDayRec.milkVol3 === "" ? 0 : milkingDayRec.milkVol3)}</td>                                       
                                    </tr>
                                    ))}
                                </tbody>
@@ -596,7 +597,7 @@ class UpdateAnimal extends Component {
                                        <td title={milkingDayRec.event1Time + ", " + milkingDayRec.event1Temperature + " °C, " + milkingDayRec.event1Humidity + "%\n" + milkingDayRec.event1Comments}>{milkingDayRec.milkVol1}</td>
                                        <td title={milkingDayRec.event2Time + ", " +milkingDayRec.event2Temperature + " °C, " + milkingDayRec.event2Humidity + "%\n" + milkingDayRec.event2Comments}>{milkingDayRec.milkVol2}</td>
                                        <td title={milkingDayRec.event3Time + ", " +milkingDayRec.event3Temperature + " °C, " + milkingDayRec.event3Humidity + "%\n" + milkingDayRec.event3Comments}>{milkingDayRec.milkVol3}</td>
-                                       <td>{milkingDayRec.milkVol1 + milkingDayRec.milkVol2 + milkingDayRec.milkVol3}</td>                                       
+                                       <td>{(milkingDayRec.milkVol1==="" ? 0:milkingDayRec.milkVol1) + (milkingDayRec.milkVol2  === "" ? 0 : milkingDayRec.milkVol2) + (milkingDayRec.milkVol3 === "" ? 0 : milkingDayRec.milkVol3)}</td>                                       
                                    </tr>
                                    ))}
                                </tbody>

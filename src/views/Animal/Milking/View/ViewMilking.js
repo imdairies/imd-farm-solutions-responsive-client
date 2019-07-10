@@ -424,7 +424,7 @@ class ViewMilking extends Component {
                                        <td title={milkingDayRec.event1Time + ", " + milkingDayRec.event1Temperature + " °C, " + milkingDayRec.event1Humidity + "%\n" + milkingDayRec.event1Comments}>{milkingDayRec.milkVol1}</td>
                                        <td title={milkingDayRec.event2Time + ", " +milkingDayRec.event2Temperature + " °C, " + milkingDayRec.event2Humidity + "%\n" + milkingDayRec.event2Comments}>{milkingDayRec.milkVol2}</td>
                                        <td title={milkingDayRec.event3Time + ", " +milkingDayRec.event3Temperature + " °C, " + milkingDayRec.event3Humidity + "%\n" + milkingDayRec.event3Comments}>{milkingDayRec.milkVol3}</td>
-                                       <td>{milkingDayRec.milkVol1 + milkingDayRec.milkVol2 + milkingDayRec.milkVol3}</td>                                       
+                                       <td>{(milkingDayRec.milkVol1==="" ? 0:milkingDayRec.milkVol1) + (milkingDayRec.milkVol2  === "" ? 0 : milkingDayRec.milkVol2) + (milkingDayRec.milkVol3 === "" ? 0 : milkingDayRec.milkVol3)}</td>                                       
                                    </tr>
                                    ))}
                                </tbody>
@@ -460,7 +460,7 @@ class ViewMilking extends Component {
                                        <td title={milkingDayRec.event1Time + ", " + milkingDayRec.event1Temperature + " °C, " + milkingDayRec.event1Humidity + "%\n" + milkingDayRec.event1Comments}>{milkingDayRec.milkVol1}</td>
                                        <td title={milkingDayRec.event2Time + ", " +milkingDayRec.event2Temperature + " °C, " + milkingDayRec.event2Humidity + "%\n" + milkingDayRec.event2Comments}>{milkingDayRec.milkVol2}</td>
                                        <td title={milkingDayRec.event3Time + ", " +milkingDayRec.event3Temperature + " °C, " + milkingDayRec.event3Humidity + "%\n" + milkingDayRec.event3Comments}>{milkingDayRec.milkVol3}</td>
-                                       <td>{milkingDayRec.milkVol1 + milkingDayRec.milkVol2 + milkingDayRec.milkVol3}</td>                                       
+                                       <td>{(milkingDayRec.milkVol1==="" ? 0:milkingDayRec.milkVol1) + (milkingDayRec.milkVol2  === "" ? 0 : milkingDayRec.milkVol2) + (milkingDayRec.milkVol3 === "" ? 0 : milkingDayRec.milkVol3)}</td>                                       
                                    </tr>
                                    ))}
                                </tbody>
