@@ -153,7 +153,19 @@ class AddFarmDailyMilk extends Component {
     let previousTotalMilk = 0;
     let avgTotalMilk = 0;
     let totalDaysInMilking = 0;
+    let temperature = "";
+    let humidity = "";
+    let fat = "";
+    let lr = "";
+    let toxin = "";
     for (let i=0; i<items.length; i++){
+      if (temperature === "" && items[i].temperatureInCentigrade !== 0) {
+        temperature = items[i].temperatureInCentigrade;
+        fat = items[i].fatValue;
+        lr = items[i].lrValue;
+        humidity = items[i].humidity;
+        toxin = items[i].toxinValue;
+      }
       totalMilk += parseFloat((isNaN(items[i].milkVolume) || items[i].milkVolume === "") ? "0" : items[i].milkVolume);
       totalDaysInMilking += parseFloat((isNaN(items[i].DAYS_IN_MILKING) || items[i].DAYS_IN_MILKING === "" || items[i].DAYS_IN_MILKING < 0) ? 0 : items[i].DAYS_IN_MILKING);
       if (shouldCalculatePastAverages){
@@ -161,7 +173,10 @@ class AddFarmDailyMilk extends Component {
         previousTotalMilk += parseFloat(isNaN(items[i].YESTERDAY_SEQ_NBR_VOL) ? "0" : items[i].YESTERDAY_SEQ_NBR_VOL);
       }
     }
-    this.setState({farmAverageMonthInMilking: items.length === 0 ? 0 : parseFloat(parseFloat(totalDaysInMilking/30)/items.length)});
+    this.setState({temperatureInCentigrade:temperature, 
+      fatValue: fat, lrValue:lr, humidity: humidity, toxinValue:toxin,
+      SNF:((lr / 4) + (fat * 0.22)+0.72),
+      farmAverageMonthInMilking: items.length === 0 ? 0 : parseFloat(parseFloat(totalDaysInMilking/30)/items.length)});
     if (shouldDetermineAddOrUpdate)
       this.setState({totalMilkMessage: "" + totalMilk,
         addOrUpdate: (totalMilk === 0 ? "Add" : "Update")});
@@ -243,15 +258,18 @@ class AddFarmDailyMilk extends Component {
             }
             else {
                 let eventTimestamp = this.state.timestamp;
-                if (!(responseJson[0].recordDate === "" || responseJson[0].recordTime === ""))
-                   eventTimestamp = new Date(responseJson[0].recordDate + " " + responseJson[0].recordTime);
+                let i=0;
+                for (i=0; i<responseJson.length;i++) {
+                  if (!(responseJson[i].recordDate === "" || responseJson[i].recordTime === ""))
+                     eventTimestamp = new Date(responseJson[i].recordDate + " " + responseJson[i].recordTime);                  
+                }
                 this.setState({animaltaglist: responseJson,
-                  temperatureInCentigrade: (responseJson[0].temperatureInCentigrade !== 0 ? responseJson[0].temperatureInCentigrade : ""),
-                  humidity: (responseJson[0].humidity !== 0 ? responseJson[0].humidity : ""),
-                  fatValue: (responseJson[0].fatValue !== 0 ? responseJson[0].fatValue : ""),
-                  lrValue: (responseJson[0].lrValue !== 0 ? responseJson[0].lrValue  : ""),
-                  toxinValue:(responseJson[0].toxinValue !== 0 ? responseJson[0].toxinValue  : ""),
-                  SNF:((responseJson[0].lrValue / 4) + (responseJson[0].fatValue * 0.22)+0.72),
+                  // temperatureInCentigrade: (responseJson[0].temperatureInCentigrade !== 0 ? responseJson[0].temperatureInCentigrade : ""),
+                  // humidity: (responseJson[0].humidity !== 0 ? responseJson[0].humidity : ""),
+                  // fatValue: (responseJson[0].fatValue !== 0 ? responseJson[0].fatValue : ""),
+                  // lrValue: (responseJson[0].lrValue !== 0 ? responseJson[0].lrValue  : ""),
+                  // toxinValue:(responseJson[0].toxinValue !== 0 ? responseJson[0].toxinValue  : ""),
+                  // SNF:((responseJson[0].lrValue / 4) + (responseJson[0].fatValue * 0.22)+0.72),
                   timestamp: eventTimestamp,
                   isLoaded: true, eventAdditionalMessage: "", messageColor: "success"});
                 this.calculateTotal(responseJson, true, true);
