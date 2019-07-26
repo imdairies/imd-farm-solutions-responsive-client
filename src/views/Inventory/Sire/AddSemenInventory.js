@@ -278,7 +278,7 @@ class AddSemenInventory extends Component {
                                 {this.state.animalTagValue}
                               </DropdownToggle>
                               <DropdownMenu onClick={this.handleSireChange}>
-                                {sireList.map(sire => (<DropdownItem id={sireCount++} value={sire.animalTag + '-' + sire.alias}>{sire.animalTag + '-' + sire.alias}</DropdownItem>))}
+                                {sireList.map(sire => (sire.semenInd == 'Y' ? <DropdownItem id={sireCount++} value={sire.animalTag + '-' + sire.alias}>{sire.animalTag + '-' + sire.alias}</DropdownItem> : ''))}
                               </DropdownMenu>
                             </Dropdown>
                           </Col>

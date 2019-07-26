@@ -44,7 +44,8 @@ class FeedList extends Component {
       warning: false,
       fadeIn: true,
       timeout: 300,
-      items: [],
+      animalFeedInfo: [],
+      feedItems: [],
       isLoaded: true,
       animalTag: "",
       animalType: "-- Animal Type --",
@@ -91,10 +92,11 @@ class FeedList extends Component {
     .then(response => response.json())
     .then(responseJson => {
       if (responseJson.error) {
-         this.setState({items: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+         this.setState({animalFeedInfo: [], feedItems:[], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
       }
       else {
-         this.setState({items: responseJson, isLoaded: true, eventAdditionalMessage: (responseJson.length === 1 ? responseJson.length + " matching record found" : responseJson.length + " matching records found"), messageColor: "success"});         
+      // alert(responseJson.feedItems.feedPlanItems[0].shortDescription);
+         this.setState({animalFeedInfo: responseJson.animalFeedInfo, feedItems: responseJson.feedItems.feedPlanItems, isLoaded: true, eventAdditionalMessage: (responseJson.length === 1 ? responseJson.length + " matching record found" : responseJson.length + " matching records found"), messageColor: "success"});         
       }
     })
     .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -117,7 +119,7 @@ class FeedList extends Component {
   }
 
   render() {
-    var { isLoaded, items, animaltypelist, eventAdditionalMessage, messageColor } = this.state;
+    var { feedItems, isLoaded, animalFeedInfo, animaltypelist, eventAdditionalMessage, messageColor } = this.state;
     let recordCount = 0;
     return (
       <div className="animated fadeIn">
@@ -142,12 +144,9 @@ class FeedList extends Component {
                               <th rowspan="2">Cohort</th>
                               <th rowspan="2">Weight (kg)</th>
                               <th colspan="3">Target Needs</th>
-                              <th rowspan="2">Milk</th>
-                              <th rowspan="2">Alfa Hay</th>
-                              <th rowspan="2">Corn Silage</th>
-                              <th rowspan="2">Alfaalfa</th>
-                              <th rowspan="2">Water</th>
-                              <th rowspan="2">Vanda</th>
+                               {feedItems.map(item => (
+                                <th rowspan="2">{item.shortDescription} <br/>{item.dailyIntake + ' ' + item.units}</th>
+                                  ))}
                             </tr> 
                             <tr  align="center" valign="middle">
                               <th>DM (Kg)</th>
@@ -156,8 +155,8 @@ class FeedList extends Component {
                             </tr> 
                          </thead>
                          <tbody>
-                           {items.map(item => (
-                               <tr key="{item.animalTag}">
+                           {animalFeedInfo.map(item => (
+                               <tr key="{item.animalTag}" align="center">
                                  <td width="2%">{++recordCount}</td>
                                  <td width="5%" title = {item.animalFeedCohortDeterminatationMessage} ><Link to={'/animal/update?animalTag=' + item.animalTag + '&orgID=' + item.orgID} >{item.animalTag}</Link></td>
                                  <td width="22%">{item.currentAge}</td>
@@ -166,6 +165,9 @@ class FeedList extends Component {
                                  <td>{item.nutritionalNeedsDryMatter}</td>
                                  <td>{item.nutritionalNeedsCrudeProtein}</td>
                                  <td>{item.nutritionalNeedsMetabloizableEnergy}</td>
+                                 {item.feedPlanItems.map(foodItem => (
+                                  <td>{foodItem.dailyIntake}</td>
+                                    ))}
                              </tr>
                              ))}
                          </tbody>

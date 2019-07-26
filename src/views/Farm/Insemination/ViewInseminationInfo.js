@@ -99,7 +99,7 @@ class ViewInseminationInfo extends Component {
                                 <th>#</th>
                                 <th>Tag#</th>
                                 <th>Type</th>
-                                <th>Lac#</th>
+                                <th>Calvings</th>
                                 <th>Inseminated At</th>
                                 <th>Insemination Summary</th>
                                 <th>Days Since Insemination</th>
