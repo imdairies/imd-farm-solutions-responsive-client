@@ -143,10 +143,17 @@ class AddFarmDailyMilk extends Component {
   handleVolumeValueChanged(event) {
     let items = this.state.animaltaglist;
     let item = this.state.animaltaglist[event.target.id];
+    let temperature = this.state.temperatureInCentigrade;
+    let humidity = this.state.humidity;
+    let fat = this.state.fatValue;
+    let lr = this.state.lrValue;
+    let toxin = this.state.toxinValue;
     item.milkVolume = event.target.value;
     items[event.target.id] = item;
     this.setState({animaltaglist: items});
     this.calculateTotal(items, false, false);
+    this.setState({temperatureInCentigrade: temperature, humidity:humidity, fatValue: fat, lrValue:lr, toxinValue:toxin});
+
   }
   calculateTotal(items, shouldDetermineAddOrUpdate, shouldCalculatePastAverages) {
     let totalMilk = 0;

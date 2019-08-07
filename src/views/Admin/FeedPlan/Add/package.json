@@ -1,0 +1,6 @@
+{
+  "name": "AddFeedPlan",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./AddFeedPlan.js"
+}

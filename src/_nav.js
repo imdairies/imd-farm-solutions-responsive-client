@@ -23,6 +23,10 @@ export default {
           name: 'Upload Milking',
           url: '/admin/milkingrecord/upload',
         },
+        {
+          name: 'Fee Plan', 
+          url: '/admin/feedplan/search',
+        },
       ],
     },
     {  
