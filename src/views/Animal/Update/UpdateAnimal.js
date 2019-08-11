@@ -153,6 +153,7 @@ class UpdateAnimal extends Component {
    //alert(targetID + " was clicked");
   }
   componentDidMount() {
+    images = [];
     const parsed = queryString.parse(this.props.location.search);
     this.setState({animalTag: parsed.animalTag, lifecycleStageList: [], orgID: parsed.orgID, invalidAccess: (parsed.animalTag ? false : true)});
     this.setState({month1MilkingRecord: [], month2MilkingRecord: [], genericMessage1: "Processing...",genericMessage2: "Processing..."}); 
