@@ -213,7 +213,7 @@ class UpdateAnimal extends Component {
                         backSideImageURL: (responseJson[0].backSideImageURL ? responseJson[0].backSideImageURL : "/assets/img/cow-photos/2.png"),
                         rightSideImageURL : (responseJson[0].rightSideImageURL ? responseJson[0].rightSideImageURL : "/assets/img/cow-photos/3.png"),
                         leftSideImageURL : (responseJson[0].leftSideImageURL ? responseJson[0].leftSideImageURL : "/assets/img/cow-photos/4.png"),
-                        animalType: responseJson[0].animalType,
+                        animalType: responseJson[0].animalTypeCD,
                         eventAdditionalMessage: (responseJson.length === 1 ? "Edit the desired values and press Search button" : "We expected to receive only one record matching the event code '" + parsed.eventCode + "' but we received " + responseJson.length), messageColor: "muted"});
           if (responseJson.length > 1)
             this.setState({messageColor: "danger"});
@@ -398,8 +398,8 @@ class UpdateAnimal extends Component {
 
 
   handleChange(event) {
-    if (event.target.id === "eventcode")
-      this.setState({eventcode: event.target.value});
+    if (event.target.id === "alias")
+      this.setState({alias: event.target.value});
     if (event.target.id === "shortdescription")
       this.setState({shortdescription: event.target.value});
     if (event.target.id === "longdescription")
@@ -410,13 +410,39 @@ class UpdateAnimal extends Component {
 
   handleUpdate(event) {
     event.preventDefault();
-    alert("Not Implemented");
+      fetch('http://localhost:8080/imd-farm-management/animals/updateanimal', {
+          method: "POST",
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            "animalTag": this.state.animalTag,
+            "alias": this.state.alias,
+            "gender" : (this.state.gender == "Female" ? "F" : "M"),
+            "sire" : (this.state.animalSireAlias == "-- Select Sire --"  ? null : this.state.animalSireTag),
+            "dateOfBirthStr": this.state.dateOfBirth,
+            "animalType": (this.state.animalType === "-- Animal Type --" ? null : this.state.animalType)
+            // "eventLongDescription": longDescr,
+            // "activeIndicator": active
+        })
+      })
+      .then(response => response.json())
+      .then(responseJson => {
+        if (responseJson.error) {
+           this.setState({isLoaded: true, message: responseJson.message, messageColor: "danger"});
+        }
+        else {
+           this.setState({isLoaded: true, message: responseJson.message, messageColor: "success"});         
+        }
+      })
+      .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
   }
 
 
 
   render() {
-    var { activeIndex, invalidAccess, lifecycleStageList, sireList, feedAnalysisMessageColor, feedAnalysisMessage, eventAdditionalMessage, genericMessage, eventMessageColor, messageColor, items, eventlist} = this.state;
+    var { activeIndex, message, invalidAccess, lifecycleStageList, sireList, feedAnalysisMessageColor, feedAnalysisMessage, eventAdditionalMessage, genericMessage, eventMessageColor, messageColor, items, eventlist} = this.state;
     var { genericMessage1, genericMessage2, month1MilkingRecord, month2MilkingRecord, message1Color, message2Color} = this.state;
     let recordCount = 0;
     let eventRecordCount = 0;
@@ -449,7 +475,7 @@ class UpdateAnimal extends Component {
                         <FormGroup row>
                           <Label sm="4" htmlFor="input-normal">Alias</Label>
                           <Col sm="4">
-                              <Input id="alias" name= "alias" type="text" maxLength="10" value={this.state.alias}  />
+                              <Input id="alias" type="text" maxLength="75" value={this.state.alias} onChange={this.handleChange} placeholder="Animal Alias"  />
                           </Col>
                         </FormGroup>
                         <FormGroup row>
@@ -498,7 +524,6 @@ class UpdateAnimal extends Component {
                               <DropdownToggle caret>
                                 {this.state.animalType}
                               </DropdownToggle>
-
                               <DropdownMenu onClick={this.handleLifecycleStage}>
                                 {lifecycleStageList.map(lifecycleStageItem => (
                                 <DropdownItem id={lifecycleStageItem.lookupValueCode} value={lifecycleStageItem.lookupValueCode} >{lifecycleStageItem.shortDescription}</DropdownItem>
@@ -615,55 +640,51 @@ class UpdateAnimal extends Component {
           </Col>
         </Row>
 
-              <Row>
-                <Col md="10">
-                  <Card>
-                      <CardHeader>
-                        <i className="fa fa-align-justify"></i>{"Life Events " + this.state.animalTag}<FormText color={eventMessageColor}>&nbsp;{eventAdditionalMessage}</FormText>
-                      </CardHeader>
-                      <CardBody>
-                         <Table hover bordered striped responsive size="sm">
-                          <thead>
-                              <tr>
-                                <th>#</th>
-                                <th>Timestamp</th>
-                                <th>Type</th>
-                                <th>Operator</th>
-                                <th>Day(s) Ago</th>
-                                <th>Age at Event</th>
-                                <th>Comments</th>
-                              </tr> 
-                          </thead>
-                          <tbody>
-                             {eventlist.map(item => (
-                                 <tr key="{item.animalTag}">
-                                   <td>{eventlist.length - ++eventRecordCount + 1}</td>
-                                   <td width="10%" data-toggle="tooltip" title={item.eventTimeStamp.substring(item.eventTimeStamp.length-8).trim()}>{item.eventTimeStamp.substring(0,item.eventTimeStamp.length-8).trim()}</td>
-                                   <td><Link to={'/animal/event/update?eventTransactionID=' + item.eventTransactionID} >{item.eventShortDescription}</Link></td>
-                                   <td>{item.eventOperator}</td>
-                                   <td>{item.daysFromToday}</td>
-                                   <td>{item.ageWhenOccurred}</td>
-                                   <td width="50%">{item.eventComments + " " + item.auxField1Value + " " + item.auxField2Value}</td>
-                               </tr>
-                               ))}
-                          </tbody>
-                         </Table>
-                      </CardBody>
-                  </Card>
-                  <Card>
-                    <CardBody>
-                      <CardFooter>
-                        <FormText color={messageColor}>&nbsp;{genericMessage}</FormText>
-                        <Button type="button" size="md" color="primary" onClick={this.handleUpdate}><i className="fa fa-edit"></i>&nbsp;Update</Button>
-                      </CardFooter>
-                    </CardBody>
-                  </Card>
-                </Col>
-              </Row>
-            </Fade>
+        <Row>
+          <Col md="10">
+            <Card>
+                <CardHeader>
+                  <i className="fa fa-align-justify"></i>{"Life Events " + this.state.animalTag}<FormText color={eventMessageColor}>&nbsp;{eventAdditionalMessage}</FormText>
+                </CardHeader>
+                <CardBody>
+                   <Table hover bordered striped responsive size="sm">
+                    <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Timestamp</th>
+                          <th>Type</th>
+                          <th>Operator</th>
+                          <th>Day(s) Ago</th>
+                          <th>Age at Event</th>
+                          <th>Comments</th>
+                        </tr> 
+                    </thead>
+                    <tbody>
+                       {eventlist.map(item => (
+                           <tr key="{item.animalTag}">
+                             <td>{eventlist.length - ++eventRecordCount + 1}</td>
+                             <td width="10%" data-toggle="tooltip" title={item.eventTimeStamp.substring(item.eventTimeStamp.length-8).trim()}>{item.eventTimeStamp.substring(0,item.eventTimeStamp.length-8).trim()}</td>
+                             <td><Link to={'/animal/event/update?eventTransactionID=' + item.eventTransactionID} >{item.eventShortDescription}</Link></td>
+                             <td>{item.eventOperator}</td>
+                             <td>{item.daysFromToday}</td>
+                             <td>{item.ageWhenOccurred}</td>
+                             <td width="50%">{item.eventComments + " " + item.auxField1Value + " " + item.auxField2Value}</td>
+                         </tr>
+                         ))}
+                    </tbody>
+                   </Table>
+                  <CardFooter>
+                    <FormText color={messageColor}>&nbsp;{message}</FormText>
+                    <Button type="button" size="md" color="primary" onClick={this.handleUpdate}><i className="fa fa-edit"></i>&nbsp;Update</Button>
+                </CardFooter>
+              </CardBody>
+            </Card>
           </Col>
         </Row>
-      </div>
+        </Fade>
+      </Col>
+    </Row>
+  </div>
     );
   }
 }
