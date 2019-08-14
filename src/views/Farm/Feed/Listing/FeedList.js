@@ -129,7 +129,7 @@ class FeedList extends Component {
              <Fade timeout={this.state.timeout} in={this.state.fadeIn}>
                 <Card>
                    <CardHeader>
-                   <i className="fa fa-align-justify"></i> Animal Feed Information {(isLoaded ? "": " Loading ...")}
+                   <i className="fa fa-align-justify"></i> Animal Feed Information {(isLoaded ? "": " Loading - be patient it may take a little while ...")}
                      <div className="card-header-actions">
                        <Button color="link" className="card-header-action btn-minimize" data-target="#animaldata" ></Button>
                      </div>
@@ -143,15 +143,20 @@ class FeedList extends Component {
                               <th rowspan="2">Age</th>
                               <th rowspan="2">Cohort</th>
                               <th rowspan="2">Weight (kg)</th>
-                              <th colspan="3">Target Needs</th>
+                              <th colspan="2">DM (Kg)</th>
+                              <th colspan="2">CP (Kg)</th>
+                              <th colspan="2">ME (MJ)</th>
                                {feedItems.map(item => (
                                 <th rowspan="2">{item.shortDescription} <br/>{item.dailyIntake + ' ' + item.units}</th>
                                   ))}
                             </tr> 
                             <tr  align="center" valign="middle">
-                              <th>DM (Kg)</th>
-                              <th>CP (Kg)</th>
-                              <th>ME (xx)</th>
+                              <th title = "Target Dry Matter">🎯</th>
+                              <th title = "Achieved Dry Matter">🔍</th>
+                              <th title = "Target Crude Protein">🎯</th>
+                              <th title = "Achieved Crude Protein">🔍</th>
+                              <th title = "Target Metabolizable Energy">🎯</th>
+                              <th title = "Achieved Metabolizable Energy">🔍</th>
                             </tr> 
                          </thead>
                          <tbody>
@@ -163,8 +168,11 @@ class FeedList extends Component {
                                  <td width="10%" title = {item.feedCohortDeterminatationCriteria}>{item.feedCohortTypeShortDescr}</td>
                                  <td> {item.weight === "" ? "?" : item.weight}</td>
                                  <td>{item.nutritionalNeedsDryMatter}</td>
+                                 <td bgcolor={item.planAchievedDM < item.nutritionalNeedsDryMatter ? "#F4DCDB" : "#DDF5DF"}>{item.planAchievedDM}</td>
                                  <td>{item.nutritionalNeedsCrudeProtein}</td>
+                                 <td bgcolor={item.planAchievedCP < item.nutritionalNeedsCrudeProtein ? "#F4DCDB" : "#DDF5DF"}>{item.planAchievedCP}</td>
                                  <td>{item.nutritionalNeedsMetabloizableEnergy}</td>
+                                 <td bgcolor={item.planAchievedME < item.nutritionalNeedsMetabloizableEnergy ? "#F4DCDB" : "#DDF5DF"}>{item.planAchievedME}</td>
                                  {item.feedPlanItems.map(foodItem => (
                                   <td>{foodItem.dailyIntake}</td>
                                     ))}
