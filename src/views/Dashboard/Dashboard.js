@@ -971,8 +971,8 @@ retrieveLactatingCount() {
                     </ButtonToolbar>
                   </Col>
                 </Row>
-                <div className="chart-wrapper" style={{ height: 300 + 'px', marginTop: 40 + 'px' }}>
-                  <Line data={mainChart} options={mainChartOpts} height={300} />
+                <div className="chart-wrapper" style={{ height: 300 + 'px', marginTop: 40 + 'px' }} >
+                  <Line data={mainChart} options={mainChartOpts}/>
                 </div>
               </CardBody>
             </Card>
