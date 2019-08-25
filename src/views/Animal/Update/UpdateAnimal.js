@@ -10,8 +10,96 @@ import {
 import { Redirect } from 'react-router-dom';
 import queryString from 'query-string';
 import { Link } from 'react-router-dom';
+import { Bar, Line } from 'react-chartjs-2';
+
+import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
+import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities'
+
+const brandSuccess = getStyle('--success')
+const brandInfo = getStyle('--info')
+
 
 var images = [];
+var data1 = [];
+var data2 = [];
+
+
+var mainChart = {
+  labels: [],
+  datasets: [
+    {
+      label: 'Ideal Kgs',
+      backgroundColor: 'transparent',
+      borderColor: brandInfo,
+      pointHoverBackgroundColor: '#fff',
+      borderWidth: 2,
+      data: data1
+    },
+    {
+      label: 'Actual Kgs',
+      backgroundColor: 'transparent',
+      borderColor: brandSuccess,
+      pointHoverBackgroundColor: '#eee',
+      borderWidth: 2,
+      data: data2
+    },
+  ],
+};
+
+var mainChartOpts = {
+  tooltips: {
+    enabled: false,
+    custom: CustomTooltips,
+    intersect: true,
+    mode: 'index',
+    position: 'nearest',
+    callbacks: {
+      labelColor: function(tooltipItem, chart) {
+        return { backgroundColor: chart.data.datasets[tooltipItem.datasetIndex].borderColor }
+      }
+    }
+  },
+  maintainAspectRatio: false,
+  legend: {
+    display: true,
+  },
+  scales: {
+    xAxes: [
+      {
+        gridLines: {
+          drawOnChartArea: false,
+        },
+        ticks: {
+          beginAtZero: true,
+          maxTicksLimit: 30,
+          stepSize: 10,
+          min: 0,
+        },
+      }],
+    yAxes: [
+      {
+        ticks: {
+          beginAtZero: true,
+          maxTicksLimit: 5,
+//          stepSize: Math.ceil(250 / 5),
+          stepSize: Math.ceil(50),
+          max: 650,
+          min: 0,
+        },
+      }],
+  },
+  elements: {
+    point: {
+      radius: 0,
+      hitRadius: 10,
+      hoverRadius: 4,
+      hoverBorderWidth: 3,
+    },
+  },
+};
+
+
+
 
 class UpdateAnimal extends Component {
   constructor(props) {
@@ -55,7 +143,9 @@ class UpdateAnimal extends Component {
       genericMessage1: "Processing ...",
       genericMessage2: "Processing ...",
       feedCohort: "",
-      planAnalysisComments: ""
+      planAnalysisComments: "",
+      weightGraphMessageColor: "success", 
+      weightGraphMessage: "", 
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleUpdate = this.handleUpdate.bind(this);
@@ -65,9 +155,48 @@ class UpdateAnimal extends Component {
     this.loadMilkingData = this.loadMilkingData.bind(this);
     this.handlePrevious = this.handlePrevious.bind(this);
     this.handleNext = this.handleNext.bind(this);
-
+    this.retrieveAnimallWeightGraphData = this.retrieveAnimallWeightGraphData.bind(this);
 
   }
+
+
+
+retrieveAnimallWeightGraphData(animalTag){
+  let now =  new Date();
+  fetch('http://localhost:8080/imd-farm-management/animals/getgrowthdata', {
+      method: "POST",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        "animalTag": animalTag 
+    })
+  })
+  .then(response => response.json())
+  .then(responseJson => {
+    if (responseJson.error) {
+       this.setState({weightGraphMessageColor: "danger", weightGraphMessage: "Error in retrieving weight information: " + responseJson.message});
+    }
+    else {
+       mainChart.labels = responseJson[0].ageInDays;
+       mainChart.datasets[0].data = responseJson[0].idealWeight;
+       mainChart.datasets[1].data = responseJson[0].actualWeight;
+       mainChartOpts.scales.yAxes = [{ ticks: {
+                                    beginAtZero: true,
+                                    maxTicksLimit: 5,
+                                    stepSize: 50,
+                                    max: responseJson[0].largestYAxisValue,
+                                    min: 0,
+                                  },
+                                }];
+       this.setState({ageInDays: responseJson[0].ageInDays, idealWeight:responseJson[0].idealWeight, actualWeight:responseJson[0].actualWeight});
+    }
+  })
+  .catch(error => this.setState({weightGraphMessageColor: "danger", weightGraphMessage: "Error in retrieving weight information: " + error.toString()}));
+}
+
+
 
   handlePrevious(event) {
     let recordDate = this.state.previousDate;
@@ -331,10 +460,7 @@ class UpdateAnimal extends Component {
     this.setState({previousMonth: previousDate.getMonth()+1, previousYear: previousDate.getFullYear(), nextMonth: nextDate.getMonth()+1, nextYear: nextDate.getFullYear()});
     this.loadMilkingData(prevDate, recordDate, parsed.animalTag);
     this.setState({previousDate: previousDate, nextDate: nextDate});
-
-
-
-
+    this.retrieveAnimallWeightGraphData(parsed.animalTag);
   }
 
   loadMilkingData(prevDate, recordDate, animalTag){
@@ -443,7 +569,7 @@ class UpdateAnimal extends Component {
 
   render() {
     var { activeIndex, message, invalidAccess, lifecycleStageList, sireList, feedAnalysisMessageColor, feedAnalysisMessage, eventAdditionalMessage, genericMessage, eventMessageColor, messageColor, items, eventlist} = this.state;
-    var { genericMessage1, genericMessage2, month1MilkingRecord, month2MilkingRecord, message1Color, message2Color} = this.state;
+    var { weightGraphMessageColor, weightGraphMessage, genericMessage1, genericMessage2, month1MilkingRecord, month2MilkingRecord, message1Color, message2Color} = this.state;
     let recordCount = 0;
     let eventRecordCount = 0;
     if (invalidAccess)
@@ -553,6 +679,21 @@ class UpdateAnimal extends Component {
                           <Col sm="10">{this.state.planAnalysisComments}</Col>                          
                         </FormGroup>
                       </Form>
+                    </CardBody>
+                  </Card>
+                </Col>
+              </Row>
+
+              <Row>
+                <Col md="8">
+                  <Card>
+                    <CardHeader>
+                      <i className="fa fa-align-justify"></i><strong>Growth Information</strong><FormText color={weightGraphMessageColor}>&nbsp;{weightGraphMessage}</FormText>
+                    </CardHeader>
+                    <CardBody>
+                      <div className="chart-wrapper" style={{ height: 450 + 'px', marginTop: 0 + 'px' }} >
+                        <Line data={mainChart} options={mainChartOpts}/>
+                      </div>
                     </CardBody>
                   </Card>
                 </Col>
