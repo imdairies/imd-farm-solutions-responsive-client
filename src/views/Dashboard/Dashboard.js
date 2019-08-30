@@ -941,7 +941,7 @@ retrieveLactatingCount() {
                     </DropdownMenu>
                   </ButtonDropdown>
                 </ButtonGroup>
-                <div className="text-value">{this.state.herdSize + " " + this.state.activeAnimalWidgetMessage}</div>
+                <div className="text-value" id="herdSize">{this.state.herdSize + " " + this.state.activeAnimalWidgetMessage}</div>
                 <div> <Link to={"/animal/search?searchCode=lactatingcows"} style={{color: '#FFF' }} > <i className="fa fa-arrow-circle-right"></i></Link> {this.state.lactatingAnimalWidgetMessage + ': '} {this.state.lactatingAnimalCount} </div>
                 <div> <Link to={"/animal/search?searchCode=pregnantcows"} style={{color: '#FFF' }} >  <i className="fa fa-arrow-circle-right"></i></Link> {this.state.pregnantAnimalWidgetMessage  + ': '} {this.state.pregnantCount} </div>
               </CardBody>
