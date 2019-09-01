@@ -29,6 +29,7 @@ import {
 import { Link } from 'react-router-dom';
 import queryString from 'query-string';
 import classnames from 'classnames';
+var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 
 
@@ -73,7 +74,7 @@ class SearchAnimalEvent extends Component {
   componentDidMount() {
 
     // retrieve Event Dropdown values  
-    fetch('http://localhost:8080/imd-farm-management/lv-lifecycle-event/allactive')
+    fetch(API_PREFIX + '/imd-farm-management/lv-lifecycle-event/allactive')
     .then(response => response.json())
     .then(responseJson => {
       if (responseJson.error) {
@@ -89,7 +90,7 @@ class SearchAnimalEvent extends Component {
   //   const parsed = queryString.parse(this.props.location.search);
   //   this.setState({lookupValueCode: parsed.lookupValueCode});
   //   this.setState({animaltaglist: [], isLoaded: false}); 
-  //   fetch('http://localhost:8080/imd-farm-management/animals/search', {
+  //   fetch(API_PREFIX + '/imd-farm-management/animals/search', {
   //       method: "POST",
   //       headers: {
   //           'Accept': 'application/json',
@@ -130,7 +131,7 @@ class SearchAnimalEvent extends Component {
     }
     else {
       this.setState({eventlist: [], isLoaded: false}); 
-      fetch('http://localhost:8080/imd-farm-management/animalevent/search', {
+      fetch(API_PREFIX + '/imd-farm-management/animalevent/search', {
           method: "POST",
           headers: {
               'Accept': 'application/json',

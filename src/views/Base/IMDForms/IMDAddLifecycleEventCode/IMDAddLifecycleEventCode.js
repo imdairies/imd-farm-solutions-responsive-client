@@ -20,6 +20,7 @@ import {
 import { AppSwitch } from '@coreui/react'
 import classnames from 'classnames';
 import { Link } from 'react-router-dom';
+var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 
 
@@ -51,7 +52,7 @@ class IMDAddLifecycleEventCode extends Component {
   //   this.setState({eventcode: parsed.eventCode, invalidAccess: (parsed.eventCode ? false : true)});
 
   //   this.setState({items: [], isLoaded: false, eventAdditionalMessage: "Processing ..."}); 
-  //   fetch('http://localhost:8080/imd-farm-management/lv-lifecycle-event/search', {
+  //   fetch(API_PREFIX + '/imd-farm-management/lv-lifecycle-event/search', {
   //       method: "POST",
   //       headers: {
   //           'Accept': 'application/json',
@@ -117,7 +118,7 @@ class IMDAddLifecycleEventCode extends Component {
         eventAdditionalMessage: "Processing ..."
       });
 
-      fetch('http://localhost:8080/imd-farm-management/lv-lifecycle-event/add', {
+      fetch(API_PREFIX + '/imd-farm-management/lv-lifecycle-event/add', {
           method: "POST",
           headers: {
               'Accept': 'application/json',

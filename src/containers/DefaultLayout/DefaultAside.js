@@ -6,6 +6,7 @@ import { AppSwitch } from '@coreui/react'
 import { Link } from 'react-router-dom';
 
 
+var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 
 const propTypes = {
@@ -18,7 +19,7 @@ class DefaultAside extends Component {
 
   componentDidMount() {
       this.setState({alertList: [], warningList: [], infoList: []}); 
-      fetch('http://localhost:8080/imd-farm-management/advisement/retrievealladvisement', {
+      fetch(API_PREFIX+ '/imd-farm-management/advisement/retrievealladvisement', {
           method: "POST",
           headers: {
               'Accept': 'application/json',

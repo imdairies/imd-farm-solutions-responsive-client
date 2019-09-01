@@ -42,6 +42,7 @@ const brandSuccess = getStyle('--success')
 const brandInfo = getStyle('--info')
 const brandWarning = getStyle('--warning')
 const brandDanger = getStyle('--danger')
+var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 
 var mainChart = {
@@ -197,7 +198,7 @@ class ViewMilking extends Component {
     this.setState({month1MilkingRecord: [], month1Sum: sum1, month1Max: max1, month1Avg: average1, isLoaded: false, genericMessage1: ""});
     this.setState({month2MilkingRecord: [], month2Sum: sum2, month2Max: max2, month2Avg: average2, isLoaded: false, genericMessage2: ""});
     // milking information month 1
-    fetch('http://localhost:8080/imd-farm-management/animals/monthlymilkingrecord', {
+    fetch(API_PREFIX + '/imd-farm-management/animals/monthlymilkingrecord', {
         method: "POST",
         headers: {
             'Accept': 'application/json',
@@ -228,7 +229,7 @@ class ViewMilking extends Component {
 
 
     // milking information month 2
-    fetch('http://localhost:8080/imd-farm-management/animals/monthlymilkingrecord', {
+    fetch(API_PREFIX + '/imd-farm-management/animals/monthlymilkingrecord', {
         method: "POST",
         headers: {
             'Accept': 'application/json',
@@ -260,7 +261,7 @@ class ViewMilking extends Component {
     .catch(error => this.setState({genericMessage2: "Following error occurred while processing the request: " + error.toString(), message2Color: "danger"}));
 
 
-    fetch('http://localhost:8080/imd-farm-management/milkinginfo/milkingrecordofananimalforspecifiedmonthpair', {
+    fetch(API_PREFIX + '/imd-farm-management/milkinginfo/milkingrecordofananimalforspecifiedmonthpair', {
             method: "POST",
             headers: {
               'Accept': 'application/json',

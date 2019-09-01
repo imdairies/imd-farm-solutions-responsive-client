@@ -27,6 +27,7 @@ import {
 import { AppSwitch } from '@coreui/react'
 import classnames from 'classnames';
 import { Link } from 'react-router-dom';
+var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 
 
@@ -79,7 +80,7 @@ class AddLookup extends Component {
 
   componentDidMount() {
 
-    fetch('http://localhost:8080/imd-farm-management/lookupvalues/search', {
+    fetch(API_PREFIX + '/imd-farm-management/lookupvalues/search', {
         method: "POST",
         headers: {
             'Accept': 'application/json',
@@ -151,7 +152,7 @@ class AddLookup extends Component {
         eventAdditionalMessage: "Processing ..."
       });
 
-      fetch('http://localhost:8080/imd-farm-management/lookupvalues/add', {
+      fetch(API_PREFIX + '/imd-farm-management/lookupvalues/add', {
           method: "POST",
           headers: {
               'Accept': 'application/json',

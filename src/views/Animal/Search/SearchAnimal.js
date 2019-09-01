@@ -29,6 +29,7 @@ import {
 import { Link } from 'react-router-dom';
 import queryString from 'query-string';
 import classnames from 'classnames';
+var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 
 
@@ -79,7 +80,7 @@ class SearchAnimal extends Component {
     var searchTypeCD = parsed.searchTypeCD;
     this.setState({animaltypelist: [], isLoaded: false}); 
     // alert(parsed.searchTypeCD);
-    fetch('http://localhost:8080/imd-farm-management/lookupvalues/search', {
+    fetch(API_PREFIX + '/imd-farm-management/lookupvalues/search', {
         method: "POST",
         headers: {
             'Accept': 'application/json',
@@ -101,7 +102,7 @@ class SearchAnimal extends Component {
     .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
 
     if (searchAPI != null) {
-      fetch('http://localhost:8080/imd-farm-management/animals/' + searchAPI, {
+      fetch(API_PREFIX + '/imd-farm-management/animals/' + searchAPI, {
           method: "POST",
           headers: {
               'Accept': 'application/json',
@@ -126,7 +127,7 @@ class SearchAnimal extends Component {
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
 
     } else if (searchTypeCD != null) {
-      fetch('http://localhost:8080/imd-farm-management/animals/search', {
+      fetch(API_PREFIX + '/imd-farm-management/animals/search', {
           method: "POST",
           headers: {
               'Accept': 'application/json',
@@ -166,7 +167,7 @@ class SearchAnimal extends Component {
   handleSearch(event) {
     event.preventDefault();
     this.setState({items: [], isLoaded: false}); 
-    fetch('http://localhost:8080/imd-farm-management/animals/search', {
+    fetch(API_PREFIX + '/imd-farm-management/animals/search', {
         method: "POST",
         headers: {
             'Accept': 'application/json',

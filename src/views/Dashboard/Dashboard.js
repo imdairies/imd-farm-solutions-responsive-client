@@ -31,6 +31,7 @@ const brandSuccess = getStyle('--success')
 const brandInfo = getStyle('--info')
 const brandWarning = getStyle('--warning')
 const brandDanger = getStyle('--danger')
+var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 // Card Chart 1
 var lactatingHerdChart = {
@@ -558,7 +559,7 @@ class Dashboard extends Component {
    }
 
 retrieveActiveHerdCount(){
-  fetch('http://localhost:8080/imd-farm-management/animals/allactive')
+  fetch(API_PREFIX+ '/imd-farm-management/animals/allactive')
   .then(response => response.json())
   .then(responseJson => {
     if (responseJson.error) {
@@ -574,7 +575,7 @@ retrieveActiveHerdCount(){
 
 retrieveMilkingRecordOfMonth(){
   let now =  new Date();
-  fetch('http://localhost:8080/imd-farm-management/milkinginfo/milkingrecordofmonth', {
+  fetch(API_PREFIX+ '/imd-farm-management/milkinginfo/milkingrecordofmonth', {
       method: "POST",
       headers: {
         'Accept': 'application/json',
@@ -609,7 +610,7 @@ retrieveMilkingRecordOfMonth(){
 }
 
 retrievePregnantCount(){
-  fetch('http://localhost:8080/imd-farm-management/animals/pregnantcows', {
+  fetch(API_PREFIX+ '/imd-farm-management/animals/pregnantcows', {
       method: "POST",
       headers: {
           'Accept': 'application/json',
@@ -634,7 +635,7 @@ retrievePregnantCount(){
 }
 
 retrieveHeiferCount(){
-  fetch('http://localhost:8080/imd-farm-management/animals/heifers', {
+  fetch(API_PREFIX+ '/imd-farm-management/animals/heifers', {
       method: "POST",
       headers: {
           'Accept': 'application/json',
@@ -659,7 +660,7 @@ retrieveHeiferCount(){
 
 retrieveFemaleCalvesCount(){
 
-  fetch('http://localhost:8080/imd-farm-management/animals/femalecalves', {
+  fetch(API_PREFIX+ '/imd-farm-management/animals/femalecalves', {
       method: "POST",
       headers: {
           'Accept': 'application/json',
@@ -695,7 +696,7 @@ retrieveHerdSizeHistory(){
   };
   // this.setState({herdSizeTrend: herdSizeHistory});
   // background graph that shows herd size growth trend
-  fetch('http://localhost:8080/imd-farm-management/farm/herdsizehistory', {
+  fetch(API_PREFIX+ '/imd-farm-management/farm/herdsizehistory', {
       method: "POST",
       headers: {
         'Accept': 'application/json',
@@ -726,7 +727,7 @@ retrieveHerdSizeHistory(){
 
 retrieveLactatingCount() {
 
-  fetch('http://localhost:8080/imd-farm-management/animals/lactatingcows', {
+  fetch(API_PREFIX+ '/imd-farm-management/animals/lactatingcows', {
       method: "POST",
       headers: {
           'Accept': 'application/json',
@@ -772,7 +773,7 @@ retrieveLactatingCount() {
   }
   loadCurrentMonthData(){
       let now =  new Date();
-      fetch('http://localhost:8080/imd-farm-management/milkinginfo/milkingrecordofmonth', {
+      fetch(API_PREFIX+ '/imd-farm-management/milkinginfo/milkingrecordofmonth', {
               method: "POST",
               headers: {
                 'Accept': 'application/json',
@@ -811,7 +812,7 @@ retrieveLactatingCount() {
         prevMonth --;
       }
 
-      fetch('http://localhost:8080/imd-farm-management/milkinginfo/milkingrecordofmonth', {
+      fetch(API_PREFIX+ '/imd-farm-management/milkinginfo/milkingrecordofmonth', {
               method: "POST",
               headers: {
                 'Accept': 'application/json',
@@ -852,7 +853,7 @@ retrieveLactatingCount() {
         prevMonth -= 2;
       }
 
-      fetch('http://localhost:8080/imd-farm-management/milkinginfo/milkingrecordofmonth', {
+      fetch(API_PREFIX+ '/imd-farm-management/milkinginfo/milkingrecordofmonth', {
               method: "POST",
               headers: {
                 'Accept': 'application/json',
@@ -883,7 +884,7 @@ retrieveLactatingCount() {
   }
   loadCurrentYearData(){
       let now =  new Date();
-      fetch('http://localhost:8080/imd-farm-management/milkinginfo/milkingrecordofeachdayofyear', {
+      fetch(API_PREFIX+ '/imd-farm-management/milkinginfo/milkingrecordofeachdayofyear', {
               method: "POST",
               headers: {
                 'Accept': 'application/json',

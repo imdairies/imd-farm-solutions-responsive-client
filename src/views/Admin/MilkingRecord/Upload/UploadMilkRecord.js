@@ -30,6 +30,8 @@ import { Link } from 'react-router-dom';
 import queryString from 'query-string';
 import DateTimePicker from 'react-datetime-picker';
 
+var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
+
 
 class UploadMilkRecord extends Component {
   constructor(props) {
@@ -178,7 +180,7 @@ class UploadMilkRecord extends Component {
         this.setState({messageColor: "danger", outcomeMessage: "The number of Cow Tags and milk records must be exactly the same. Please modify the Cow Tags and/or Milk Records values to fix the mis-match."});
       }
       else {
-        fetch('http://localhost:8080/imd-farm-management/milkinginfo/uploadfarmmilkingevent', {
+        fetch(API_PREFIX + '/imd-farm-management/milkinginfo/uploadfarmmilkingevent', {
             method: "POST",
             headers: {
                 'Accept': 'application/json',

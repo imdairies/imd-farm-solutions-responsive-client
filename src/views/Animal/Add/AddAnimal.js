@@ -27,6 +27,7 @@ import classnames from 'classnames';
 import { Link } from 'react-router-dom';
 import DateTimePicker from 'react-datetime-picker';
 
+var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 
 
@@ -80,7 +81,7 @@ class AddAnimal extends Component {
 
   componentDidMount() {
     this.setState({animaltypelist: [], breedList: [], isLoaded: false}); 
-    fetch('http://localhost:8080/imd-farm-management/lookupvalues/search', {
+    fetch(API_PREFIX + '/imd-farm-management/lookupvalues/search', {
         method: "POST",
         headers: {
             'Accept': 'application/json',
@@ -102,7 +103,7 @@ class AddAnimal extends Component {
     })
     .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
 
-    fetch('http://localhost:8080/imd-farm-management/lookupvalues/search', {
+    fetch(API_PREFIX + '/imd-farm-management/lookupvalues/search', {
         method: "POST",
         headers: {
             'Accept': 'application/json',
@@ -126,7 +127,7 @@ class AddAnimal extends Component {
 
 
 
-    fetch('http://localhost:8080/imd-farm-management/animals/retrieveaisire', {
+    fetch(API_PREFIX + '/imd-farm-management/animals/retrieveaisire', {
         method: "POST",
         headers: {
             'Accept': 'application/json',
@@ -147,7 +148,7 @@ class AddAnimal extends Component {
     })
     .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
 
-    fetch('http://localhost:8080/imd-farm-management/animals/getactivedams', {
+    fetch(API_PREFIX + '/imd-farm-management/animals/getactivedams', {
         method: "POST",
         headers: {
             'Accept': 'application/json',
@@ -253,7 +254,7 @@ class AddAnimal extends Component {
     } else {
       this.setState({message: "Processing ..."
       });
-      fetch('http://localhost:8080/imd-farm-management/animals/addanimal', {
+      fetch(API_PREFIX + '/imd-farm-management/animals/addanimal', {
           method: "POST",
           headers: {
               'Accept': 'application/json',

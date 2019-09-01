@@ -29,6 +29,7 @@ import classnames from 'classnames';
 import { Link } from 'react-router-dom';
 import queryString from 'query-string';
 import DateTimePicker from 'react-datetime-picker';
+var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 
 class AddFarmDailyMilk extends Component {
@@ -239,7 +240,7 @@ class AddFarmDailyMilk extends Component {
 
    fetchMilkingRecordForTheEvent(eventNumber, timestampValue){
     if (timestampValue !== null) {
-      fetch('http://localhost:8080/imd-farm-management/animals/lactatingcowsmilkrecord', {
+      fetch(API_PREFIX + '/imd-farm-management/animals/lactatingcowsmilkrecord', {
               method: "POST",
               headers: {
                   'Accept': 'application/json',
@@ -271,12 +272,6 @@ class AddFarmDailyMilk extends Component {
                      eventTimestamp = new Date(responseJson[i].recordDate + " " + responseJson[i].recordTime);                  
                 }
                 this.setState({animaltaglist: responseJson,
-                  // temperatureInCentigrade: (responseJson[0].temperatureInCentigrade !== 0 ? responseJson[0].temperatureInCentigrade : ""),
-                  // humidity: (responseJson[0].humidity !== 0 ? responseJson[0].humidity : ""),
-                  // fatValue: (responseJson[0].fatValue !== 0 ? responseJson[0].fatValue : ""),
-                  // lrValue: (responseJson[0].lrValue !== 0 ? responseJson[0].lrValue  : ""),
-                  // toxinValue:(responseJson[0].toxinValue !== 0 ? responseJson[0].toxinValue  : ""),
-                  // SNF:((responseJson[0].lrValue / 4) + (responseJson[0].fatValue * 0.22)+0.72),
                   timestamp: eventTimestamp,
                   isLoaded: true, eventAdditionalMessage: "", messageColor: "success"});
                 this.calculateTotal(responseJson, true, true);
@@ -339,7 +334,7 @@ class AddFarmDailyMilk extends Component {
       if (totalVolume === 0) {
         this.setState({eventAdditionalMessage: "You have not specified any milk volume", messageColor: "danger"});
       } else {
-        fetch('http://localhost:8080/imd-farm-management/milkinginfo/addfarmmilkingevent', {
+        fetch(API_PREFIX + '/imd-farm-management/milkinginfo/addfarmmilkingevent', {
             method: "POST",
             headers: {
                 'Accept': 'application/json',

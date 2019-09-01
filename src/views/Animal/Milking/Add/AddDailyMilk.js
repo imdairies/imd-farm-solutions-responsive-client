@@ -28,6 +28,7 @@ import classnames from 'classnames';
 import { Link } from 'react-router-dom';
 import queryString from 'query-string';
 import DateTimePicker from 'react-datetime-picker';
+var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 
 class AddDailyMilk extends Component {
@@ -97,7 +98,7 @@ class AddDailyMilk extends Component {
     const parsed = queryString.parse(this.props.location.search);
     this.setState({lookupValueCode: parsed.lookupValueCode, animaltaglist: [], eventlist: [], operatorlist: [], isLoaded: false}); 
 
-    fetch('http://localhost:8080/imd-farm-management/animals/lactatingcows', {
+    fetch(API_PREFIX + '/imd-farm-management/animals/lactatingcows', {
         method: "POST",
         headers: {
             'Accept': 'application/json',
@@ -161,7 +162,7 @@ class AddDailyMilk extends Component {
     } else {
       this.setState({eventAdditionalMessage: "Processing ..."
       });
-      fetch('http://localhost:8080/imd-farm-management/animals/addmilkingrecord', {
+      fetch(API_PREFIX + '/imd-farm-management/animals/addmilkingrecord', {
           method: "POST",
           headers: {
               'Accept': 'application/json',

@@ -31,6 +31,7 @@ import { Link } from 'react-router-dom';
 import queryString from 'query-string';
 import DateTimePicker from 'react-datetime-picker';
 
+var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 class AddFarmEvent extends Component {
   constructor(props) {
@@ -186,7 +187,7 @@ handleField1DropdownValueChanged(event) {
   handleAnimalTypeSelected(event) {
     event.preventDefault();
     this.setState({animalType: event.target.value, selectAll: false, animalTagList: [], isLoaded: false}); 
-    fetch('http://localhost:8080/imd-farm-management/animals/search', {
+    fetch(API_PREFIX + '/imd-farm-management/animals/search', {
         method: "POST",
         headers: {
             'Accept': 'application/json',
@@ -232,7 +233,7 @@ handleField1DropdownValueChanged(event) {
   componentDidMount() {
 
     // retrieve animal typelist
-    fetch('http://localhost:8080/imd-farm-management/lookupvalues/search', {
+    fetch(API_PREFIX + '/imd-farm-management/lookupvalues/search', {
         method: "POST",
         headers: {
             'Accept': 'application/json',
@@ -256,7 +257,7 @@ handleField1DropdownValueChanged(event) {
 
 
     // retrieve Event Dropdown values  
-    fetch('http://localhost:8080/imd-farm-management/lv-lifecycle-event/allactive')
+    fetch(API_PREFIX + '/imd-farm-management/lv-lifecycle-event/allactive')
     .then(response => response.json())
     .then(responseJson => {
       if (responseJson.error) {
@@ -271,7 +272,7 @@ handleField1DropdownValueChanged(event) {
 
 
     // retrieve Operator Dropdown values  
-    fetch('http://localhost:8080/imd-farm-management/lookupvalues/search', {
+    fetch(API_PREFIX + '/imd-farm-management/lookupvalues/search', {
         method: "POST",
         headers: {
             'Accept': 'application/json',
@@ -353,7 +354,7 @@ handleField1DropdownValueChanged(event) {
       // dropdown data type.
       field1DropdownDisplay = true;
       apiUrlPostfix =  field1DataType.substring(3);
-      fetch('http://localhost:8080/imd-farm-management/lv-lifecycle-event' + apiUrlPostfix, {
+      fetch(API_PREFIX + '/imd-farm-management/lv-lifecycle-event' + apiUrlPostfix, {
           method: "POST",
           headers: {
               'Accept': 'application/json',
@@ -375,7 +376,7 @@ handleField1DropdownValueChanged(event) {
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
     } else if (field1DataType === "CATEGORY_CD") {
       field1DropdownDisplay = true;
-      fetch('http://localhost:8080/imd-farm-management/lookupvalues/search', {
+      fetch(API_PREFIX + '/imd-farm-management/lookupvalues/search', {
           method: "POST",
           headers: {
               'Accept': 'application/json',
@@ -413,9 +414,9 @@ handleField1DropdownValueChanged(event) {
       // dropdown data type.
       field2DropdownDisplay = true;
       apiUrlPostfix =  field2DataType.substring(3);
-      // alert('http://localhost:8080/imd-farm-management/lv-lifecycle-event' + apiUrlPostfix);
+      // alert(API_PREFIX + '/imd-farm-management/lv-lifecycle-event' + apiUrlPostfix);
 
-      fetch('http://localhost:8080/imd-farm-management/lv-lifecycle-event' + apiUrlPostfix, {
+      fetch(API_PREFIX + '/imd-farm-management/lv-lifecycle-event' + apiUrlPostfix, {
           method: "POST",
           headers: {
               'Accept': 'application/json',
@@ -437,7 +438,7 @@ handleField1DropdownValueChanged(event) {
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
     } else if (field2DataType === "CATEGORY_CD") {
       field2DropdownDisplay = true;
-      fetch('http://localhost:8080/imd-farm-management/lookupvalues/search', {
+      fetch(API_PREFIX + '/imd-farm-management/lookupvalues/search', {
           method: "POST",
           headers: {
               'Accept': 'application/json',
@@ -521,7 +522,7 @@ handleField1DropdownValueChanged(event) {
     } else {
       this.setState({eventAdditionalMessage: "Processing ..."
       });
-      fetch('http://localhost:8080/imd-farm-management/animalevent/addbatch', {
+      fetch(API_PREFIX + '/imd-farm-management/animalevent/addbatch', {
           method: "POST",
           headers: {
               'Accept': 'application/json',

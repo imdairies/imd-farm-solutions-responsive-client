@@ -27,6 +27,7 @@ import classnames from 'classnames';
 import { Link } from 'react-router-dom';
 import DateTimePicker from 'react-datetime-picker';
 import queryString from 'query-string';
+var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 
 class AddSire extends Component {
@@ -93,7 +94,7 @@ class AddSire extends Component {
     let alias = "";
     let semenCompany = "";
 
-    fetch('http://localhost:8080/imd-farm-management/animals/search', {
+    fetch(API_PREFIX + '/imd-farm-management/animals/search', {
         method: "POST",
         headers: {
             'Accept': 'application/json',
@@ -136,7 +137,7 @@ class AddSire extends Component {
     }
 
 
-    fetch('http://localhost:8080/imd-farm-management/lookupvalues/search', {
+    fetch(API_PREFIX + '/imd-farm-management/lookupvalues/search', {
         method: "POST",
         headers: {
             'Accept': 'application/json',
@@ -158,7 +159,7 @@ class AddSire extends Component {
     .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
 
 
-    fetch('http://localhost:8080/imd-farm-management/lookupvalues/search', {
+    fetch(API_PREFIX + '/imd-farm-management/lookupvalues/search', {
         method: "POST",
         headers: {
             'Accept': 'application/json',
@@ -179,7 +180,7 @@ class AddSire extends Component {
     })
     .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
 
-    fetch('http://localhost:8080/imd-farm-management/lookupvalues/search', {
+    fetch(API_PREFIX + '/imd-farm-management/lookupvalues/search', {
         method: "POST",
         headers: {
             'Accept': 'application/json',
@@ -259,7 +260,7 @@ setupFarmSireInformation() {
 
 
     // populate the Sire Tag list
-        fetch('http://localhost:8080/imd-farm-management/animals/retrievefarmsire', {
+        fetch(API_PREFIX + '/imd-farm-management/animals/retrievefarmsire', {
         method: "POST",
         headers: {
             'Accept': 'application/json',
@@ -315,7 +316,7 @@ setupFarmSireInformation() {
     } else {
       this.setState({message: "Processing ..."
       });
-      fetch('http://localhost:8080/imd-farm-management/animals/addsire', {
+      fetch(API_PREFIX + '/imd-farm-management/animals/addsire', {
           method: "POST",
           headers: {
               'Accept': 'application/json',

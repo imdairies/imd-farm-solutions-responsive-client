@@ -27,6 +27,7 @@ import {
 import { Link } from 'react-router-dom';
 import queryString from 'query-string';
 import classnames from 'classnames';
+var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 
 
@@ -76,7 +77,7 @@ class Forms extends Component {
     this.setState({items: [], isLoaded: false}); 
     // var jsonString = '{"eventCode":"' + (this.state.eventcode) + '", "eventShortDescription":"' + (this.state.shortdescription) + '", "eventLongDescription":"' + (this.state.longdescription) + '"}';
     // alert(jsonString);
-    fetch('http://localhost:8080/imd-farm-management/lv-lifecycle-event/search', {
+    fetch(API_PREFIX + '/imd-farm-management/lv-lifecycle-event/search', {
         method: "POST",
         headers: {
             'Accept': 'application/json',

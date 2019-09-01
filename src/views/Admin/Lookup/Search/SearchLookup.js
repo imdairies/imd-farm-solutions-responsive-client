@@ -26,6 +26,7 @@ import {
 import { Link } from 'react-router-dom';
 import queryString from 'query-string';
 import classnames from 'classnames';
+var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 
 
@@ -70,7 +71,7 @@ class SearchLookup extends Component {
   handleSearch(event) {
     event.preventDefault();
     this.setState({items: [], isLoaded: false}); 
-    fetch('http://localhost:8080/imd-farm-management/lookupvalues/search', {
+    fetch(API_PREFIX + '/imd-farm-management/lookupvalues/search', {
         method: "POST",
         headers: {
             'Accept': 'application/json',

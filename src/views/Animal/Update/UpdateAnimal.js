@@ -22,6 +22,7 @@ const brandInfo = getStyle('--info')
 var images = [];
 var data1 = [];
 var data2 = [];
+var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 
 var mainChart = {
@@ -163,7 +164,7 @@ class UpdateAnimal extends Component {
 
 retrieveAnimallWeightGraphData(animalTag){
   let now =  new Date();
-  fetch('http://localhost:8080/imd-farm-management/animals/getgrowthdata', {
+  fetch(API_PREFIX+ '/imd-farm-management/animals/getgrowthdata', {
       method: "POST",
       headers: {
         'Accept': 'application/json',
@@ -306,9 +307,9 @@ retrieveAnimallWeightGraphData(animalTag){
 
     nextDate = new Date(recordDate);
     nextDate.setMonth(nextDate.getMonth()+1);
-
-
-    fetch('http://localhost:8080/imd-farm-management/animals/search', {
+    
+   // alert(API_PREFIX);
+    fetch(API_PREFIX + '/imd-farm-management/animals/search', {
         method: "POST",
         headers: {
             'Accept': 'application/json',
@@ -357,7 +358,7 @@ retrieveAnimallWeightGraphData(animalTag){
     .catch(error => this.setState({genericMessage: error.toString(), messageColor: "danger"}));
 
     // retrieve Lifecycle Dropdown values  
-    fetch('http://localhost:8080/imd-farm-management/lookupvalues/search', {
+    fetch(API_PREFIX+ '/imd-farm-management/lookupvalues/search', {
         method: "POST",
         headers: {
             'Accept': 'application/json',
@@ -379,7 +380,7 @@ retrieveAnimallWeightGraphData(animalTag){
     .catch(error => this.setState({genericMessage: error.toString(), messageColor: "danger"}));
 
     // retrieve sires
-    fetch('http://localhost:8080/imd-farm-management/animals/retrieveaisire', {
+    fetch(API_PREFIX+ '/imd-farm-management/animals/retrieveaisire', {
         method: "POST",
         headers: {
             'Accept': 'application/json',
@@ -404,7 +405,7 @@ retrieveAnimallWeightGraphData(animalTag){
 
     // lifecycle event
     this.setState({eventlist: [], isLoaded: false}); 
-    fetch('http://localhost:8080/imd-farm-management/animalevent/search', {
+    fetch(API_PREFIX+ '/imd-farm-management/animalevent/search', {
         method: "POST",
         headers: {
             'Accept': 'application/json',
@@ -430,7 +431,7 @@ retrieveAnimallWeightGraphData(animalTag){
 
   // Feed Analysis
     this.setState({feedCohort: "Undetermined"}); 
-    fetch('http://localhost:8080/imd-farm-management/feed/determineanimalfeed', {
+    fetch(API_PREFIX+ '/imd-farm-management/feed/determineanimalfeed', {
         method: "POST",
         headers: {
             'Accept': 'application/json',
@@ -449,6 +450,10 @@ retrieveAnimallWeightGraphData(animalTag){
          this.setState({feedCohort: responseJson[0].animalFeedCohortDeterminatationMessage,
                         feedCohortTypeShortDescr: responseJson[0].feedCohortTypeShortDescr,
                         planAnalysisComments: responseJson[0].planAnalysisComments,
+                        nutritionalNeedsDryMatter: responseJson[0].nutritionalNeedsDryMatter,
+                        nutritionalNeedsCrudeProtein: responseJson[0].nutritionalNeedsCrudeProtein,
+                        nutritionalNeedsTDN: responseJson[0].nutritionalNeedsTDN,
+                        nutritionalNeedsMetabloizableEnergy: responseJson[0].nutritionalNeedsMetabloizableEnergy,
                         feedAnalysisMessage: "", feedAnalysisMessageColor: "success"});         
       }
     })
@@ -465,7 +470,7 @@ retrieveAnimallWeightGraphData(animalTag){
 
   loadMilkingData(prevDate, recordDate, animalTag){
     // milking information month 1
-    fetch('http://localhost:8080/imd-farm-management/animals/monthlymilkingrecord', {
+    fetch(API_PREFIX+ '/imd-farm-management/animals/monthlymilkingrecord', {
         method: "POST",
         headers: {
             'Accept': 'application/json',
@@ -488,7 +493,7 @@ retrieveAnimallWeightGraphData(animalTag){
     .catch(error => this.setState({genericMessage1: "Following error occurred while processing the request: " + error.toString(), message1Color: "danger"}));
 
     // milking information month 2
-    fetch('http://localhost:8080/imd-farm-management/animals/monthlymilkingrecord', {
+    fetch(API_PREFIX+ '/imd-farm-management/animals/monthlymilkingrecord', {
         method: "POST",
         headers: {
             'Accept': 'application/json',
@@ -536,7 +541,7 @@ retrieveAnimallWeightGraphData(animalTag){
 
   handleUpdate(event) {
     event.preventDefault();
-      fetch('http://localhost:8080/imd-farm-management/animals/updateanimal', {
+      fetch(API_PREFIX+ '/imd-farm-management/animals/updateanimal', {
           method: "POST",
           headers: {
               'Accept': 'application/json',
@@ -677,6 +682,12 @@ retrieveAnimallWeightGraphData(animalTag){
                         </FormGroup>
                         <FormGroup row>
                           <Col sm="10">{this.state.planAnalysisComments}</Col>                          
+                        </FormGroup>
+                        <FormGroup row>
+                          <Col sm="10">{'The daily needs of this animal are: ' + (this.state.nutritionalNeedsDryMatter * 100 )+ 
+                          '% of body weight in Dry Matter (DM), Crude protein of ' + (this.state.nutritionalNeedsCrudeProtein * 100) + 
+                          ' % DM, ' + this.state.nutritionalNeedsMetabloizableEnergy + 
+                          ' MJ Metabolizable Energy and ' + this.state.nutritionalNeedsTDN + ' Kgs. TDN'}</Col>                          
                         </FormGroup>
                       </Form>
                     </CardBody>

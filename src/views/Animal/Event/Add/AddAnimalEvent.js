@@ -29,6 +29,7 @@ import classnames from 'classnames';
 import { Link } from 'react-router-dom';
 import queryString from 'query-string';
 import DateTimePicker from 'react-datetime-picker';
+var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 
 class AddAnimalEvent extends Component {
@@ -196,7 +197,7 @@ class AddAnimalEvent extends Component {
 
 
     // retrieve Event Dropdown values  
-    fetch('http://localhost:8080/imd-farm-management/lv-lifecycle-event/allactive')
+    fetch(API_PREFIX + '/imd-farm-management/lv-lifecycle-event/allactive')
     .then(response => response.json())
     .then(responseJson => {
       if (responseJson.error) {
@@ -211,7 +212,7 @@ class AddAnimalEvent extends Component {
 
 
     // retrieve Operator Dropdown values  
-    fetch('http://localhost:8080/imd-farm-management/lookupvalues/search', {
+    fetch(API_PREFIX + '/imd-farm-management/lookupvalues/search', {
         method: "POST",
         headers: {
             'Accept': 'application/json',
@@ -317,7 +318,7 @@ class AddAnimalEvent extends Component {
       // dropdown data type.
       field1DropdownDisplay = true;
       apiUrlPostfix =  field1DataType.substring(3);
-      fetch('http://localhost:8080/imd-farm-management/lv-lifecycle-event' + apiUrlPostfix, {
+      fetch(API_PREFIX + '/imd-farm-management/lv-lifecycle-event' + apiUrlPostfix, {
           method: "POST",
           headers: {
               'Accept': 'application/json',
@@ -339,7 +340,7 @@ class AddAnimalEvent extends Component {
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
     } else if (field1DataType === "CATEGORY_CD") {
       field1DropdownDisplay = true;
-      fetch('http://localhost:8080/imd-farm-management/lookupvalues/search', {
+      fetch(API_PREFIX + '/imd-farm-management/lookupvalues/search', {
           method: "POST",
           headers: {
               'Accept': 'application/json',
@@ -377,9 +378,9 @@ class AddAnimalEvent extends Component {
       // dropdown data type.
       field2DropdownDisplay = true;
       apiUrlPostfix =  field2DataType.substring(3);
-      // alert('http://localhost:8080/imd-farm-management/lv-lifecycle-event' + apiUrlPostfix);
+      // alert(API_PREFIX + '/imd-farm-management/lv-lifecycle-event' + apiUrlPostfix);
 
-      fetch('http://localhost:8080/imd-farm-management/lv-lifecycle-event' + apiUrlPostfix, {
+      fetch(API_PREFIX + '/imd-farm-management/lv-lifecycle-event' + apiUrlPostfix, {
           method: "POST",
           headers: {
               'Accept': 'application/json',
@@ -401,7 +402,7 @@ class AddAnimalEvent extends Component {
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
     } else if (field2DataType === "CATEGORY_CD") {
       field2DropdownDisplay = true;
-      fetch('http://localhost:8080/imd-farm-management/lookupvalues/search', {
+      fetch(API_PREFIX + '/imd-farm-management/lookupvalues/search', {
           method: "POST",
           headers: {
               'Accept': 'application/json',
@@ -443,9 +444,9 @@ class AddAnimalEvent extends Component {
       // dropdown data type.
       field3DropdownDisplay = true;
       apiUrlPostfix =  field3DataType.substring(3);
-      // alert('http://localhost:8080/imd-farm-management/lv-lifecycle-event' + apiUrlPostfix);
+      // alert(API_PREFIX + '/imd-farm-management/lv-lifecycle-event' + apiUrlPostfix);
 
-      fetch('http://localhost:8080/imd-farm-management/lv-lifecycle-event' + apiUrlPostfix, {
+      fetch(API_PREFIX + '/imd-farm-management/lv-lifecycle-event' + apiUrlPostfix, {
           method: "POST",
           headers: {
               'Accept': 'application/json',
@@ -467,7 +468,7 @@ class AddAnimalEvent extends Component {
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
     } else if (field3DataType === "CATEGORY_CD") {
       field3DropdownDisplay = true;
-      fetch('http://localhost:8080/imd-farm-management/lookupvalues/search', {
+      fetch(API_PREFIX + '/imd-farm-management/lookupvalues/search', {
           method: "POST",
           headers: {
               'Accept': 'application/json',
@@ -507,9 +508,9 @@ class AddAnimalEvent extends Component {
       // dropdown data type.
       field4DropdownDisplay = true;
       apiUrlPostfix =  field4DataType.substring(3);
-      // alert('http://localhost:8080/imd-farm-management/lv-lifecycle-event' + apiUrlPostfix);
+      // alert(API_PREFIX + '/imd-farm-management/lv-lifecycle-event' + apiUrlPostfix);
 
-      fetch('http://localhost:8080/imd-farm-management/lv-lifecycle-event' + apiUrlPostfix, {
+      fetch(API_PREFIX + '/imd-farm-management/lv-lifecycle-event' + apiUrlPostfix, {
           method: "POST",
           headers: {
               'Accept': 'application/json',
@@ -531,7 +532,7 @@ class AddAnimalEvent extends Component {
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
     } else if (field4DataType === "CATEGORY_CD") {
       field4DropdownDisplay = true;
-      fetch('http://localhost:8080/imd-farm-management/lookupvalues/search', {
+      fetch(API_PREFIX + '/imd-farm-management/lookupvalues/search', {
           method: "POST",
           headers: {
               'Accept': 'application/json',
@@ -646,7 +647,7 @@ class AddAnimalEvent extends Component {
     } else {
       this.setState({eventAdditionalMessage: "Processing ..."
       });
-      fetch('http://localhost:8080/imd-farm-management/animalevent/add', {
+      fetch(API_PREFIX + '/imd-farm-management/animalevent/add', {
           method: "POST",
           headers: {
               'Accept': 'application/json',
