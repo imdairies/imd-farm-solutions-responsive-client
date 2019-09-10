@@ -26,6 +26,7 @@ class DefaultAside extends Component {
               'Content-Type': 'application/json'
           },
           body: JSON.stringify({
+            "animalTag":"%",
             "advisementID":"%",
             "threshold1Violated": true,
             "threshold2Violated": true,

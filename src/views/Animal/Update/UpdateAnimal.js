@@ -147,6 +147,9 @@ class UpdateAnimal extends Component {
       planAnalysisComments: "",
       weightGraphMessageColor: "success", 
       weightGraphMessage: "", 
+      alertList: [],
+      warningList: [], 
+      infoList: [],
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleUpdate = this.handleUpdate.bind(this);
@@ -157,6 +160,7 @@ class UpdateAnimal extends Component {
     this.handlePrevious = this.handlePrevious.bind(this);
     this.handleNext = this.handleNext.bind(this);
     this.retrieveAnimallWeightGraphData = this.retrieveAnimallWeightGraphData.bind(this);
+    this.retrieveAnimalAdvisement = this.retrieveAnimalAdvisement.bind(this);
 
   }
 
@@ -466,7 +470,55 @@ retrieveAnimallWeightGraphData(animalTag){
     this.loadMilkingData(prevDate, recordDate, parsed.animalTag);
     this.setState({previousDate: previousDate, nextDate: nextDate});
     this.retrieveAnimallWeightGraphData(parsed.animalTag);
+    this.retrieveAnimalAdvisement(parsed.animalTag);
   }
+
+
+  retrieveAnimalAdvisement(animalTag) {
+      fetch(API_PREFIX+ '/imd-farm-management/advisement/retrieveanimaladvisement', {
+          method: "POST",
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            "animalTag":animalTag,
+            "advisementID":"%",
+            "threshold1Violated": true,
+            "threshold2Violated": true,
+            "threshold3Violated": true
+        })
+      })
+      .then(response => response.json())
+      .then(responseJson => {
+        if (responseJson.error) {
+           this.setState({alertList: []});
+        }
+        else {
+          // this.setState({alertList: responseJson, warningList: responseJson, infoList: responseJson});
+          let th1List = [];
+          let th2List = [];
+          let th3List = [];
+          //alert(responseJson[0].animalTags)    
+          for (let i=0; i< responseJson.length; i++) {
+            let item = responseJson[i];
+            if (item.severityThreshold === "THRESHOLD1") {
+              th1List.push(item);
+            } else if (item.severityThreshold === "THRESHOLD2") {
+              th2List.push(item);
+            } else if (item.severityThreshold === "THRESHOLD3") {
+              th3List.push(item);
+            }
+          }
+
+          if (th1List.length === 0 && th2List.length === 0 && th3List.length === 0)
+            th1List.push({ruleOutcomeMessage: "You seem to be managing this animal well. There are no special instructions pertainig to this animal.", ruleOutcomeShortMessage:"You seem to be managing this animal well. There is no special instructions pertainig to this animal.", animalTags:"", advisementRule: "THUMBSUP"});
+
+          this.setState({alertList: th3List, warningList: th2List, infoList: th1List});
+          }
+        })
+  }
+
 
   loadMilkingData(prevDate, recordDate, animalTag){
     // milking information month 1
@@ -573,7 +625,7 @@ retrieveAnimallWeightGraphData(animalTag){
 
 
   render() {
-    var { activeIndex, message, invalidAccess, lifecycleStageList, sireList, feedAnalysisMessageColor, feedAnalysisMessage, eventAdditionalMessage, genericMessage, eventMessageColor, messageColor, items, eventlist} = this.state;
+    var { infoList, warningList, alertList, activeIndex, message, invalidAccess, lifecycleStageList, sireList, feedAnalysisMessageColor, feedAnalysisMessage, eventAdditionalMessage, genericMessage, eventMessageColor, messageColor, items, eventlist} = this.state;
     var { weightGraphMessageColor, weightGraphMessage, genericMessage1, genericMessage2, month1MilkingRecord, month2MilkingRecord, message1Color, message2Color} = this.state;
     let recordCount = 0;
     let eventRecordCount = 0;
@@ -669,6 +721,31 @@ retrieveAnimallWeightGraphData(animalTag){
                   </Card>
                 </Col>
               </Row>
+
+              <Row>
+                <Col md="8">
+                  <Card>
+                    <CardHeader>
+                      <i className="fa fa-align-justify"></i><strong>Advisement</strong>
+                    </CardHeader>
+                    <CardBody>
+                    <ol>
+                      {alertList.map(alertItem => (
+                        <li><font color="red">{alertItem.ruleOutcomeMessage}</font></li>
+                       ))}
+                      {warningList.map(warningItem => (
+                        <li><font color="orange">{warningItem.ruleOutcomeMessage}</font></li>
+                       ))}
+                      
+                      {infoList.map(infoItem => (
+                        <li><font color="blue">{infoItem.ruleOutcomeMessage}</font></li>
+                       ))}
+                      </ol>
+                    </CardBody>
+                  </Card>
+                </Col>
+              </Row>
+
               <Row>
                 <Col md="8">
                   <Card>
