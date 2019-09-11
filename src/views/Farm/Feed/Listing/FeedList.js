@@ -52,7 +52,7 @@ class FeedList extends Component {
       activeOnly: false,
       messageColor: "muted",
       animaltypelist: [],
-      eventAdditionalMessage: "Enter search fields (you can use % for wild card searches) and press Search button"
+      eventAdditionalMessage: "Processing..."
     };
     this.handleAnimalTagValueChanged = this.handleAnimalTagValueChanged.bind(this);
     this.handleActiveOnly = this.handleActiveOnly.bind(this);
@@ -92,11 +92,12 @@ class FeedList extends Component {
     .then(response => response.json())
     .then(responseJson => {
       if (responseJson.error) {
+        alert(responseJson.message);
          this.setState({animalFeedInfo: [], feedItems:[], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
       }
       else {
       // alert(responseJson.feedItems.feedPlanItems[0].shortDescription);
-         this.setState({animalFeedInfo: responseJson.animalFeedInfo, feedItems: responseJson.feedItems.feedPlanItems, isLoaded: true, eventAdditionalMessage: (responseJson.length === 1 ? responseJson.length + " matching record found" : responseJson.length + " matching records found"), messageColor: "success"});         
+         this.setState({animalFeedInfo: responseJson.animalFeedInfo, feedItems: responseJson.feedItems.feedPlanItems, isLoaded: true, eventAdditionalMessage: "", messageColor: "success"});         
       }
     })
     .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -129,7 +130,7 @@ class FeedList extends Component {
              <Fade timeout={this.state.timeout} in={this.state.fadeIn}>
                 <Card>
                    <CardHeader>
-                   <i className="fa fa-align-justify"></i> Animal Feed Information {(isLoaded ? "": " Loading - be patient it may take a little while ...")}
+                   <i className="fa fa-align-justify"></i> Animal Feed Information {eventAdditionalMessage}
                      <div className="card-header-actions">
                        <Button color="link" className="card-header-action btn-minimize" data-target="#animaldata" ></Button>
                      </div>
