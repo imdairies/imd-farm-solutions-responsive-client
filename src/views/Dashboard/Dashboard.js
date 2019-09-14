@@ -598,8 +598,8 @@ retrieveMilkingRecordOfMonth(){
                                   beginAtZero: true,
                                   maxTicksLimit: 5,
                                   stepSize: 25,
-                                  max: 450,
-                                  min: 200,
+                                  max: 400,
+                                  min: 150,
                                 },
                               }];
      this.setState({monthVolumes: responseJson[0].volumes, monthDays:responseJson[0].days});
@@ -908,7 +908,7 @@ retrieveLactatingCount() {
                                                       maxTicksLimit: 5,
                                                       stepSize: 25,
                                                       max: 450,
-                                                      min: 200,
+                                                      min: 150,
                                                     },
                                                   }]
              this.setState({monthVolumes: responseJson[0].volumes,monthDays:responseJson[0].dates});

@@ -29,7 +29,7 @@ var mainChart = {
   labels: [],
   datasets: [
     {
-      label: 'Ideal Kgs',
+      label: 'Target Wt (Kgs)',
       backgroundColor: 'transparent',
       borderColor: brandInfo,
       pointHoverBackgroundColor: '#fff',
@@ -37,7 +37,7 @@ var mainChart = {
       data: data1
     },
     {
-      label: 'Actual Kgs',
+      label: 'Actual Wt (Kgs)',
       backgroundColor: 'transparent',
       borderColor: brandSuccess,
       pointHoverBackgroundColor: '#eee',
@@ -150,6 +150,9 @@ class UpdateAnimal extends Component {
       alertList: [],
       warningList: [], 
       infoList: [],
+      progneyList: [],
+      progneyMessageColor: "",
+      progneyMessage: "",
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleUpdate = this.handleUpdate.bind(this);
@@ -161,6 +164,7 @@ class UpdateAnimal extends Component {
     this.handleNext = this.handleNext.bind(this);
     this.retrieveAnimallWeightGraphData = this.retrieveAnimallWeightGraphData.bind(this);
     this.retrieveAnimalAdvisement = this.retrieveAnimalAdvisement.bind(this);
+    this.retrieveAnimalProgney = this.retrieveAnimalProgney.bind(this);
 
   }
 
@@ -244,7 +248,7 @@ retrieveAnimallWeightGraphData(animalTag){
     this.setState({month1Date : prevDate.toLocaleString('en-us', { month: 'short'}) + " " + prevDate.getFullYear(), month2Date: recordDate.toLocaleString('en-us', { month: 'short'}) + " " + recordDate.getFullYear()});
     this.setState({previousMonth: previousDate.getMonth()+1, previousYear: previousDate.getFullYear(), nextMonth: nextDate.getMonth()+1, nextYear: nextDate.getFullYear()});
     // milking information month 1
-   this.loadMilkingData(prevDate, recordDate, this.state.animalTag);
+    this.loadMilkingData(prevDate, recordDate, this.state.animalTag);
     this.setState({previousDate: previousDate, nextDate: nextDate});
   }
 
@@ -471,6 +475,7 @@ retrieveAnimallWeightGraphData(animalTag){
     this.setState({previousDate: previousDate, nextDate: nextDate});
     this.retrieveAnimallWeightGraphData(parsed.animalTag);
     this.retrieveAnimalAdvisement(parsed.animalTag);
+    this.retrieveAnimalProgney(parsed.animalTag);
   }
 
 
@@ -520,6 +525,28 @@ retrieveAnimallWeightGraphData(animalTag){
   }
 
 
+  retrieveAnimalProgney(animalTag) {
+      fetch(API_PREFIX+ '/imd-farm-management/animals/retrieveprogney', {
+          method: "POST",
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            "animalTag":animalTag
+        })
+      })
+      .then(response => response.json())
+      .then(responseJson => {
+        if (responseJson.error) {
+           this.setState({progneyList: [],progneyMessage: responseJson.message, progneyMessageColor: "danger"});
+        }
+        else {
+          this.setState({progneyList: responseJson, progneyMessage: "", progneyMessageColor: "success"});
+          }
+        })
+    .catch(error => this.setState({progneyMessage: "Following error occurred while processing the request: " + error.toString(), progneyMessageColor: "danger"}));
+  }
   loadMilkingData(prevDate, recordDate, animalTag){
     // milking information month 1
     fetch(API_PREFIX+ '/imd-farm-management/animals/monthlymilkingrecord', {
@@ -625,7 +652,7 @@ retrieveAnimallWeightGraphData(animalTag){
 
 
   render() {
-    var { infoList, warningList, alertList, activeIndex, message, invalidAccess, lifecycleStageList, sireList, feedAnalysisMessageColor, feedAnalysisMessage, eventAdditionalMessage, genericMessage, eventMessageColor, messageColor, items, eventlist} = this.state;
+    var { progneyList, progneyMessageColor, progneyMessage, infoList, warningList, alertList, activeIndex, message, invalidAccess, lifecycleStageList, sireList, feedAnalysisMessageColor, feedAnalysisMessage, eventAdditionalMessage, genericMessage, eventMessageColor, messageColor, items, eventlist} = this.state;
     var { weightGraphMessageColor, weightGraphMessage, genericMessage1, genericMessage2, month1MilkingRecord, month2MilkingRecord, message1Color, message2Color} = this.state;
     let recordCount = 0;
     let eventRecordCount = 0;
@@ -717,6 +744,38 @@ retrieveAnimallWeightGraphData(animalTag){
 
                         </FormGroup>
                       </Form>
+                    </CardBody>
+                  </Card>
+                </Col>
+              </Row>
+
+              <Row>
+                <Col md="6">
+                  <Card>
+                      <CardHeader>
+                        <i className="fa fa-align-justify"></i><strong>Progney</strong><FormText color={progneyMessageColor}>&nbsp;{progneyMessage}</FormText>
+                      </CardHeader>
+                      <CardBody>
+                         <Table hover bordered striped responsive size="sm">
+                          <thead>
+                              <tr>
+                                <th>Tag</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Age</th>
+                              </tr> 
+                          </thead>
+                          <tbody>
+                             {progneyList.map(item => (
+                                 <tr key="{item.animalTag}">
+                                   <td><Link target='_blank' to={'/animal/update?animalTag=' + item.animalTag + '&orgID=' + item.orgID} >{item.animalTag}</Link></td>
+                                   <td>{item.animalType}</td>
+                                   <td>{item.animalStatus}</td>
+                                   <td>{item.currentAge}</td>
+                               </tr>
+                               ))}
+                          </tbody>
+                         </Table>
                     </CardBody>
                   </Card>
                 </Col>
@@ -893,7 +952,7 @@ retrieveAnimallWeightGraphData(animalTag){
                            <tr key="{item.animalTag}">
                              <td>{eventlist.length - ++eventRecordCount + 1}</td>
                              <td width="10%" data-toggle="tooltip" title={item.eventTimeStamp.substring(item.eventTimeStamp.length-8).trim()}>{item.eventTimeStamp.substring(0,item.eventTimeStamp.length-8).trim()}</td>
-                             <td><Link to={'/animal/event/update?eventTransactionID=' + item.eventTransactionID} >{item.eventShortDescription}</Link></td>
+                             <td><Link target="_blank" to={'/animal/event/update?eventTransactionID=' + item.eventTransactionID} >{item.eventShortDescription}</Link></td>
                              <td>{item.eventOperator}</td>
                              <td>{item.daysFromToday}</td>
                              <td>{item.ageWhenOccurred}</td>

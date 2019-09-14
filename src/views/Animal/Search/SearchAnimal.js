@@ -78,8 +78,11 @@ class SearchAnimal extends Component {
     const parsed = queryString.parse(this.props.location.search);
     var searchAPI = parsed.searchCode;
     var searchTypeCD = parsed.searchTypeCD;
+    var animalTags = parsed.animalTags;
     this.setState({animaltypelist: [], isLoaded: false}); 
-    // alert(parsed.searchTypeCD);
+
+
+    // populate Lifecycle Type dropdown
     fetch(API_PREFIX + '/imd-farm-management/lookupvalues/search', {
         method: "POST",
         headers: {
@@ -96,11 +99,13 @@ class SearchAnimal extends Component {
          this.setState({animaltypelist: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
       }
       else {
-         this.setState({animaltypelist: responseJson, isLoaded: true, eventAdditionalMessage: "", messageColor: "success"});         
+         this.setState({animaltypelist: responseJson, isLoaded: true});         
       }
     })
     .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
 
+
+ //   alert(animalTags);
     if (searchAPI != null) {
       fetch(API_PREFIX + '/imd-farm-management/animals/' + searchAPI, {
           method: "POST",
@@ -111,7 +116,7 @@ class SearchAnimal extends Component {
           // body: JSON.stringify(jsonString)
 
           body: JSON.stringify({
-            "animalTag": "%",
+            "animalTag": "",
             "animalType":searchTypeCD,
             "activeOnly": true
         })
@@ -121,6 +126,7 @@ class SearchAnimal extends Component {
         if (responseJson.error) {
            this.setState({items: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
         } else {
+          // alert(responseJson.length);
            this.setState({items: responseJson, isLoaded: true, eventAdditionalMessage: (responseJson.length === 1 ? responseJson.length + " matching record found" : responseJson.length + " matching records found"), messageColor: "success"});         
         }
       })
@@ -136,7 +142,7 @@ class SearchAnimal extends Component {
           // body: JSON.stringify(jsonString)
 
           body: JSON.stringify({
-            "animalTag": "%",
+            "animalTag": "",
             "animalType":searchTypeCD,
             "activeOnly": true
         })
@@ -150,8 +156,32 @@ class SearchAnimal extends Component {
         }
       })
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
-    }
-   }
+   } else if (animalTags != null) {
+      fetch(API_PREFIX + '/imd-farm-management/animals/search', {
+          method: "POST",
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+          },
+          // body: JSON.stringify(jsonString)
+
+          body: JSON.stringify({
+            "animalTag": animalTags,
+            "animalType":"%",
+            "activeOnly": false
+        })
+      })
+      .then(response => response.json())
+      .then(responseJson => {
+        if (responseJson.error) {
+           this.setState({items: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+        } else {
+           this.setState({items: responseJson, isLoaded: true, eventAdditionalMessage: (responseJson.length === 1 ? responseJson.length + " matching record found" : responseJson.length + " matching records found"), messageColor: "success"});         
+        }
+      })
+      .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
+    } 
+  }
 
   handleAnimalTagValueChanged(event) {
     this.setState({animalTag: event.target.value});
@@ -317,7 +347,7 @@ class SearchAnimal extends Component {
                            {items.map(item => (
                                <tr key="{item.animalTag}">
                                  <td>{++recordCount}</td>
-                                 <td><Link to={'/animal/update?animalTag=' + item.animalTag + '&orgID=' + item.orgID} >{item.animalTag}</Link></td>
+                                 <td><Link target='_blank' to={'/animal/update?animalTag=' + item.animalTag + '&orgID=' + item.orgID} >{item.animalTag}</Link></td>
                                  <td>{item.animalType}</td>
                                  <td>{item.animalStatus}</td>
                                  <td><Link to={'/animal/update?animalTag=' + item.animalDam + '&orgID=' + item.orgID} >{item.animalDam}</Link></td>

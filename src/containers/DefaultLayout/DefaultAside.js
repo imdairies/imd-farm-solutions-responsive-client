@@ -101,7 +101,7 @@ class DefaultAside extends Component {
                     <div className="avatar float-right">
                       <img className="img-avatar" src={"assets/img/avatars/" + alertItem.advisementRule + ".png"} alt="imddairies@gmail.com"/>
                     </div>
-                    <div>{alertItem.ruleOutcomeMessage + ": "}<strong>{alertItem.animalTags}</strong></div>
+                    <div>{alertItem.ruleOutcomeMessage + ": "}<a target="_blank" href={'#/animal/search?animalTags=' + alertItem.animalTags}><strong>{alertItem.animalTags}</strong></a></div>
                 </ListGroupItem>
                    ))}
               <ListGroupItem className="list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">Warnings</ListGroupItem>
@@ -110,7 +110,7 @@ class DefaultAside extends Component {
                     <div className="avatar float-right">
                       <img className="img-avatar" src={"assets/img/avatars/" + alertItem.advisementRule + ".png"} alt="imddairies@gmail.com"/>
                     </div>
-                    <div>{alertItem.ruleOutcomeMessage + ": "}<strong>{alertItem.animalTags}</strong></div>
+                    <div>{alertItem.ruleOutcomeMessage + ": "}<a target="_blank" href={'#/animal/search?animalTags=' + alertItem.animalTags}><strong>{alertItem.animalTags}</strong></a></div>
                 </ListGroupItem>
                    ))}
 
@@ -120,7 +120,7 @@ class DefaultAside extends Component {
                     <div className="avatar float-right">
                       <img className="img-avatar" src={"assets/img/avatars/" + alertItem.advisementRule + ".png"} alt="imddairies@gmail.com"/>
                     </div>
-                    <div>{alertItem.ruleOutcomeMessage + (alertItem.advisementRule === "THUMBSUP" ? "" : ": ")}<strong>{alertItem.animalTags}</strong></div>
+                    <div>{alertItem.ruleOutcomeMessage + (alertItem.advisementRule === "THUMBSUP" ? "" : ": ")}<a target="_blank" href={'#/animal/search?animalTags=' + alertItem.animalTags}><strong>{alertItem.animalTags}</strong></a></div>
                 </ListGroupItem>
                    ))}
 
