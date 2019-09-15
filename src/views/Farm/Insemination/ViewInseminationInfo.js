@@ -4,31 +4,15 @@ import {
    Button,
    Card,
    CardBody,
-   CardFooter,
    CardHeader,
    Col,
    Fade,
-   Form,
-   FormGroup,
-   FormText,
-   Input,
-   InputGroup,
-   InputGroupText,
    Row,
    Table,
-   Nav, 
-   NavItem, 
-   NavLink, 
-   Label,
-   Dropdown, 
-   DropdownItem, 
-   DropdownMenu, 
-  DropdownToggle 
 } from 'reactstrap';
 
 import { Link } from 'react-router-dom';
-// import queryString from 'query-string';
-import classnames from 'classnames';
+
 
 
 
@@ -77,9 +61,8 @@ class ViewInseminationInfo extends Component {
 
 
   render() {
-    var { isLoaded, items, eventAdditionalMessage, messageColor } = this.state;
+    var { isLoaded, items} = this.state;
     let recordCount = 0;
-    var date = new Date();
     return (
       <div className="animated fadeIn">
          <Row>

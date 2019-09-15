@@ -27,7 +27,6 @@ import {
 } from 'reactstrap';
 import classnames from 'classnames';
 import { Link } from 'react-router-dom';
-import queryString from 'query-string';
 import DateTimePicker from 'react-datetime-picker';
 var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
@@ -131,9 +130,9 @@ class AddFarmDailyMilk extends Component {
   }
 
   handleTimestampChanged(newValue) {
-    if (newValue.getFullYear() != this.state.timestamp.getFullYear() || 
-      newValue.getMonth() != this.state.timestamp.getMonth() || 
-      newValue.getDate() != this.state.timestamp.getDate()) 
+    if (newValue.getFullYear() !== this.state.timestamp.getFullYear() || 
+      newValue.getMonth() !== this.state.timestamp.getMonth() || 
+      newValue.getDate() !== this.state.timestamp.getDate()) 
     {
       this.setState({timestamp: newValue});
       this.fetchMilkingRecordForTheEvent(this.state.milkingEventNumber, newValue);
@@ -386,7 +385,7 @@ class AddFarmDailyMilk extends Component {
   }
 
   render() {
-    var { farmAverageMonthInMilking, eventAdditionalMessage, messageColor, addOrUpdate, totalMilkMessage, animaltaglist, isLoaded, previousTotalMilkMessage, avgTotalMilkMessage} = this.state;
+    var { farmAverageMonthInMilking, eventAdditionalMessage, messageColor, addOrUpdate, totalMilkMessage, animaltaglist, previousTotalMilkMessage, avgTotalMilkMessage} = this.state;
     let recordCount = 0;
     //var yesterday = this.state.timestamp;
     let days = this.state.timestamp.getDate();
@@ -395,16 +394,16 @@ class AddFarmDailyMilk extends Component {
     if (days > 1) {
       days = days -1;
     } else {
-      if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10) {
+      if (month === 1 || month === 3 || month === 5 || month === 7 || month === 8 || month === 10) {
         days = 31;
         month = month -1;
-      } else if (month == 4 || month == 6 || month == 9 || month == 11) {
+      } else if (month === 4 || month === 6 || month === 9 || month === 11) {
         days = 30;
-      } else if (month == 0) {
+      } else if (month === 0) {
         days = 31;
         month = 11;
         year = year - 1;
-      } else if ((year % 4) == 0 ) {
+      } else if ((year % 4) === 0 ) {
         // leap year
         days = 29;
         month = month -1;

@@ -10,7 +10,6 @@ import {
   Fade,
   Form,
   InputGroup,
-  InputGroupText,
   Dropdown,
   DropdownToggle,
   DropdownMenu,

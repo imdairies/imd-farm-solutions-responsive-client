@@ -1,19 +1,19 @@
-import React, { Component, lazy, Suspense } from 'react';
+import React, { Component} from 'react';
 
 import {
   Button, Card, CardBody, CardFooter, CardHeader, Col, Fade, Form,
   FormGroup, FormText, Input, Row,
   Label,  Dropdown, DropdownToggle, DropdownMenu, Table, DropdownItem,
-  Carousel, UncontrolledCarousel, CarouselCaption, CarouselControl, CarouselIndicators, CarouselItem
+  UncontrolledCarousel,
 } from 'reactstrap';
 // import ViewMilking  from '../Milking/View';
 import { Redirect } from 'react-router-dom';
 import queryString from 'query-string';
 import { Link } from 'react-router-dom';
-import { Bar, Line } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
 
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
-import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities'
+import { getStyle } from '@coreui/coreui/dist/js/coreui-utilities'
 
 const brandSuccess = getStyle('--success')
 const brandInfo = getStyle('--info')
@@ -171,7 +171,6 @@ class UpdateAnimal extends Component {
 
 
 retrieveAnimallWeightGraphData(animalTag){
-  let now =  new Date();
   fetch(API_PREFIX+ '/imd-farm-management/animals/getgrowthdata', {
       method: "POST",
       headers: {
@@ -557,7 +556,7 @@ retrieveAnimallWeightGraphData(animalTag){
         },
         body: JSON.stringify({
           "animalTag": animalTag,
-          "milkingDateStr": prevDate.getFullYear() + "-" + (prevDate.getMonth()+1) + "-" + "01"
+          "milkingDateStr": prevDate.getFullYear() + '-' + (prevDate.getMonth()+1) + '-01',
       })
     })
     .then(response => response.json())
@@ -580,7 +579,7 @@ retrieveAnimallWeightGraphData(animalTag){
         },
         body: JSON.stringify({
           "animalTag": animalTag,
-          "milkingDateStr": recordDate.getFullYear() + "-" + (recordDate.getMonth()+1) + "-" + "01"
+          "milkingDateStr": recordDate.getFullYear() + '-' + (recordDate.getMonth()+1) + '-01',
       })
     })
     .then(response => response.json())
@@ -629,8 +628,8 @@ retrieveAnimallWeightGraphData(animalTag){
           body: JSON.stringify({
             "animalTag": this.state.animalTag,
             "alias": this.state.alias,
-            "gender" : (this.state.gender == "Female" ? "F" : "M"),
-            "sire" : (this.state.animalSireAlias == "-- Select Sire --"  ? null : this.state.animalSireTag),
+            "gender" : (this.state.gender === "Female" ? "F" : "M"),
+            "sire" : (this.state.animalSireAlias === "-- Select Sire --"  ? null : this.state.animalSireTag),
             "dateOfBirthStr": this.state.dateOfBirth,
             "animalType": (this.state.animalType === "-- Animal Type --" ? null : this.state.animalType)
             // "eventLongDescription": longDescr,
@@ -652,7 +651,7 @@ retrieveAnimallWeightGraphData(animalTag){
 
 
   render() {
-    var { progneyList, progneyMessageColor, progneyMessage, infoList, warningList, alertList, activeIndex, message, invalidAccess, lifecycleStageList, sireList, feedAnalysisMessageColor, feedAnalysisMessage, eventAdditionalMessage, genericMessage, eventMessageColor, messageColor, items, eventlist} = this.state;
+    var { progneyList, progneyMessageColor, progneyMessage, infoList, warningList, alertList, message, invalidAccess, lifecycleStageList, sireList, feedAnalysisMessageColor, feedAnalysisMessage, eventAdditionalMessage, eventMessageColor, messageColor, eventlist} = this.state;
     var { weightGraphMessageColor, weightGraphMessage, genericMessage1, genericMessage2, month1MilkingRecord, month2MilkingRecord, message1Color, message2Color} = this.state;
     let recordCount = 0;
     let eventRecordCount = 0;
@@ -860,7 +859,7 @@ retrieveAnimallWeightGraphData(animalTag){
                             <Col>
                              <Table hover bordered striped responsive size="sm">
                               <tr>
-                                <td colspan="5" align="center"> <a onClick={this.handlePrevious}><u>&lt;&lt;</u></a>&nbsp;&nbsp;<strong>{this.state.month1Date}</strong></td>
+                                <td colspan="5" align="center"> <button onClick={this.handlePrevious}>◀︎◀︎</button>&nbsp;&nbsp;<strong>{this.state.month1Date}</strong></td>
                               </tr> 
                               <tr>
                                 <th>Day</th>
@@ -895,7 +894,7 @@ retrieveAnimallWeightGraphData(animalTag){
                             <Col>
                                <Table hover bordered striped responsive size="sm">
                                 <tr>
-                                  <td colspan="5" align="center"><strong>{this.state.month2Date}</strong>&nbsp;&nbsp;<a onClick={this.handleNext} ><u>&gt;&gt;</u></a></td>
+                                  <td colspan="5" align="center"><strong>{this.state.month2Date}</strong>&nbsp;&nbsp;<button onClick={this.handleNext} >►►</button></td>
                                 </tr> 
                                 <tr>
                                   <th>Day</th>

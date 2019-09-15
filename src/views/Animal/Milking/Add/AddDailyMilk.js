@@ -17,7 +17,6 @@ import {
   Nav, 
   NavItem, 
   InputGroup,
-  InputGroupText,
   Dropdown,
   DropdownToggle,
   DropdownMenu,

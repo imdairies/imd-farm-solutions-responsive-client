@@ -11,8 +11,6 @@ import {
   FormGroup,
   FormText,
   Input,
-  InputGroup,
-  InputGroupText,
   Row,
   Label,
   Nav, 
@@ -26,7 +24,6 @@ import {
 import classnames from 'classnames';
 import { Link } from 'react-router-dom';
 import DateTimePicker from 'react-datetime-picker';
-import queryString from 'query-string';
 
 
 class AddSemenInventory extends Component {
@@ -278,7 +275,7 @@ class AddSemenInventory extends Component {
                                 {this.state.animalTagValue}
                               </DropdownToggle>
                               <DropdownMenu onClick={this.handleSireChange}>
-                                {sireList.map(sire => (sire.semenInd == 'Y' ? <DropdownItem id={sireCount++} value={sire.animalTag + '-' + sire.alias}>{sire.animalTag + '-' + sire.alias}</DropdownItem> : ''))}
+                                {sireList.map(sire => (sire.semenInd === 'Y' ? <DropdownItem id={sireCount++} value={sire.animalTag + '-' + sire.alias}>{sire.animalTag + '-' + sire.alias}</DropdownItem> : ''))}
                               </DropdownMenu>
                             </Dropdown>
                           </Col>

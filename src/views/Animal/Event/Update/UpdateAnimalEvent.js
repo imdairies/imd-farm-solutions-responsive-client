@@ -12,7 +12,6 @@ import {
   FormText,
   Input,
   InputGroup,
-  InputGroupText,
   Dropdown,
   DropdownToggle,
   DropdownMenu,
@@ -50,7 +49,7 @@ class UpdateAnimalEvent extends Component {
       eventComments: "",
       eventCodeID: "",
       eventTransactionID: "",
-      eventCode: "",
+
 
       field1Label: "",
       field1Value: "",
@@ -95,7 +94,7 @@ class UpdateAnimalEvent extends Component {
       field4YesNoDisplay : false,
 
       commentsFieldDisplay: false,
-      eventComments: "",
+
 
       messageColor: "muted",
       eventAdditionalMessage: "Specify desired values and press Add"
@@ -300,7 +299,7 @@ showHideFields(responseJsonRecord) {
       field1NumberDisplay = true;
     else if (field1DataType === "YESNO")
       field1YesNoDisplay = true;
-    else if (field1DataType.indexOf("LV:") == 0) {
+    else if (field1DataType.indexOf("LV:") === 0) {
       // dropdown data type.
       field1DropdownDisplay = true;
       apiUrlPostfix =  field1DataType.substring(3);
@@ -376,7 +375,7 @@ showHideFields(responseJsonRecord) {
       field2NumberDisplay = true;
     else if (field2DataType === "YESNO")
       field2YesNoDisplay = true;
-    else if (field2DataType.indexOf("LV:") == 0) {
+    else if (field2DataType.indexOf("LV:") === 0) {
       // dropdown data type.
       field2DropdownDisplay = true;
       apiUrlPostfix =  field2DataType.substring(3);
@@ -460,7 +459,7 @@ showHideFields(responseJsonRecord) {
       field3NumberDisplay = true;
     else if (field3DataType === "YESNO")
       field3YesNoDisplay = true;
-    else if (field3DataType.indexOf("LV:") == 0) {
+    else if (field3DataType.indexOf("LV:") === 0) {
       // dropdown data type.
       field3DropdownDisplay = true;
       apiUrlPostfix =  field3DataType.substring(3);
@@ -540,7 +539,7 @@ showHideFields(responseJsonRecord) {
       field4NumberDisplay = true;
     else if (field4DataType === "YESNO")
       field4YesNoDisplay = true;
-    else if (field4DataType.indexOf("LV:") == 0) {
+    else if (field4DataType.indexOf("LV:") === 0) {
       // dropdown data type.
       field4DropdownDisplay = true;
       apiUrlPostfix =  field4DataType.substring(4);
@@ -851,7 +850,6 @@ handleField3DropdownValueChanged(event) {
 
   render() {
     var { field1list, field2list, field3list, field4list, eventAdditionalMessage, messageColor, operatorlist} = this.state;
-    let eventCount = 0;
     let field1Count = 0;
     let field2Count = 0;
     let field3Count = 0;

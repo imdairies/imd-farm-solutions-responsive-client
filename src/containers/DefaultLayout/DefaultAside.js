@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
-import { Nav, NavItem, NavLink, Progress, TabContent, TabPane, ListGroup, ListGroupItem } from 'reactstrap';
+import { Progress, TabContent, TabPane, ListGroup, ListGroupItem } from 'reactstrap';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
 import { AppSwitch } from '@coreui/react'
-import { Link } from 'react-router-dom';
 
 
 var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
@@ -101,7 +99,7 @@ class DefaultAside extends Component {
                     <div className="avatar float-right">
                       <img className="img-avatar" src={"assets/img/avatars/" + alertItem.advisementRule + ".png"} alt="imddairies@gmail.com"/>
                     </div>
-                    <div>{alertItem.ruleOutcomeMessage + ": "}<a target="_blank" href={'#/animal/search?animalTags=' + alertItem.animalTags}><strong>{alertItem.animalTags}</strong></a></div>
+                    <div>{alertItem.ruleOutcomeMessage + ": "}<a target="_blank" rel="noopener noreferrer" href={'#/animal/search?animalTags=' + alertItem.animalTags}><strong>{alertItem.animalTags}</strong></a></div>
                 </ListGroupItem>
                    ))}
               <ListGroupItem className="list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">Warnings</ListGroupItem>
@@ -110,7 +108,7 @@ class DefaultAside extends Component {
                     <div className="avatar float-right">
                       <img className="img-avatar" src={"assets/img/avatars/" + alertItem.advisementRule + ".png"} alt="imddairies@gmail.com"/>
                     </div>
-                    <div>{alertItem.ruleOutcomeMessage + ": "}<a target="_blank" href={'#/animal/search?animalTags=' + alertItem.animalTags}><strong>{alertItem.animalTags}</strong></a></div>
+                    <div>{alertItem.ruleOutcomeMessage + ": "}<a target="_blank" rel="noopener noreferrer" href={'#/animal/search?animalTags=' + alertItem.animalTags}><strong>{alertItem.animalTags}</strong></a></div>
                 </ListGroupItem>
                    ))}
 
@@ -120,7 +118,7 @@ class DefaultAside extends Component {
                     <div className="avatar float-right">
                       <img className="img-avatar" src={"assets/img/avatars/" + alertItem.advisementRule + ".png"} alt="imddairies@gmail.com"/>
                     </div>
-                    <div>{alertItem.ruleOutcomeMessage + (alertItem.advisementRule === "THUMBSUP" ? "" : ": ")}<a target="_blank" href={'#/animal/search?animalTags=' + alertItem.animalTags}><strong>{alertItem.animalTags}</strong></a></div>
+                    <div>{alertItem.ruleOutcomeMessage + (alertItem.advisementRule === "THUMBSUP" ? "" : ": ")}<a target="_blank" rel="noopener noreferrer" href={'#/animal/search?animalTags=' + alertItem.animalTags}><strong>{alertItem.animalTags}</strong></a></div>
                 </ListGroupItem>
                    ))}
 

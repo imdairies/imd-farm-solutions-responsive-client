@@ -1,47 +1,31 @@
 import React, { Component } from 'react';
-import { Bar, Line } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
 
 
 import {
-  Button,
-  ButtonDropdown,
-  ButtonGroup,
-  ButtonToolbar,
   Card,
   CardBody,
-  CardFooter,
   CardHeader,
   CardTitle,
   Col,
-  Fade,
-  Form,
   FormGroup,
   FormText,
-  Input,
   Row,
-  Label,
-  Dropdown,
-  DropdownToggle,
-  DropdownMenu,
   Table,
-  DropdownItem,
   Nav,
   NavItem,
   NavLink
 } from 'reactstrap';
 import queryString from 'query-string';
 import classnames from 'classnames';
-import { Redirect, Link, Route } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities'
 var data1 = [];
 var data2 = [];
-var data3 = [];
-const brandPrimary = getStyle('--primary')
 const brandSuccess = getStyle('--success')
 const brandInfo = getStyle('--info')
-const brandWarning = getStyle('--warning')
-const brandDanger = getStyle('--danger')
+
 var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 
@@ -156,7 +140,6 @@ class ViewMilking extends Component {
   componentDidMount() {
 
     const parsed = queryString.parse(this.props.location.search);
-    let now =  new Date();
     var recordDate = new Date();
     var prevDate = null;
     var previousDate = null;
@@ -206,7 +189,7 @@ class ViewMilking extends Component {
         },
         body: JSON.stringify({
           "animalTag": animalTag,
-          "milkingDateStr": prevDate.getFullYear() + "-" + (prevDate.getMonth()+1) + "-" + "01"
+          "milkingDateStr": prevDate.getFullYear() + '-' + (prevDate.getMonth()+1) + '-01'
       })
     })
     .then(response => response.json())
@@ -237,7 +220,7 @@ class ViewMilking extends Component {
         },
         body: JSON.stringify({
           "animalTag": animalTag,
-          "milkingDateStr": recordDate.getFullYear() + "-" + (recordDate.getMonth()+1) + "-" + "01"
+          "milkingDateStr": recordDate.getFullYear() + '-' + (recordDate.getMonth()+1) + '-01'
       })
     })
     .then(response => response.json())
@@ -269,7 +252,7 @@ class ViewMilking extends Component {
             },
             body: JSON.stringify({
               "animalTag": animalTag,
-              "milkingDateStr": prevDate.getFullYear() + "-" + (prevDate.getMonth()+1) + "-" + "01"
+              "milkingDateStr": prevDate.getFullYear() + '-' + (prevDate.getMonth()+1) + '-01'
           })
         })
      .then(response => response.json())
@@ -357,9 +340,7 @@ class ViewMilking extends Component {
 
 
   render() {
-    var { previousPreviousMonth, previsousMonth, currentMonth, currentYear, invalidAccess, genericMessage1, genericMessage2, month1MilkingRecord, month2MilkingRecord, message1Color, message2Color} = this.state;
-    let recordCount = 0;
-    let eventRecordCount = 0;
+    var { genericMessage1, genericMessage2, month1MilkingRecord, month2MilkingRecord, message1Color, message2Color} = this.state;
     // if (invalidAccess)
     //   return (<Redirect to='/animal/search'  />);
     return (
@@ -409,7 +390,7 @@ class ViewMilking extends Component {
                             <Col>
                              <Table hover bordered striped responsive size="sm">
                               <tr>
-                                <td colspan="5" align="center"> <a onClick={this.handlePrevious}><u>&lt;&lt;</u></a>&nbsp;&nbsp;<strong>{this.state.month1Date}</strong></td>
+                                <td colspan="5" align="center"> <button onClick={this.handlePrevious}>◀︎◀︎</button>&nbsp;&nbsp;<strong>{this.state.month1Date}</strong></td>
                               </tr> 
                               <tr>
                                 <th>Day</th>
@@ -445,7 +426,7 @@ class ViewMilking extends Component {
                             <Col>
                                <Table hover bordered striped responsive size="sm">
                                 <tr>
-                                  <td colspan="5" align="center"><strong>{this.state.month2Date}</strong>&nbsp;&nbsp;<a onClick={this.handleNext} ><u>&gt;&gt;</u></a></td>
+                                  <td colspan="5" align="center"><strong>{this.state.month2Date}</strong>&nbsp;&nbsp;<button onClick={this.handleNext}>►►</button></td>
                                 </tr> 
                                 <tr>
                                   <th>Day</th>

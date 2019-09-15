@@ -11,7 +11,6 @@ import {
    Form,
    FormGroup,
    FormText,
-   Input,
    InputGroup,
    InputGroupText,
    Row,
@@ -19,7 +18,6 @@ import {
    Nav, 
    NavItem, 
    NavLink, 
-   Label,
    Dropdown, 
    DropdownItem, 
    DropdownMenu, 
@@ -27,7 +25,6 @@ import {
 } from 'reactstrap';
 
 import { Link } from 'react-router-dom';
-import queryString from 'query-string';
 import classnames from 'classnames';
 var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
@@ -70,9 +67,7 @@ class SearchFeedPlan extends Component {
   }
 
   componentDidMount() {
-    const parsed = queryString.parse(this.props.location.search);
-    var searchAPI = parsed.searchCode;
-    var searchTypeCD = parsed.searchTypeCD;
+//    const parsed = queryString.parse(this.props.location.search);
     this.setState({cohortTypelist: [], isLoaded: false}); 
     // alert(parsed.searchTypeCD);
     fetch(API_PREFIX + '/imd-farm-management/lookupvalues/search', {

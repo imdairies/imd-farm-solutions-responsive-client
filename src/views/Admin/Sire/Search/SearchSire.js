@@ -1,33 +1,18 @@
 import React, { Component } from 'react';
 
 import {
-   Button,
    Card,
    CardBody,
-   CardFooter,
-   CardHeader,
    Col,
    Fade,
-   Form,
-   FormGroup,
-   FormText,
-   Input,
-   InputGroup,
-   InputGroupText,
    Row,
    Table,
    Nav, 
    NavItem, 
-   NavLink, 
-   Label,
-   Dropdown, 
-   DropdownItem, 
-   DropdownMenu, 
-  DropdownToggle 
+   NavLink,
 } from 'reactstrap';
 
 import { Link } from 'react-router-dom';
-import queryString from 'query-string';
 import classnames from 'classnames';
 var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
@@ -145,7 +130,7 @@ class SearchSire extends Component {
   }
 
   render() {
-    var { isLoaded, items, animaltypelist, eventAdditionalMessage, messageColor } = this.state;
+    var { items } = this.state;
     let recordCount = 0;
     return (
       <div className="animated fadeIn">
@@ -180,10 +165,10 @@ class SearchSire extends Component {
                                 <th rowspan="2">photo</th>
                               </tr> 
                               <tr>
-                                <th>✌️</th>
-                                <th>✅</th>
-                                <th>❌</th>
-                                <th>⏳</th>
+                                <th><span role="img" aria-label="%Success">✌️</span></th>
+                                <th><span role="img" aria-label="success">✅</span></th>
+                                <th><span role="img" aria-label="failure">❌</span></th>
+                                <th><span role="img" aria-label="tbd">⏳</span></th>
                               </tr> 
                            </thead>
                            <tbody>
@@ -198,7 +183,7 @@ class SearchSire extends Component {
                                    <td>{item.semenTbdCount}</td>
                                    <td>{item.controller}</td>
                                    <td width="25%"><a target="_blank" rel="noopener noreferrer" href={item.sireDataSheet}>View Data Sheet</a></td>
-                                   <td><a target="_blank" rel="noopener noreferrer" href={item.sirePhoto} ><img src={item.sirePhoto} width="100" height="60" /></a></td>
+                                   <td><a target="_blank" rel="noopener noreferrer" href={item.sirePhoto} ><img alt='Sire' src={item.sirePhoto} width="100" height="60" /></a></td>
                                </tr>
                                ))}
                            </tbody>

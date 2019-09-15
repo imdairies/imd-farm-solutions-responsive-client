@@ -15,20 +15,13 @@ import {
   Table,
   Row,
   Label,
-  Nav, 
-  NavItem, 
   InputGroup,
-  InputGroupText,
   Dropdown,
   DropdownToggle,
   DropdownMenu,
   DropdownItem,
-  NavLink,
-  ButtonDropdown
 } from 'reactstrap';
-import classnames from 'classnames';
 import { Link } from 'react-router-dom';
-import queryString from 'query-string';
 import DateTimePicker from 'react-datetime-picker';
 
 var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
@@ -86,7 +79,7 @@ class AddFarmEvent extends Component {
       selectAll: false,
 
       eventAdditionalMessage: "Specify desired values and press Add",
-      messageColor: "danger",
+
 
       animalListMessage: "",
       animalListMessageColor: "",
@@ -350,7 +343,7 @@ handleField1DropdownValueChanged(event) {
       field1NumberDisplay = true;
     else if (field1DataType === "YESNO")
       field1YesNoDisplay = true;
-    else if (field1DataType.indexOf("LV:") == 0) {
+    else if (field1DataType.indexOf("LV:") === 0) {
       // dropdown data type.
       field1DropdownDisplay = true;
       apiUrlPostfix =  field1DataType.substring(3);
@@ -410,7 +403,7 @@ handleField1DropdownValueChanged(event) {
       field2NumberDisplay = true;
     else if (field2DataType === "YESNO")
       field2YesNoDisplay = true;
-    else if (field2DataType.indexOf("LV:") == 0) {
+    else if (field2DataType.indexOf("LV:") === 0) {
       // dropdown data type.
       field2DropdownDisplay = true;
       apiUrlPostfix =  field2DataType.substring(3);
@@ -558,7 +551,7 @@ handleField1DropdownValueChanged(event) {
 
   render() {
 
-    var { animaltypelist, animalListMessageColor, animalListMessage,field1list, field2list, nextLifecycleStageList, eventAdditionalMessage, messageColor, animalTagList, eventlist, operatorlist} = this.state;
+    var { animaltypelist, animalListMessageColor, animalListMessage,field1list, field2list, eventAdditionalMessage, messageColor, animalTagList, eventlist, operatorlist} = this.state;
     let eventCount = 0;
     let field1Count = 0;
     let field2Count = 0;

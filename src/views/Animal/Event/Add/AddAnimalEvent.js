@@ -17,13 +17,12 @@ import {
   Nav, 
   NavItem, 
   InputGroup,
-  InputGroupText,
+
   Dropdown,
   DropdownToggle,
   DropdownMenu,
   DropdownItem,
   NavLink,
-  ButtonDropdown
 } from 'reactstrap';
 import classnames from 'classnames';
 import { Link } from 'react-router-dom';
@@ -314,7 +313,7 @@ class AddAnimalEvent extends Component {
       field1NumberDisplay = true;
     else if (field1DataType === "YESNO")
       field1YesNoDisplay = true;
-    else if (field1DataType.indexOf("LV:") == 0) {
+    else if (field1DataType.indexOf("LV:") === 0) {
       // dropdown data type.
       field1DropdownDisplay = true;
       apiUrlPostfix =  field1DataType.substring(3);
@@ -374,7 +373,7 @@ class AddAnimalEvent extends Component {
       field2NumberDisplay = true;
     else if (field2DataType === "YESNO")
       field2YesNoDisplay = true;
-    else if (field2DataType.indexOf("LV:") == 0) {
+    else if (field2DataType.indexOf("LV:") === 0) {
       // dropdown data type.
       field2DropdownDisplay = true;
       apiUrlPostfix =  field2DataType.substring(3);
@@ -440,7 +439,7 @@ class AddAnimalEvent extends Component {
       field3NumberDisplay = true;
     else if (field3DataType === "YESNO")
       field3YesNoDisplay = true;
-    else if (field3DataType.indexOf("LV:") == 0) {
+    else if (field3DataType.indexOf("LV:") === 0) {
       // dropdown data type.
       field3DropdownDisplay = true;
       apiUrlPostfix =  field3DataType.substring(3);
@@ -504,7 +503,7 @@ class AddAnimalEvent extends Component {
       field4NumberDisplay = true;
     else if (field4DataType === "YESNO")
       field4YesNoDisplay = true;
-    else if (field4DataType.indexOf("LV:") == 0) {
+    else if (field4DataType.indexOf("LV:") === 0) {
       // dropdown data type.
       field4DropdownDisplay = true;
       apiUrlPostfix =  field4DataType.substring(3);
@@ -685,7 +684,7 @@ class AddAnimalEvent extends Component {
   }
 
   render() {
-    var { field1list, field2list,field3list,field4list, nextLifecycleStageList, eventAdditionalMessage, messageColor, animaltaglist, eventlist, operatorlist} = this.state;
+    var { field1list, field2list,field3list,field4list, nextLifecycleStageList, eventAdditionalMessage, messageColor, eventlist, operatorlist} = this.state;
     let eventCount = 0;
     let field1Count = 0;
     let field2Count = 0;

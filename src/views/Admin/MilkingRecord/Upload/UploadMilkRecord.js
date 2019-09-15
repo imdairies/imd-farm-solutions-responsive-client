@@ -14,21 +14,8 @@ import {
   Input,
   Row,
   Label,
-  Nav, 
-  NavItem, 
-  Table,
-  InputGroup,
-//  InputGroupText,
-  Dropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
-  NavLink   
 } from 'reactstrap';
-import classnames from 'classnames';
-import { Link } from 'react-router-dom';
-import queryString from 'query-string';
-import DateTimePicker from 'react-datetime-picker';
+
 
 var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
@@ -106,7 +93,7 @@ class UploadMilkRecord extends Component {
 
     let cowTagsList = cowTags.trim().split("\n");
     let cowRecordsList = milkRecords.trim().split("\n");
-    if (cowTagsList.length != cowRecordsList.length)
+    if (cowTagsList.length !== cowRecordsList.length)
       return null;
     for (let i=0; i< cowTagsList.length; i++) {
       results += cowTagsList[i] + "\t" + cowRecordsList[i] + "\n";
@@ -170,7 +157,7 @@ class UploadMilkRecord extends Component {
     } else if (milkRecords.length === 0) {
       this.setState({messageColor: "danger", outcomeMessage: "Please enter Milking Records Values"});
       document.getElementById("milkRecords").focus();
-    } else if (cowTagsCount != milkRecordsCount) {
+    } else if (cowTagsCount !== milkRecordsCount) {
       this.setState({messageColor: "danger", outcomeMessage: "You have specified " + cowTagsCount + " cow tags and " + milkRecordsCount + " milk records. Each cow tag should have exactly one milk record specified"});
       document.getElementById("cowTags").focus();
     } else {
@@ -239,7 +226,7 @@ class UploadMilkRecord extends Component {
   }
 
   render() {
-    var { date,time,event,temp,humidity,fat,lr,toxin,showParseResult, line1Contents,line2Contents,line3Contents,cowTags,milkRecords, outcomeMessage, messageColor, parseOrCommit} = this.state;
+    var { date,time,event,temp,humidity,fat,lr,toxin,cowTags,milkRecords, outcomeMessage, messageColor, parseOrCommit} = this.state;
     //var yesterday = this.state.timestamp;
     let parsingResultsDisplay  = this.state.showParseResult ? {} : {display : 'none'};
     return (

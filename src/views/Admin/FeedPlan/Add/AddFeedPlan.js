@@ -12,7 +12,6 @@ import {
   FormText,
   Input,
   InputGroup,
-  InputGroupText,
   Row,
   Label,
   Nav, 
@@ -25,8 +24,6 @@ import {
 } from 'reactstrap';
 import classnames from 'classnames';
 import { Link } from 'react-router-dom';
-import DateTimePicker from 'react-datetime-picker';
-import queryString from 'query-string';
 var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 
@@ -52,7 +49,6 @@ class AddFeedPlan extends Component {
       isFarmSire: false,
       isExternalSire: false,
       categoryCodeList: [],
-      controller:"",
       breedCodeList: [],
       breed: "",
       semenCompanyCodeList: [],
@@ -85,14 +81,6 @@ class AddFeedPlan extends Component {
     let serverURL = window.location.href;
     serverURL = serverURL.substring(0,serverURL.indexOf(serverPathname)-1)
 
-    let animalTag = "";
-    let photoURL = "";
-    let recordURL = "";
-    let controller = "";
-    let semenInd = false;
-    let breed = "";
-    let alias = "";
-    let semenCompany = "";
 
     fetch(API_PREFIX + '/imd-farm-management/animals/search', {
         method: "POST",
@@ -361,9 +349,7 @@ setupFarmSireInformation() {
 
 
   render() {
-    var { message, messageColor, animaltypelist, categoryCodeList, breedCodeList, sireList, semenCompanyCodeList} = this.state;
-    let recordCount = 0;
-    let damRecordCount = 0;
+    var { message, messageColor, categoryCodeList, breedCodeList, sireList, semenCompanyCodeList} = this.state;
     let showFarmSireFields = this.state.isFarmSire ? {} : {display : 'none'};
     let showExternalSireFields = this.state.isExternalSire ? {} : {display : 'none'};
     let hide = this.state.isExternalSire || this.state.isFarmSire ? {} : {display : 'none'};

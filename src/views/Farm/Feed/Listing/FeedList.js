@@ -4,31 +4,14 @@ import {
    Button,
    Card,
    CardBody,
-   CardFooter,
    CardHeader,
    Col,
    Fade,
-   Form,
-   FormGroup,
-   FormText,
-   Input,
-   InputGroup,
-   InputGroupText,
    Row,
    Table,
-   Nav, 
-   NavItem, 
-   NavLink, 
-   Label,
-   Dropdown, 
-   DropdownItem, 
-   DropdownMenu, 
-  DropdownToggle 
 } from 'reactstrap';
 
 import { Link } from 'react-router-dom';
-import queryString from 'query-string';
-import classnames from 'classnames';
 
 
 
@@ -120,7 +103,7 @@ class FeedList extends Component {
   }
 
   render() {
-    var { feedItems, isLoaded, animalFeedInfo, animaltypelist, eventAdditionalMessage, messageColor } = this.state;
+    var { feedItems, animalFeedInfo, eventAdditionalMessage } = this.state;
     let recordCount = 0;
     return (
       <div className="animated fadeIn">
@@ -152,12 +135,12 @@ class FeedList extends Component {
                                   ))}
                             </tr> 
                             <tr  align="center" valign="middle">
-                              <th title = "Target Dry Matter">🎯</th>
-                              <th title = "Achieved Dry Matter">🔍</th>
-                              <th title = "Target Crude Protein">🎯</th>
-                              <th title = "Achieved Crude Protein">🔍</th>
-                              <th title = "Target Metabolizable Energy">🎯</th>
-                              <th title = "Achieved Metabolizable Energy">🔍</th>
+                              <th title = "Target Dry Matter"><span role="img" aria-label="target">🎯</span></th>
+                              <th title = "Achieved Dry Matter"><span role="img" aria-label="achieved">🔍</span></th>
+                              <th title = "Target Crude Protein"><span role="img" aria-label="target">🎯</span></th>
+                              <th title = "Achieved Crude Protein"><span role="img" aria-label="achieved">🔍</span></th>
+                              <th title = "Target Metabolizable Energy"><span role="img" aria-label="target">🎯</span></th>
+                              <th title = "Achieved Metabolizable Energy"><span role="img" aria-label="achieved">🔍</span></th>
                             </tr> 
                          </thead>
                          <tbody>

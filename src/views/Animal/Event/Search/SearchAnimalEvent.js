@@ -27,9 +27,9 @@ import {
 } from 'reactstrap';
 
 import { Link } from 'react-router-dom';
-import queryString from 'query-string';
 import classnames from 'classnames';
 var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
+//var API_PREFIX = 'http://52.14.65.112:8080';
 
 
 
@@ -163,7 +163,7 @@ class SearchAnimalEvent extends Component {
   }
 
   render() {
-    var { isLoaded, eventlist, eventSearchFilterlist, animaltaglist, eventAdditionalMessage, messageColor } = this.state;
+    var { isLoaded, eventlist, eventSearchFilterlist, eventAdditionalMessage, messageColor } = this.state;
     let recordCount = 0;
     return (
       <div className="animated fadeIn">
@@ -194,7 +194,7 @@ class SearchAnimalEvent extends Component {
                         </NavLink>
                       </NavItem>
                     </Nav>
-                      <Form action="" method="post" className="form-horizontal">
+                      <Form action="" method="post" onSubmit={this.handleSearch} className="form-horizontal">
                         <FormGroup row>
                           <Col>&nbsp;
                           </Col>

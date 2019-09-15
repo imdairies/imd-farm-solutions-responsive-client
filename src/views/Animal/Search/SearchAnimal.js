@@ -260,7 +260,7 @@ class SearchAnimal extends Component {
                         </NavLink>
                       </NavItem>
                     </Nav>
-                      <Form action="#" method="post" className="form-horizontal">
+                      <Form action="" method="POST" onSubmit={this.handleSearch} className="form-horizontal">
                         <FormGroup row>
                           <Col>&nbsp;
                           </Col>
