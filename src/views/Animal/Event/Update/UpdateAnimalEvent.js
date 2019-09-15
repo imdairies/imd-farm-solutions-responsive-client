@@ -943,7 +943,23 @@ handleField3DropdownValueChanged(event) {
                                   {this.state.eventOperator}
                                 </DropdownToggle>
 
-                                <DropdownMenu id="eventOperatorDropdownMenu" onClick={this.handleOperatorSelected}>
+                                <DropdownMenu id="eventOperatorDropdownMenu" onClick={this.handleOperatorSelected}
+                                modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}>
                                   {operatorlist.map(item => (
                                   <DropdownItem id={item.lookupValueCode} value={item.shortDescription} >{item.shortDescription}</DropdownItem>
                                ))}
@@ -1010,7 +1026,23 @@ handleField3DropdownValueChanged(event) {
                                 <DropdownToggle id="field1" caret>
                                   {this.state.field1DropdownDisplayValue}
                                 </DropdownToggle>
-                              <DropdownMenu id="field1" onClick={this.handleField1DropdownValueChanged}>
+                              <DropdownMenu id="field1" onClick={this.handleField1DropdownValueChanged}
+                              modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}>
                                   {field1list.map(item => (
                                   <DropdownItem id={field1Count++} value={(item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode : "")} >{(item.description ? item.description : "") + (item.shortDescription ? item.shortDescription : "") + " (" + (item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode  : "") + ")"}</DropdownItem>
                                ))}
@@ -1078,7 +1110,23 @@ handleField3DropdownValueChanged(event) {
                                 <DropdownToggle  id="field2" caret>
                                   {this.state.field2DropdownDisplayValue}
                                 </DropdownToggle>
-                              <DropdownMenu id="field2" onClick={this.handleField2DropdownValueChanged}>
+                              <DropdownMenu id="field2" onClick={this.handleField2DropdownValueChanged}
+                              modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}>
                                   {field2list.map(item => (
                                   <DropdownItem id={field2Count++} value={(item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode : "")} >{(item.description ? item.description : "") + (item.shortDescription ? item.shortDescription : "") + " (" + (item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode  : "") + ")"}</DropdownItem>
                                ))}
@@ -1148,7 +1196,23 @@ handleField3DropdownValueChanged(event) {
                                 <DropdownToggle  id="field3" caret>
                                   {this.state.field3DropdownDisplayValue}
                                 </DropdownToggle>
-                              <DropdownMenu id="field3" onClick={this.handleField3DropdownValueChanged}>
+                              <DropdownMenu id="field3" onClick={this.handleField3DropdownValueChanged}
+                              modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}>
                                   {field3list.map(item => (
                                   <DropdownItem id={field3Count++} value={(item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode : "")} >{(item.description ? item.description : "") + (item.shortDescription ? item.shortDescription : "") + " (" + (item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode  : "") + ")"}</DropdownItem>
                                ))}
@@ -1215,7 +1279,23 @@ handleField3DropdownValueChanged(event) {
                                 <DropdownToggle  id="field4" caret>
                                   {this.state.field4DropdownDisplayValue}
                                 </DropdownToggle>
-                              <DropdownMenu id="field4" onClick={this.handleField4DropdownValueChanged}>
+                              <DropdownMenu id="field4" onClick={this.handleField4DropdownValueChanged}
+                              modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}>
                                   {field4list.map(item => (
                                   <DropdownItem id={field4Count++} value={(item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode : "")} >{(item.description ? item.description : "") + (item.shortDescription ? item.shortDescription : "") + " (" + (item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode  : "") + ")"}</DropdownItem>
                                ))}

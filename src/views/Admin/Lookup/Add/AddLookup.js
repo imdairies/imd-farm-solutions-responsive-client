@@ -225,7 +225,23 @@ class AddLookup extends Component {
                                 <DropdownToggle caret>
                                   {this.state.codeDescription}
                                 </DropdownToggle>
-                                <DropdownMenu onClick={this.handleCategoryCodeChange}>
+                                <DropdownMenu onClick={this.handleCategoryCodeChange}
+                                modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}>
                                   {categoryCodeList.map(item => (
                                   <DropdownItem id={itemCount++} value={item.lookupValueCode} >{item.shortDescription + " (" + item.lookupValueCode + ")"}</DropdownItem>
                                ))}

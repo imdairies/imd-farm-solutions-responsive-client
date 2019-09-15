@@ -775,7 +775,23 @@ class AddAnimalEvent extends Component {
                                   {this.state.eventCode}
                                 </DropdownToggle>
 
-                                <DropdownMenu id="eventCode" onClick={this.handleEventSelected}>
+                                <DropdownMenu id="eventCode" onClick={this.handleEventSelected}
+                                modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}>
                                   {eventlist.map(item => (
                                   <DropdownItem id={eventCount++} value={item.eventShortDescription} >{item.eventShortDescription}</DropdownItem>
                                ))}
@@ -801,7 +817,23 @@ class AddAnimalEvent extends Component {
                                   {this.state.operator}
                                 </DropdownToggle>
 
-                                <DropdownMenu id="lookupValueCode" onClick={this.handleOperatorSelected}>
+                                <DropdownMenu id="lookupValueCode" onClick={this.handleOperatorSelected}
+                                modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}>
                                   {operatorlist.map(item => (
                                   <DropdownItem id={item.lookupValueCode} value={item.shortDescription} >{item.shortDescription}</DropdownItem>
                                ))}
@@ -867,7 +899,23 @@ class AddAnimalEvent extends Component {
                                 <DropdownToggle caret>
                                   {this.state.field1DropdownDisplayValue}
                                 </DropdownToggle>
-                              <DropdownMenu id="field1" onClick={this.handleField1DropdownValueChanged}>
+                              <DropdownMenu id="field1" onClick={this.handleField1DropdownValueChanged}
+                              modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}>
                                   {field1list.map(item => (
                                   <DropdownItem id={field1Count++} value={(item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode : "")} >{(item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode  : "") + " " + (item.description ? item.description : "") + (item.shortDescription ? item.shortDescription : "") }</DropdownItem>
                                ))}
@@ -937,7 +985,23 @@ class AddAnimalEvent extends Component {
                                 <DropdownToggle caret>
                                   {this.state.field2DropdownDisplayValue}
                                 </DropdownToggle>
-                              <DropdownMenu id="field2" onClick={this.handleField2DropdownValueChanged}>
+                              <DropdownMenu id="field2" onClick={this.handleField2DropdownValueChanged}
+                              modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}>
                                   {field2list.map(item => (
                                   <DropdownItem id={field2Count++} value={(item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode : "")} >{(item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode  : "") + " " + (item.description ? item.description : "") + (item.shortDescription ? item.shortDescription : "")}</DropdownItem>
                                ))}
@@ -1010,7 +1074,23 @@ class AddAnimalEvent extends Component {
                                 <DropdownToggle caret>
                                   {this.state.field3DropdownDisplayValue}
                                 </DropdownToggle>
-                              <DropdownMenu id="field3" onClick={this.handleField3DropdownValueChanged}>
+                              <DropdownMenu id="field3" onClick={this.handleField3DropdownValueChanged}
+                              modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}>
                                   {field3list.map(item => (
                                   <DropdownItem id={field3Count++} value={(item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode : "")} >{(item.description ? item.description : "") + (item.shortDescription ? item.shortDescription : "") + " (" + (item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode  : "") + ")"}</DropdownItem>
                                ))}
@@ -1081,7 +1161,23 @@ class AddAnimalEvent extends Component {
                                 <DropdownToggle caret>
                                   {this.state.field4DropdownDisplayValue}
                                 </DropdownToggle>
-                              <DropdownMenu id="field4" onClick={this.handleField4DropdownValueChanged}>
+                              <DropdownMenu id="field4" onClick={this.handleField4DropdownValueChanged}
+                              modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}>
                                   {field4list.map(item => (
                                   <DropdownItem id={field4Count++} value={(item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode : "")} >{(item.description ? item.description : "") + (item.shortDescription ? item.shortDescription : "") + " (" + (item.code ? item.code : "") + (item.lookupValueCode ? item.lookupValueCode  : "") + ")"}</DropdownItem>
                                ))}
@@ -1126,7 +1222,23 @@ class AddAnimalEvent extends Component {
                                 <DropdownToggle caret>
                                   {this.state.nextLifecycleStageValue}
                                 </DropdownToggle>
-                              <DropdownMenu id="field2" onClick={this.handleLifecycleStageValueChanged}>
+                              <DropdownMenu id="field2" onClick={this.handleLifecycleStageValueChanged}
+                              modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}>
                                   {nextLifecycleStageList.map(item => (
                                   <DropdownItem id={field2Count++} value={item} >{item}</DropdownItem>
                                ))}

@@ -288,7 +288,23 @@ class SearchAnimal extends Component {
                                   {this.state.animalType}
                                 </DropdownToggle>
 
-                                <DropdownMenu onClick={this.handleAnimalTypeSelected}>
+                                <DropdownMenu onClick={this.handleAnimalTypeSelected}
+                                modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}>
                                   <DropdownItem id="ALL" value="ALL" >ALL</DropdownItem>
                                   {animaltypelist.map(animaltypeitem => (
                                   <DropdownItem id={animaltypeitem.lookupValueCode} value={animaltypeitem.lookupValueCode} >{animaltypeitem.shortDescription}</DropdownItem>

@@ -181,7 +181,23 @@ class SearchFeedPlan extends Component {
                                   {this.state.cohortType}
                                 </DropdownToggle>
 
-                                <DropdownMenu onClick={this.handleCohortTypeSelected}>
+                                <DropdownMenu onClick={this.handleCohortTypeSelected}
+                                modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}>
                                   {cohortTypelist.map(cohortTypeitem => (
                                   <DropdownItem id={cohortTypeitem.lookupValueCode} value={cohortTypeitem.lookupValueCode} >{cohortTypeitem.shortDescription}</DropdownItem>
                                ))}

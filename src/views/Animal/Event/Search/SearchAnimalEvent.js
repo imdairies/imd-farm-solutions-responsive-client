@@ -222,7 +222,23 @@ class SearchAnimalEvent extends Component {
                                   {this.state.eventCode}
                                 </DropdownToggle>
 
-                                <DropdownMenu id="eventCode" onClick={this.handleEventSelected}>
+                                <DropdownMenu id="eventCode" onClick={this.handleEventSelected}
+                                modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}>
                                   <DropdownItem id="%" value="ALL" >ALL</DropdownItem>                                  
                                   {eventSearchFilterlist.map(item => (
                                   <DropdownItem id={item.eventCode} value={item.eventShortDescription} >{item.eventShortDescription}</DropdownItem>

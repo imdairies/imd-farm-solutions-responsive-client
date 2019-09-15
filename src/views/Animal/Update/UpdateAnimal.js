@@ -716,7 +716,23 @@ retrieveAnimallWeightGraphData(animalTag){
                               <DropdownToggle caret>
                                 {this.state.animalSireAlias}
                               </DropdownToggle>
-                              <DropdownMenu onClick={this.handleSireChange}>
+                              <DropdownMenu onClick={this.handleSireChange}
+                              modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}>
                                 {sireList.map(sire => (<DropdownItem id={sire.animalTag} value={recordCount++}>{sire.alias}</DropdownItem>))}
                               </DropdownMenu>
                             </Dropdown>
@@ -733,7 +749,23 @@ retrieveAnimallWeightGraphData(animalTag){
                               <DropdownToggle caret>
                                 {this.state.animalType}
                               </DropdownToggle>
-                              <DropdownMenu onClick={this.handleLifecycleStage}>
+                              <DropdownMenu onClick={this.handleLifecycleStage}
+                              modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}>
                                 {lifecycleStageList.map(lifecycleStageItem => (
                                 <DropdownItem id={lifecycleStageItem.lookupValueCode} value={lifecycleStageItem.lookupValueCode} >{lifecycleStageItem.shortDescription}</DropdownItem>
                              ))}

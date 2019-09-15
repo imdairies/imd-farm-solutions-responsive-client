@@ -416,7 +416,23 @@ setupFarmSireInformation() {
                               <DropdownToggle caret>
                                 {this.state.animalTag}
                               </DropdownToggle>
-                              <DropdownMenu onClick={this.handleSireChange}>
+                              <DropdownMenu onClick={this.handleSireChange}
+                              modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}>
                                 {sireList.map(sire => (<DropdownItem id={sire.animalTag} value={sire.animalTag}>{sire.animalTag + '-' + sire.alias}</DropdownItem>))}
                               </DropdownMenu>
                             </Dropdown>
@@ -458,7 +474,23 @@ setupFarmSireInformation() {
                                   {this.state.breed}
                                 </DropdownToggle>
 
-                                <DropdownMenu onClick={this.handleBreedSelected}>
+                                <DropdownMenu onClick={this.handleBreedSelected}
+                                modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}>
                                   {breedCodeList.map(item => (
                                   <DropdownItem id={item.lookupValueCode} value={item.lookupValueCode} >{item.shortDescription}</DropdownItem>
                                ))}
@@ -478,7 +510,23 @@ setupFarmSireInformation() {
                                   {this.state.controller}
                                 </DropdownToggle>
 
-                                <DropdownMenu onClick={this.handleControllerSelected}>
+                                <DropdownMenu onClick={this.handleControllerSelected}
+                                modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}>
                                   {categoryCodeList.map(animaltypeitem => (
                                   <DropdownItem id={animaltypeitem.lookupValueCode} value={animaltypeitem.lookupValueCode} >{animaltypeitem.shortDescription}</DropdownItem>
                                ))}
@@ -498,7 +546,23 @@ setupFarmSireInformation() {
                                   {this.state.semenCompany}
                                 </DropdownToggle>
 
-                                <DropdownMenu onClick={this.handleSemenCompanySelected}>
+                                <DropdownMenu onClick={this.handleSemenCompanySelected}
+                                modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}>
                                   {semenCompanyCodeList.map(animaltypeitem => (
                                   <DropdownItem id={animaltypeitem.lookupValueCode} value={animaltypeitem.lookupValueCode} >{animaltypeitem.shortDescription}</DropdownItem>
                                ))}

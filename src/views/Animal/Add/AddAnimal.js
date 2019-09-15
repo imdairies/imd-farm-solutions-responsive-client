@@ -353,7 +353,23 @@ class AddAnimal extends Component {
                                   {this.state.breed}
                                 </DropdownToggle>
 
-                                <DropdownMenu onClick={this.handleBreedSelected}>
+                                <DropdownMenu onClick={this.handleBreedSelected}
+                                modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}>
                                   {breedList.map(breeds => (
                                   <DropdownItem id={breeds.lookupValueCode} value={breeds.lookupValueCode} >{breeds.lookupValueCode + " - " + breeds.shortDescription}</DropdownItem>
                                ))}
@@ -405,7 +421,24 @@ class AddAnimal extends Component {
                                   {this.state.animalType}
                                 </DropdownToggle>
 
-                                <DropdownMenu onClick={this.handleAnimalTypeSelected}>
+                                <DropdownMenu onClick={this.handleAnimalTypeSelected} 
+                                  modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}
+                                >
                                   {animaltypelist.map(animaltypeitem => (
                                   <DropdownItem id={animaltypeitem.lookupValueCode} value={animaltypeitem.lookupValueCode} >{animaltypeitem.shortDescription}</DropdownItem>
                                ))}
@@ -440,7 +473,23 @@ class AddAnimal extends Component {
                               <DropdownToggle caret>
                                 {this.state.animalSireAlias}
                               </DropdownToggle>
-                              <DropdownMenu onClick={this.handleSireChange}>
+                              <DropdownMenu overflow='auto' onClick={this.handleSireChange}
+                              modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}>
                                 <DropdownItem id="0Sire" value="-1">-- Select Sire --</DropdownItem>
                                 {sireList.map(sire => (<DropdownItem id={sire.animalTag} value={recordCount++}>{sire.animalTag + '-' + sire.alias}</DropdownItem>))}
                               </DropdownMenu>
@@ -450,12 +499,29 @@ class AddAnimal extends Component {
                         <FormGroup row>
                           <Label sm="4" htmlFor="input-normal">Dam</Label>
                           <Col sm="4">
-                            <Dropdown isOpen={this.state.dropdownOpen[4]} toggle={() => {
+                            <Dropdown isOpen={this.state.dropdownOpen[4]} size="md" toggle={() => {
                               this.toggle(4);}}>
                               <DropdownToggle caret>
                                 {this.state.animalDamTag}
                               </DropdownToggle>
-                              <DropdownMenu onClick={this.handleDamChange}>
+                              <DropdownMenu onClick={this.handleDamChange}
+                                 modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}
+                              >
                                 <DropdownItem id="0Dam" value="-1">-- Select Dam --</DropdownItem>
                                 {damList.map(dam => (<DropdownItem id={dam.animalTag} value={damRecordCount++}>{dam.animalTag}</DropdownItem>))}
                               </DropdownMenu>

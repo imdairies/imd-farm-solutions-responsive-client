@@ -274,7 +274,23 @@ class AddSemenInventory extends Component {
                               <DropdownToggle caret>
                                 {this.state.animalTagValue}
                               </DropdownToggle>
-                              <DropdownMenu onClick={this.handleSireChange}>
+                              <DropdownMenu onClick={this.handleSireChange}
+                              modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}>
                                 {sireList.map(sire => (sire.semenInd === 'Y' ? <DropdownItem id={sireCount++} value={sire.animalTag + '-' + sire.alias}>{sire.animalTag + '-' + sire.alias}</DropdownItem> : ''))}
                               </DropdownMenu>
                             </Dropdown>
