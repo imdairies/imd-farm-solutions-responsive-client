@@ -894,7 +894,7 @@ retrieveAnimallWeightGraphData(animalTag){
                             <Col>
                                <Table hover bordered striped responsive size="sm">
                                 <tr>
-                                  <td colspan="5" align="center"><strong>{this.state.month2Date}</strong>&nbsp;&nbsp;<button onClick={this.handleNext} >►►</button></td>
+                                  <td colspan="5" align="center"><strong>{this.state.month2Date}</strong>&nbsp;&nbsp;<button onClick={this.handleNext}>▶︎▶︎</button></td>
                                 </tr> 
                                 <tr>
                                   <th>Day</th>
