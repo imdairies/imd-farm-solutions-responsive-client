@@ -12,6 +12,8 @@ import {
 } from 'reactstrap';
 
 import { Link } from 'react-router-dom';
+import queryString from 'query-string';
+
 
 
 
@@ -32,7 +34,18 @@ class ViewInseminationInfo extends Component {
   }
 
   componentDidMount() {
-    this.setState({items: [], isLoaded: false}); 
+
+    const parsed = queryString.parse(this.props.location.search);
+    var upcomingCalvings = parsed.calvings;
+    var recentInseminations = parsed.inseminations;
+    // if (upcomingCalvings)
+    //   alert("upcomingCalvings " + upcomingCalvings);
+    // if (recentInseminations)
+    //   alert("recentInseminations " + recentInseminations);
+
+    this.setState({showCurrentMonthExpectedCalvings:upcomingCalvings, 
+                  showCurrentMonthInseminations:recentInseminations,
+                  items: [], isLoaded: false}); 
     fetch('http://localhost:8080/imd-farm-management/animals/adultfemalecows', {
         method: "POST",
         headers: {
@@ -49,11 +62,27 @@ class ViewInseminationInfo extends Component {
     })
     .then(response => response.json())
     .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({items: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
-      }
-      else {
-         this.setState({items: responseJson, isLoaded: true, eventAdditionalMessage: (responseJson.length === 1 ? responseJson.length + " matching record found" : responseJson.length + " matching records found"), messageColor: "success"});         
+        if (responseJson.error) {
+           this.setState({items: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+        }
+        else {
+          let i = 0;
+          let item;
+          let items = [];
+          for (i=0; i <responseJson.length; i++) {
+            item = responseJson[i];
+            if ( (upcomingCalvings && (!item.daysSinceInsemination || item.daysSinceInsemination < 240)) || 
+                 (recentInseminations && (!item.daysSinceInsemination || item.daysSinceInsemination >= 30))) {
+              // don't include
+              ;
+            } else {
+              items.push(responseJson[i]);
+            }
+
+           this.setState({items: items, isLoaded: true, eventAdditionalMessage: (responseJson.length === 1 ? responseJson.length + " matching record found" : responseJson.length + " matching records found"), messageColor: "success"});         
+
+           // this.setState({items: responseJson, isLoaded: true, eventAdditionalMessage: (responseJson.length === 1 ? responseJson.length + " matching record found" : responseJson.length + " matching records found"), messageColor: "success"});         
+        }
       }
     })
     .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -70,7 +99,7 @@ class ViewInseminationInfo extends Component {
                <Fade timeout={this.state.timeout} in={this.state.fadeIn}>
                   <Card>
                      <CardHeader>
-                     <i className="fa fa-align-justify"></i> Animals {(isLoaded ? "": " Loading ...")}
+                     <i className="fa fa-align-justify"></i> Animals {(isLoaded ? "": " Loading ...")} {this.state.showCurrentMonthExpectedCalvings ? " who are expected to calve soon, In Sha Allah" : ""} {this.state.showCurrentMonthInseminations ? " who have been recently inseminated" : ""}
                        <div className="card-header-actions">
                          <Button color="link" className="card-header-action btn-minimize" data-target="#animaldata" ></Button>
                        </div>
@@ -86,13 +115,13 @@ class ViewInseminationInfo extends Component {
                                 <th>Inseminated At</th>
                                 <th>Insemination Summary</th>
                                 <th>Days Since Insemination</th>
-                                <th>Days to Parturition</th>
+                                <th>Days to Calving</th>
                                 <th>Insemination Attempts</th>
                               </tr> 
                            </thead>
                            <tbody>
                              {items.map(item => (
-                                <tr key="{item.animalTag}">
+                                <tr key="{item.animalTag}" style={{visibility: (this.state.showCurrentMonthExpectedCalvings && (!item.daysSinceInsemination || item.daysSinceInsemination < 240)) || (this.state.showCurrentMonthInseminations && (!item.daysSinceInsemination || item.daysSinceInsemination >= 30))? 'hidden' : 'visible' }} >
                                   <td>{++recordCount}</td>
                                   <td><Link to={'/animal/update?animalTag=' + item.animalTag + '&orgID=' + item.orgID} >{item.animalTag}</Link></td>
                                   <td>{item.animalType}</td>

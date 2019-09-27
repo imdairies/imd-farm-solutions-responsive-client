@@ -25,10 +25,36 @@ const brandInfo = getStyle('--info')
 var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 
-
-
-
-
+var inseminationsHistoryOpts = {
+  tooltips: {
+    enabled: false,
+    custom: CustomTooltips
+  },
+  maintainAspectRatio: false,
+  legend: {
+    display: false,
+  },
+  scales: {
+    xAxes: [
+      {
+        display: false,
+      }],
+    yAxes: [
+      {
+        display: false,
+      }],
+  },
+  elements: {
+    line: {
+      borderWidth: 2,
+    },
+    point: {
+      radius: 0,
+      hitRadius: 10,
+      hoverRadius: 4,
+    },
+  },
+}; 
 
 var herdSizeHistoryOpts = {
   tooltips: {
@@ -170,6 +196,7 @@ class Dashboard extends Component {
     this.retrieveHeiferCount = this.retrieveHeiferCount.bind(this);
     this.retrieveFemaleCalvesCount = this.retrieveFemaleCalvesCount.bind(this);
     this.retrieveHerdSizeHistory = this.retrieveHerdSizeHistory.bind(this);
+    this.retrieveInseminationHistory = this.retrieveInseminationHistory.bind(this);
     this.retrieveMilkingRecordOfMonth = this.retrieveMilkingRecordOfMonth.bind(this);
 
     this.state = {
@@ -261,11 +288,12 @@ class Dashboard extends Component {
       this.retrieveActiveHerdCount();
       this.retrieveLactatingCount();
       this.retrievePregnantCount();
+      this.retrieveFemaleCalvesCount();
       this.retrieveHerdSizeHistory();
+      this.retrieveInseminationHistory();
       this.retrieveMilkingRecordOfMonth();
 
       // this.retrieveHeiferCount();
-      // this.retrieveFemaleCalvesCount();
    }
 
 retrieveActiveHerdCount(){
@@ -386,10 +414,55 @@ retrieveFemaleCalvesCount(){
      this.setState({femaleCalfCount: -999, femaleCalfWidgetMessage:  "Error in retrieving active female calves count: " + responseJson.message});
   }
   else {
-     this.setState({femaleCalfCount: responseJson.length,  femaleCalfWidgetMessage: "Female Progney"});         
+     this.setState({femaleCalfCount: responseJson.length,  femaleCalfWidgetMessage: "Female Calves"});         
   }
   })
   .catch(error => this.setState({femaleCalfCount: -999,  femaleCalfWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" :  "Error in retrieving active female calves count: " + error.toString())}));
+}
+
+retrieveInseminationHistory (){
+  let now =  new Date();
+  let inseminationHistory = {
+    datasets: [
+      {
+        label: 'Insemninations',
+        backgroundColor: 'rgba(255,255,255,.5)',
+        borderColor: 'rgba(255,255,255,0.55)',
+        // data: [1,2,3,0,5,6,2,1,3],
+      },
+    ],
+  };
+
+  fetch(API_PREFIX+ '/imd-farm-management/farm/inseminationhistory', {
+      method: "POST",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        "start": "2017-01-31",
+        "end": now.getFullYear() + "-" + (now.getMonth()+1) + "-" + now.getDate(),
+        "steps": 1
+    })
+  })
+  .then(response => response.json())
+  .then(responseJson => {
+  if (responseJson.error) {
+    this.setState({herdSize: -999, activeAnimalWidgetMessage:  "Error in retrieving herd size history: " + responseJson.message});
+  }
+  else {
+    // alert(responseJson.months);
+    inseminationHistory.labels = responseJson.months;
+    inseminationHistory.datasets[0].data = responseJson.herdCounts;
+    this.setState({inseminationTrend: inseminationHistory});
+  }
+  })
+  .catch(error => this.setState({herdSize: -999,  activeAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" :  "Error in retrieving herd size history: " + error.toString())}));
+
+  inseminationHistory.labels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep'];//responseJson.months;
+  inseminationHistory.datasets[0].data = [3,3,2,2,1,0,0,2,5];
+  this.setState({inseminationTrend: inseminationHistory});
+
 }
 
 retrieveHerdSizeHistory(){
@@ -634,7 +707,7 @@ retrieveLactatingCount() {
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
 
   render() {
-    var {herdSizeTrend, previousPreviousMonth, previsousMonth, currentMonth, currentYear} = this.state;
+    var {herdSizeTrend, inseminationTrend, previousPreviousMonth, previsousMonth, currentMonth, currentYear} = this.state;
 
     return (
       <div className="animated fadeIn">
@@ -652,15 +725,39 @@ retrieveLactatingCount() {
                     </DropdownMenu>
                   </ButtonDropdown>
                 </ButtonGroup>
-                <div className="text-value" id="herdSize">{this.state.herdSize + " " + this.state.activeAnimalWidgetMessage}</div>
+                <div className="text-value" id="herdSize">{"Active Herd: " + this.state.herdSize + " " + this.state.activeAnimalWidgetMessage}</div>
                 <div> <Link to={"/animal/search?searchCode=lactatingcows"} style={{color: '#FFF' }} > <i className="fa fa-arrow-circle-right"></i></Link> {this.state.lactatingAnimalWidgetMessage + ': '} {this.state.lactatingAnimalCount} </div>
                 <div> <Link to={"/animal/search?searchCode=pregnantcows"} style={{color: '#FFF' }} >  <i className="fa fa-arrow-circle-right"></i></Link> {this.state.pregnantAnimalWidgetMessage  + ': '} {this.state.pregnantCount} </div>
+                <div> <Link to={"/animal/search?searchCode=femalecalves"} style={{color: '#FFF' }} >  <i className="fa fa-arrow-circle-right"></i></Link> {this.state.femaleCalfWidgetMessage  + ': '} {this.state.femaleCalfCount} </div>
               </CardBody>
               <div className="chart-wrapper" style={{ height: '50px' }}>
                 <Line data={herdSizeTrend} options={herdSizeHistoryOpts} height={30} />
               </div>
             </Card>
           </Col>
+          <Col xs="8" sm="5" lg="4">
+            <Card className="text-white bg-info">
+              <CardBody className="pb-0">
+                <ButtonGroup className="float-right">
+                  <ButtonDropdown id='card2' isOpen={this.state.card2} toggle={() => { this.setState({ card2: !this.state.card2 }); }}>
+                    <DropdownToggle caret className="p-0" color="transparent">
+                      <i className="icon-location-pin"></i>
+                    </DropdownToggle>
+                    <DropdownMenu right>
+                      <DropdownItem><a href="#/animal/search?searchTypeCD=%">View Active Herd</a></DropdownItem>
+                    </DropdownMenu>
+                  </ButtonDropdown>
+                </ButtonGroup>
+                <div className="text-value" id="monthYear">{"Breeding"}</div>
+                <div> <Link to={"/farm/insemination?calvings=Y"} style={{color: '#FFF' }} > <i className="fa fa-arrow-circle-right"></i></Link> {'Expected Calvings: '} {'5'} </div>
+                <div> <Link to={"/animal/search?animalTags=051,052"} style={{color: '#FFF' }} >  <i className="fa fa-arrow-circle-right"></i></Link> {'Calved: '} {'2'} </div>
+                <div> <Link to={"/farm/insemination?inseminations=Y"} style={{color: '#FFF' }} > <i className="fa fa-arrow-circle-right"></i></Link> {'Inseminations Performed: '} {'5'} </div>
+              </CardBody>
+              <div className="chart-wrapper" style={{ height: '50px' }}>
+                <Line data={inseminationTrend} options={inseminationsHistoryOpts} height={30} />
+              </div>
+            </Card>
+          </Col>          
         </Row>
         <Row>
           <Col>

@@ -175,7 +175,7 @@ class SearchAnimalMilking extends Component {
                         </NavLink>
                       </NavItem>
                     </Nav>
-                      <Form action="" method="post" className="form-horizontal">
+                      <Form action="" method="post" onSubmit={this.handleSearch} className="form-horizontal">
                         <FormGroup row>
                           <Col>&nbsp;
                           </Col>

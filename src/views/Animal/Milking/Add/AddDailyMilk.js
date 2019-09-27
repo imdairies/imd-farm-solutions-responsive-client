@@ -242,7 +242,23 @@ class AddDailyMilk extends Component {
                                   {this.state.animalTag}
                                 </DropdownToggle>
 
-                                <DropdownMenu onClick={this.handleAnimalTagSelected}>
+                                <DropdownMenu onClick={this.handleAnimalTagSelected}
+                                                                modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}>
                                   {animaltaglist.map(animaltagitem => (
                                   <DropdownItem id={animaltagitem.animalTag} value={animaltagitem.animalTag} >{animaltagitem.animalTag}</DropdownItem>
                                ))}

@@ -366,7 +366,8 @@ class AddFarmDailyMilk extends Component {
               if (responseJson[i].outcome === "ERROR") {
                 outcomeMessage += responseJson[i].tag + " ";
               }
-              totalMilk += parseFloat(responseJson[i].volume);
+              if (!isNaN(parseFloat(responseJson[i].volume)))
+                totalMilk += parseFloat(responseJson[i].volume);
             }
             this.setState({totalMilkMessage: "" + totalMilk, addOrUpdate: (totalMilk === 0 ? "Add" : "Update")});
 
