@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import { Badge, DropdownItem, DropdownMenu, DropdownToggle, Nav, NavItem, NavLink } from 'reactstrap';
 import PropTypes from 'prop-types';
 
 import { AppAsideToggler, AppHeaderDropdown, AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
-import logo from '../../assets/img/brand/imdlogo.png'
-import sygnet from '../../assets/img/brand/sygnet.png'
+import logo from '../../assets/img/brand/imdlogo.png';
+import sygnet from '../../assets/img/brand/sygnet.png';
+import Clock from 'react-live-clock';
 
 const propTypes = {
   children: PropTypes.node,
@@ -32,14 +32,13 @@ class DefaultHeader extends Component {
           <NavItem className="px-3">
             <NavLink href="/">Dashboard</NavLink>
           </NavItem>
-          <NavItem className="px-3">
-            <Link to="/users">Users</Link>
-          </NavItem>
-          <NavItem className="px-3">
-            <NavLink href="#">Settings</NavLink>
-          </NavItem>
         </Nav>
-        <Nav className="ml-auto" navbar>
+        <Nav className="ml-auto" navbar><b>Time at IMDairies:&nbsp;&nbsp;</b>
+	        <Clock
+	        style={{fontSize: '1.0em', color:'blue'}}
+	        format={'dddd D-MMMM-YYYY, h:mm A'}
+	        ticking={true}
+	        timezone={'Asia/Aqtau'} />&nbsp;&nbsp;
           <NavItem className="d-md-down-none">
             <NavLink href="#"><i className="icon-bell"></i><Badge pill color="danger">5</Badge></NavLink>
           </NavItem>

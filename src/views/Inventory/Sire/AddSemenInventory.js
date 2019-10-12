@@ -76,7 +76,13 @@ class AddSemenInventory extends Component {
       if (responseJson.error) {
         this.setState({message: responseJson.message, messageColor: "danger"});
       } else {
-        this.setState({ sireList: responseJson, message:""});
+        let count = 0;
+        let sireList = [];
+        for (; count < responseJson.length; count++) {
+          if (responseJson[count].semenInd === 'Y') 
+            sireList.push(responseJson[count]);
+        }
+        this.setState({ sireList: sireList, message:""});
       }
     })
     .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
@@ -85,7 +91,7 @@ class AddSemenInventory extends Component {
 
   handleSireChange (event) {
     let arrayIndex = event.target.id;
-    //alert(this.state.sireList[arrayIndex].animalTag + " PKR. " + this.state.sireList[arrayIndex].currentSexListPrice);
+    //alert(arrayIndex + ':' + this.state.sireList[arrayIndex].animalTag + '-' + this.state.sireList[arrayIndex].alias + " PKR. " + this.state.sireList[arrayIndex].currentSexListPrice + " / " + this.state.sireList[arrayIndex].currentConventionalListPrice);
     this.setState({
       animalTagValue : event.target.value,
       animalTag : this.state.sireList[arrayIndex].animalTag,

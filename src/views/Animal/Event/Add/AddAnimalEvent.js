@@ -28,6 +28,11 @@ import classnames from 'classnames';
 import { Link } from 'react-router-dom';
 import queryString from 'query-string';
 import DateTimePicker from 'react-datetime-picker';
+import 'moment-timezone';
+
+const moment = require('moment-timezone'); //moment-timezone
+
+
 var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 
@@ -53,8 +58,15 @@ class AddAnimalEvent extends Component {
       dirty: false,
       longdescription: "",
       messageColor: "muted",
-      timestamp: new Date(),
-      eventDate: new Date(),
+      timestamp:  new Date(moment.tz("Asia/Aqtau").year(),
+        moment.tz("Asia/Aqtau").month(),moment.tz("Asia/Aqtau").date(),
+        moment.tz("Asia/Aqtau").hour(),
+        moment.tz("Asia/Aqtau").minute()),
+
+      eventDate:  new Date(moment.tz("Asia/Aqtau").year(),
+        moment.tz("Asia/Aqtau").month(),moment.tz("Asia/Aqtau").date(),
+        moment.tz("Asia/Aqtau").hour(),
+        moment.tz("Asia/Aqtau").minute()),
 
       field1Label: "",
       field1Value: "",
@@ -191,8 +203,10 @@ class AddAnimalEvent extends Component {
   }
 
   componentDidMount() {
+
+    //alert(moment.tz("Asia/Aqtau"));
     const parsed = queryString.parse(this.props.location.search);
-    this.setState({lookupValueCode: parsed.lookupValueCode, animaltaglist: [], eventlist: [], operatorlist: [], isLoaded: false}); 
+    this.setState({timezone:moment.tz("Asia/Aqtau"), eventDate:moment.tz("Asia/Aqtau"), lookupValueCode: parsed.lookupValueCode, animaltaglist: [], eventlist: [], operatorlist: [], isLoaded: false}); 
 
 
     // retrieve Event Dropdown values  

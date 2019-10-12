@@ -163,12 +163,12 @@ class SearchSemenInventory extends Component {
                                 <th rowspan="2">photo</th>
                               </tr> 
                               <tr>
-                                <th><span role="img" aria-label="normal">🚻</span></th>
-                                <th><span role="img" aria-label="sexed">🚺</span></th>
-                                <th><span role="img" aria-label="%success">✌️</span></th>
-                                <th><span role="img" aria-label="success">✅</span></th>
-                                <th><span role="img" aria-label="failure">❌</span></th>
-                                <th><span role="img" aria-label="tbd">⏳</span></th>
+                                <th><span role="img" aria-label="normal" title="Conventional Semen">🚻</span></th>
+                                <th><span role="img" aria-label="sexed" title="Sexed Semen">🚺</span></th>
+                                <th><span role="img" aria-label="%success" title="% Success">✌️</span></th>
+                                <th><span role="img" aria-label="success"  title="Successful Insemination">✅</span></th>
+                                <th><span role="img" aria-label="failure"  title="Failed Insemination">❌</span></th>
+                                <th><span role="img" aria-label="tbd" title="Insemination Outcome Awaited">⏳</span></th>
                               </tr> 
                             </thead>
                             <tbody>

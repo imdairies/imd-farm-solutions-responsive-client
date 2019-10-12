@@ -23,6 +23,9 @@ import {
 } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import DateTimePicker from 'react-datetime-picker';
+import 'moment-timezone';
+
+const moment = require('moment-timezone'); //moment-timezone
 
 var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
@@ -46,9 +49,15 @@ class AddFarmEvent extends Component {
       alias: "",
       longdescription: "",
       messageColor: "muted",
-      timestamp: new Date(),
-      eventDate: new Date(),
+      timestamp:  new Date(moment.tz("Asia/Aqtau").year(),
+        moment.tz("Asia/Aqtau").month(),moment.tz("Asia/Aqtau").date(),
+        moment.tz("Asia/Aqtau").hour(),
+        moment.tz("Asia/Aqtau").minute()),
 
+      eventDate:  new Date(moment.tz("Asia/Aqtau").year(),
+        moment.tz("Asia/Aqtau").month(),moment.tz("Asia/Aqtau").date(),
+        moment.tz("Asia/Aqtau").hour(),
+        moment.tz("Asia/Aqtau").minute()),
       field1Label: "",
       field1Value: "",
       field1DropdownDisplayValue: "",
