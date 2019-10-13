@@ -40,7 +40,7 @@ class SearchAnimal extends Component {
     this.toggle = this.toggle.bind(this);
     this.toggleFade = this.toggleFade.bind(this);
     this.state = {
-      dropdownOpen: new Array(1).fill(false),
+      dropdownOpen: new Array(4).fill(false),
       collapse: true,
       warning: false,
       fadeIn: true,
@@ -52,6 +52,8 @@ class SearchAnimal extends Component {
       activeOnly: false,
       messageColor: "muted",
       animaltypelist: [],
+      sireList:[],
+      damList: [],
       eventAdditionalMessage: "Enter search fields (you can use % for wild card searches) and press Search button"
     };
     this.handleAnimalTagValueChanged = this.handleAnimalTagValueChanged.bind(this);
@@ -59,6 +61,11 @@ class SearchAnimal extends Component {
     this.handleAnimalTypeSelected = this.handleAnimalTypeSelected.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
     this.handleTabClick = this.handleTabClick.bind(this);
+    this.handleSireChange = this.handleSireChange.bind(this);
+    this.handleDamChange = this.handleDamChange.bind(this);
+    this.handleGenderChange = this.handleGenderChange.bind(this);
+    this.handleDobFromChanged = this.handleDobFromChanged.bind(this);
+    this.handleDobToChanged = this.handleDobToChanged.bind(this);
   }
 
   toggle(i) {
@@ -72,6 +79,10 @@ class SearchAnimal extends Component {
 
   handleActiveOnly() {
     this.setState({activeOnly: !this.state.activeOnly});
+  }
+
+  handleDobToChanged() {
+    this.setState({dobTo: !this.state.activeOnly});
   }
 
   componentDidMount() {
@@ -181,7 +192,82 @@ class SearchAnimal extends Component {
       })
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
     } 
+
+    fetch(API_PREFIX + '/imd-farm-management/animals/retrieveaisire', {
+        method: "POST",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          "animalTag":"%",
+      })
+    })
+    .then(response => response.json())
+    .then(responseJson => {
+      if (responseJson.error) {
+         this.setState({sireList: [], isLoaded: true, message: responseJson.message, messageColor: "danger"});
+      }
+      else {
+         this.setState({sireList: responseJson, isLoaded: true, message: "", messageColor: "success"});         
+      }
+    })
+    .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
+
+    fetch(API_PREFIX + '/imd-farm-management/animals/getactivedams', {
+        method: "POST",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          "animalTag":"%",
+      })
+    })
+    .then(response => response.json())
+    .then(responseJson => {
+      if (responseJson.error) {
+         this.setState({damList: [], isLoaded: true, message: responseJson.message, messageColor: "danger"});
+      }
+      else {
+         this.setState({damList: responseJson, isLoaded: true, message: "", messageColor: "success"});         
+      }
+    })
+    .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
+
+
+
+
   }
+
+
+  handleSireChange(event) {
+    if (event.target.value === "-1") {
+      this.setState({animalSireTag: null, animalSireAlias: "-- Select Sire --" , animalSireURL: null});
+    }
+    else 
+      this.setState({animalSireTag: this.state.sireList[event.target.value].animalTag, animalSireAlias: this.state.sireList[event.target.value].alias, animalSireURL: this.state.sireList[event.target.value].sireDataSheet});
+  }
+  handleDamChange(event) {
+    if (event.target.value === "-1") {
+      this.setState({animalDamTag: "-- Select Dam --", animalDamAlias: "-- Select Dam --"});
+    }
+    else 
+      this.setState({animalDamTag: this.state.damList[event.target.value].animalTag, animalDamAlias: this.state.damList[event.target.value].alias});
+  }
+
+
+  handleGenderChange(event) {
+    this.setState({gender: event.target.value});
+  }
+
+  handleDobToChanged(event) {
+    this.setState({dobTo: event.target.value});
+  }
+  handleDobFromChanged(event) {
+    this.setState({dobFrom: event.target.value});
+  }
+
 
   handleAnimalTagValueChanged(event) {
     this.setState({animalTag: event.target.value});
@@ -208,6 +294,12 @@ class SearchAnimal extends Component {
         body: JSON.stringify({
           "animalTag": this.state.animalTag,
           "animalType": (this.state.animalType === "-- Animal Type --" || this.state.animalType === "ALL" ? null : this.state.animalType),
+          "sire": (this.state.animalSireTag === "-- Select Sire --" || this.state.animalSireTag === "ALL" ? null : this.state.animalSireTag),
+          "dam": (this.state.animalDamTag === "-- Select Dam --" || this.state.animalDamTag === "ALL" ? null : this.state.animalDamTag),
+          "gender": this.state.gender,
+          "dateOfBirthStr": this.state.dobFrom,
+          "dobFrom": this.state.dobFrom,
+          "dobTo": this.state.dobTo,
           "activeOnly": this.state.activeOnly
       })
     })
@@ -229,15 +321,18 @@ class SearchAnimal extends Component {
   }
 
   render() {
-    var { isLoaded, items, animaltypelist, eventAdditionalMessage, messageColor } = this.state;
+    var { isLoaded, sireList, damList, items, animaltypelist, eventAdditionalMessage, messageColor } = this.state;
     let recordCount = 0;
+    let sireCount = 0;
+    let damRecordCount = 0;
+
     return (
       <div className="animated fadeIn">
          <Row>
          <Col xs="7">
            <Fade timeout={this.state.timeout} in={this.state.fadeIn}>
             <Row>
-              <Col md="12">
+              <Col md="8">
                 <Card>
                   <CardHeader>
                     <i className="fa fa-align-justify"></i><strong>Animal Maintenance</strong>
@@ -253,9 +348,8 @@ class SearchAnimal extends Component {
                       </NavItem>
                       <NavItem>
                         <NavLink id="add-tab"
-                          className={classnames({ active: false })}
-                          onClick={this.handleTabClick("add-tab")}
-                        >
+                          className={classnames({ active: false })} onClick={this.handleTabClick("add-tab")}
+                          >
                            <Link to={'/animal/add'}><i className="fa fa-plus"></i>{' '}</Link><strong>Add</strong>
                         </NavLink>
                       </NavItem>
@@ -272,6 +366,107 @@ class SearchAnimal extends Component {
                                   <i className="fa icon-tag fa-lg mt-1"></i>
                                 </InputGroupText>
                               <Input id="animalTag" type="text" maxLength="10" value={this.state.animalTag} onChange={this.handleAnimalTagValueChanged} placeholder="Animal Tag"/>
+                            </InputGroup>
+                          </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                          <Col>
+                            <InputGroup>
+
+                              <Dropdown isOpen={this.state.dropdownOpen[1]} toggle={() => {
+                                this.toggle(1);}}>
+                                <DropdownToggle caret>
+                                  {this.state.animalSireAlias}
+                                </DropdownToggle>
+                                <DropdownMenu overflow='auto' onClick={this.handleSireChange}
+                                modifiers={{
+                                    setMaxHeight: {
+                                      enabled: true,
+                                      order: 890,
+                                      fn: (data) => {
+                                        return {
+                                          ...data,
+                                          styles: {
+                                            ...data.styles,
+                                            overflow: 'auto',
+                                            maxHeight: 400,
+                                          },
+                                        };
+                                      },
+                                    },
+                                  }}>
+                                  <DropdownItem id="0Sire" value="-1">-- Select Sire --</DropdownItem>
+                                  {sireList.map(sire => (<DropdownItem id={sire.animalTag} value={sireCount++}>{sire.animalTag + '-' + sire.alias}</DropdownItem>))}
+                                </DropdownMenu>
+                              </Dropdown>
+                            </InputGroup>                                
+                          </Col>
+
+                          <Col>
+                            <InputGroup>
+                            <Dropdown isOpen={this.state.dropdownOpen[2]} size="md" toggle={() => {
+                              this.toggle(2);}}>
+                              <DropdownToggle caret>
+                                {this.state.animalDamTag}
+                              </DropdownToggle>
+                              <DropdownMenu onClick={this.handleDamChange}
+                                 modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}
+                              >
+                                <DropdownItem id="0Dam" value="-1">-- Select Dam --</DropdownItem>
+                                {damList.map(dam => (<DropdownItem id={dam.animalTag} value={damRecordCount++}>{dam.animalTag}</DropdownItem>))}
+                              </DropdownMenu>
+                            </Dropdown>
+
+                            </InputGroup>
+                          </Col>
+                          <Col>
+                            <InputGroup>
+
+                              <Dropdown isOpen={this.state.dropdownOpen[3]} toggle={() => {
+                                this.toggle(3);
+                              }}>
+                                <DropdownToggle caret>
+                                  {this.state.gender}
+                                </DropdownToggle>
+                                <DropdownMenu onClick={this.handleGenderChange}>
+                                  <DropdownItem id="?" value="Select Gender">-- Select Gender --</DropdownItem>
+                                  <DropdownItem id="F" value="Female" >Female</DropdownItem>
+                                  <DropdownItem id="M" value="Male" >Male</DropdownItem>
+                                </DropdownMenu>
+                              </Dropdown>
+                            </InputGroup>
+                          </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                          <Col>
+                            <InputGroup>
+                                <InputGroupText>
+                                  <i className="fa icon-calendar fa-md mt-1"></i>
+                                </InputGroupText>
+                              <Input id="dobFrom" type="text" maxLength="10" value={this.state.dobFrom} onChange={this.handleDobFromChanged} placeholder="Date of Birth From"/>
+                            </InputGroup>
+                          </Col>
+                          <Col>
+                            <InputGroup>
+                                <InputGroupText>
+                                  <i className="fa icon-calendar fa-md mt-1"></i>
+                                </InputGroupText>
+                              <Input id="dobTo" type="text" maxLength="10" value={this.state.dobTo} onChange={this.handleDobToChanged} placeholder="Date of Birth To"/>
                             </InputGroup>
                           </Col>
                         </FormGroup>
@@ -352,6 +547,7 @@ class SearchAnimal extends Component {
                             <tr>
                               <th>#</th>
                               <th>Tag#</th>
+                              <th>Gender</th>
                               <th>Type</th>
                               <th>Status</th>
                               <th>Dam</th>
@@ -364,6 +560,7 @@ class SearchAnimal extends Component {
                                <tr key="{item.animalTag}">
                                  <td>{++recordCount}</td>
                                  <td><Link target='_blank' to={'/animal/update?animalTag=' + item.animalTag + '&orgID=' + item.orgID} >{item.animalTag}</Link></td>
+                                 <td>{item.gender === 'M' ? 'Male' : item.gender === 'F' ? 'Female' : ''}</td>
                                  <td>{item.animalType}</td>
                                  <td>{item.animalStatus}</td>
                                  <td><Link to={'/animal/update?animalTag=' + item.animalDam + '&orgID=' + item.orgID} >{item.animalDam}</Link></td>

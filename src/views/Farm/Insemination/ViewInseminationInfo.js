@@ -129,7 +129,7 @@ class ViewInseminationInfo extends Component {
                                   <td>{item.lastInseminationTimeStamp}</td>
                                   <td>{(item.isPregnant === "YES" ? "✅" : (item.isPregnant === "UNKNOWN" ? "❓" : "")) + (item.sexed === "YES" ? "🚺":"")} <a target="_blank" rel="noopener noreferrer" href={'#/animal/event/update?eventTransactionID=' + item.eventTransactionID + '&orgID=' + item.orgID} >{item.sireInformation}</a> </td>
                                   <td>{item.daysSinceInsemination}</td>
-                                  <td>{(item.daysSinceInsemination ? 270 - item.daysSinceInsemination : "")}</td>
+                                  <td>{(item.daysSinceInsemination ? 275 - item.daysSinceInsemination : "")}</td>
                                   <td>{item.inseminationAttempts}</td>
                                 </tr>
                                ))}
