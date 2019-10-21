@@ -49,14 +49,18 @@ class SearchAnimal extends Component {
       isLoaded: true,
       animalTag: "",
       animalType: "-- Animal Type --",
+      animalSireTag: "-- Select Sire --",
+      animalSireAlias: "-- Select Sire --",
+      animalDamTag: "-- Select Dam --",
+      gender: "-- Select Gender --",
       activeOnly: false,
       messageColor: "muted",
       animaltypelist: [],
       sireList:[],
       damList: [],
-      eventAdditionalMessage: "Enter search fields (you can use % for wild card searches) and press Search button"
+      eventAdditionalMessage: "Enter search fields and press Search button"
     };
-    this.handleAnimalTagValueChanged = this.handleAnimalTagValueChanged.bind(this);
+    this.handleAnimalTagValueChange = this.handleAnimalTagValueChange.bind(this);
     this.handleActiveOnly = this.handleActiveOnly.bind(this);
     this.handleAnimalTypeSelected = this.handleAnimalTypeSelected.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
@@ -64,8 +68,8 @@ class SearchAnimal extends Component {
     this.handleSireChange = this.handleSireChange.bind(this);
     this.handleDamChange = this.handleDamChange.bind(this);
     this.handleGenderChange = this.handleGenderChange.bind(this);
-    this.handleDobFromChanged = this.handleDobFromChanged.bind(this);
-    this.handleDobToChanged = this.handleDobToChanged.bind(this);
+    this.handleDobFromChange = this.handleDobFromChange.bind(this);
+    this.handleDobToChange = this.handleDobToChange.bind(this);
   }
 
   toggle(i) {
@@ -81,9 +85,6 @@ class SearchAnimal extends Component {
     this.setState({activeOnly: !this.state.activeOnly});
   }
 
-  handleDobToChanged() {
-    this.setState({dobTo: !this.state.activeOnly});
-  }
 
   componentDidMount() {
     const parsed = queryString.parse(this.props.location.search);
@@ -209,7 +210,7 @@ class SearchAnimal extends Component {
          this.setState({sireList: [], isLoaded: true, message: responseJson.message, messageColor: "danger"});
       }
       else {
-         this.setState({sireList: responseJson, isLoaded: true, message: "", messageColor: "success"});         
+         this.setState({sireList: responseJson, isLoaded: true, message: ""});         
       }
     })
     .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
@@ -230,7 +231,7 @@ class SearchAnimal extends Component {
          this.setState({damList: [], isLoaded: true, message: responseJson.message, messageColor: "danger"});
       }
       else {
-         this.setState({damList: responseJson, isLoaded: true, message: "", messageColor: "success"});         
+         this.setState({damList: responseJson, isLoaded: true, message: ""});         
       }
     })
     .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
@@ -258,18 +259,21 @@ class SearchAnimal extends Component {
 
 
   handleGenderChange(event) {
-    this.setState({gender: event.target.value});
+ if (event.target.value === "-1")
+      this.setState({gender: "-- Select Gender --"});
+    else 
+       this.setState({gender: event.target.value});
   }
 
-  handleDobToChanged(event) {
+  handleDobToChange(event) {
     this.setState({dobTo: event.target.value});
   }
-  handleDobFromChanged(event) {
+  handleDobFromChange(event) {
     this.setState({dobFrom: event.target.value});
   }
 
 
-  handleAnimalTagValueChanged(event) {
+  handleAnimalTagValueChange(event) {
     this.setState({animalTag: event.target.value});
   }
 
@@ -332,7 +336,7 @@ class SearchAnimal extends Component {
          <Col xs="7">
            <Fade timeout={this.state.timeout} in={this.state.fadeIn}>
             <Row>
-              <Col md="8">
+              <Col md="10">
                 <Card>
                   <CardHeader>
                     <i className="fa fa-align-justify"></i><strong>Animal Maintenance</strong>
@@ -365,7 +369,7 @@ class SearchAnimal extends Component {
                                 <InputGroupText>
                                   <i className="fa icon-tag fa-lg mt-1"></i>
                                 </InputGroupText>
-                              <Input id="animalTag" type="text" maxLength="10" value={this.state.animalTag} onChange={this.handleAnimalTagValueChanged} placeholder="Animal Tag"/>
+                              <Input id="animalTag" type="text" maxLength="10" value={this.state.animalTag} onChange={this.handleAnimalTagValueChange} placeholder="Animal Tag"/>
                             </InputGroup>
                           </Col>
                         </FormGroup>
@@ -444,7 +448,7 @@ class SearchAnimal extends Component {
                                   {this.state.gender}
                                 </DropdownToggle>
                                 <DropdownMenu onClick={this.handleGenderChange}>
-                                  <DropdownItem id="?" value="Select Gender">-- Select Gender --</DropdownItem>
+                                  <DropdownItem id="?" value="-1">-- Select Gender --</DropdownItem>
                                   <DropdownItem id="F" value="Female" >Female</DropdownItem>
                                   <DropdownItem id="M" value="Male" >Male</DropdownItem>
                                 </DropdownMenu>
@@ -458,7 +462,7 @@ class SearchAnimal extends Component {
                                 <InputGroupText>
                                   <i className="fa icon-calendar fa-md mt-1"></i>
                                 </InputGroupText>
-                              <Input id="dobFrom" type="text" maxLength="10" value={this.state.dobFrom} onChange={this.handleDobFromChanged} placeholder="Date of Birth From"/>
+                              <Input id="dobFrom" type="text" maxLength="10" value={this.state.dobFrom} onChange={this.handleDobFromChange} placeholder="Date of Birth From"/>
                             </InputGroup>
                           </Col>
                           <Col>
@@ -466,7 +470,7 @@ class SearchAnimal extends Component {
                                 <InputGroupText>
                                   <i className="fa icon-calendar fa-md mt-1"></i>
                                 </InputGroupText>
-                              <Input id="dobTo" type="text" maxLength="10" value={this.state.dobTo} onChange={this.handleDobToChanged} placeholder="Date of Birth To"/>
+                              <Input id="dobTo" type="text" maxLength="10" value={this.state.dobTo} onChange={this.handleDobToChange} placeholder="Date of Birth To"/>
                             </InputGroup>
                           </Col>
                         </FormGroup>

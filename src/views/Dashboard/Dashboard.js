@@ -20,6 +20,7 @@ import { Link } from 'react-router-dom';
 
 const brandSuccess = getStyle('--success')
 const brandInfo = getStyle('--info')
+const brandDanger = getStyle('--danger')
 
 
 var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
@@ -98,6 +99,7 @@ var herdSizeHistoryOpts = {
 
   var data1 = [];
   var data2 = [];
+  var data3 = [];
 
 
   // for (var i = 0; i <= elements; i++) {
@@ -124,6 +126,14 @@ var mainChart = {
       pointHoverBackgroundColor: '#fff',
       borderWidth: 2,
       data: data2
+    },
+    {
+      label: 'lactating',
+      backgroundColor: 'transparent',
+      borderColor: brandDanger,
+      pointHoverBackgroundColor: '#fff',
+      borderWidth: 2,
+      data: data3
     },
     // {
     //   label: 'Milk Volume',
@@ -193,12 +203,11 @@ class Dashboard extends Component {
     this.loadCurrentYearData = this.loadCurrentYearData.bind(this);
     this.loadCurrentMonthData = this.loadCurrentMonthData.bind(this);
     this.retrieveLactatingCount = this.retrieveLactatingCount.bind(this);
-    this.retrieveHeiferCount = this.retrieveHeiferCount.bind(this);
+    this.retrieveDryCowCount = this.retrieveDryCowCount.bind(this);
     this.retrieveFemaleCalvesCount = this.retrieveFemaleCalvesCount.bind(this);
     this.retrieveHerdSizeHistory = this.retrieveHerdSizeHistory.bind(this);
-    this.retrieveInseminationHistory = this.retrieveInseminationHistory.bind(this);
     this.retrieveMilkingRecordOfMonth = this.retrieveMilkingRecordOfMonth.bind(this);
-    this.retrieveBreedingEventsThisMonth = this.retrieveBreedingEventsThisMonth.bind(this);
+    this.retrieveRecentBreedingEvents = this.retrieveRecentBreedingEvents.bind(this);
 
     this.state = {
       dropdownOpen: false,
@@ -208,7 +217,7 @@ class Dashboard extends Component {
       monthAverages:[],
       herdSize: -999,
       lactatingAnimalCount: -999,
-      heiferCount: -999,
+      dryCowCount: -999,
       femaleCalfCount:-999,
       bullCount:3,
       pregnantCount: -999,
@@ -221,13 +230,15 @@ class Dashboard extends Component {
       previsousPreviousMonthYear: "",
       currentMonth: "",
       currentYear: "",
-      expectedCalvingThisMonthCount: "0", 
+      expectedCalvingThisMonthCount: "-999", 
       expectedCalvingThisMonthList: "", 
-      calvedThisMonthCount : "0", 
+      calvedThisMonthCount : "-999", 
+      abortedThisMonthCount : "-999",
+      abortedThisMonthList : "",
       calvedThisMonthList : "", 
-      inseminatedThisMonthCount: "0",
+      inseminatedThisMonthCount: "-999",
       inseminatedThisMonthList: "",
-      breedingWidgetMessage: "",
+      breedingWidgetMessage: "Recent Breeding Events",
       chartSubTitle: new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: 'long' }).format(new Date())
     };
 
@@ -295,17 +306,15 @@ class Dashboard extends Component {
 
       this.retrieveActiveHerdCount();
       this.retrieveLactatingCount();
+      this.retrieveDryCowCount();
       this.retrievePregnantCount();
       this.retrieveFemaleCalvesCount();
       this.retrieveHerdSizeHistory();
-      this.retrieveBreedingEventsThisMonth();
-      //this.retrieveInseminationHistory();
+      this.retrieveRecentBreedingEvents();
       this.retrieveMilkingRecordOfMonth();
-
-      // this.retrieveHeiferCount();
    }
 
-retrieveBreedingEventsThisMonth() {
+retrieveRecentBreedingEvents() {
 
   let inseminationHistory = {
     datasets: [
@@ -320,11 +329,19 @@ retrieveBreedingEventsThisMonth() {
 
 
   // fetch(API_PREFIX+ '/imd-farm-management/animals/allactive')
-  fetch(API_PREFIX+ '/imd-farm-management/farm/breedingeventthismonth')
+  fetch(API_PREFIX+ '/imd-farm-management/farm/recentbreedingevents')
   .then(response => response.json())
   .then(responseJson => {
     if (responseJson.error) {
-      this.setState({expectedCalvingThisMonth: -999, calvedThisMonthCount: -999, inseminatedThisMonthCount: -999, breedingWidgetMessage: "Error in retrieving breeding info: " + responseJson.message});
+      this.setState({expectedCalvingThisMonth: -999, 
+        abortedThisMonthCount:-999, 
+        calvedThisMonthCount: -999, 
+        inseminatedThisMonthCount: -999, 
+        expectedCalvingThisMonthLabel: "Server Connection Error", 
+        abortedThisMonthLabel: "Server Connection Error", 
+        calvedThisMonthLabel: "Server Connection Error", 
+        inseminatedThisMonthLabel: "Server Connection Error",
+        breedingWidgetMessage: "Error in retrieving recent breeding info: " + responseJson.message});
     }
     else {
       inseminationHistory.labels = responseJson.yearMonthCalving;
@@ -333,14 +350,28 @@ retrieveBreedingEventsThisMonth() {
       this.setState({expectedCalvingThisMonthCount: responseJson.expectedCalvingThisMonthCount,
                     expectedCalvingThisMonthList: responseJson.expectedCalvingThisMonthList,
                     calvedThisMonthCount: responseJson.calvedThisMonthCount,
+                    abortedThisMonthCount : responseJson.abortedThisMonthCount,
+                    abortedThisMonthList : responseJson.abortedThisMonthList,
                     calvedThisMonthList: responseJson.calvedThisMonthList, 
                     inseminatedThisMonthCount: responseJson.inseminatedThisMonthCount,
                     inseminatedThisMonthList: responseJson.inseminatedThisMonthList,
+                    expectedCalvingThisMonthLabel: "Upcoming Calvings", 
+                    abortedThisMonthLabel: "Recent Abortions", 
+                    calvedThisMonthLabel: "Recent Calcings", 
+                    inseminatedThisMonthLabel: "Recent Inseminations",
                     inseminationTrend: inseminationHistory
                   });
     }
   })
-  .catch(error => this.setState({expectedCalvingThisMonth: -999,  calvedThisMonthCount: -999, inseminatedThisMonth: -999, breedingWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : "Error in retrieving breeding info: " + error.toString())}));
+  .catch(error => this.setState({expectedCalvingThisMonth: -999, 
+        abortedThisMonthCount:-999, 
+        calvedThisMonthCount: -999, 
+        inseminatedThisMonthCount: -999,
+        expectedCalvingThisMonthLabel: error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : error.toString(), 
+        abortedThisMonthLabel: error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : error.toString(), 
+        calvedThisMonthLabel: error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : error.toString(), 
+        inseminatedThisMonthLabel: error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : error.toString(),
+    breedingWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Could not retrieve recent breeding information: Server Connection Error" : "Error in retrieving recent breeding info: " + error.toString())}));
 }
 
 retrieveActiveHerdCount(){
@@ -351,10 +382,10 @@ retrieveActiveHerdCount(){
       this.setState({herdSize: -999, activeAnimalWidgetMessage: "Error in retrieving active herd size: " + responseJson.message});
     }
     else {
-       this.setState({herdSize: responseJson.length,  activeAnimalWidgetMessage: ""});
+       this.setState({herdSize: responseJson.length,  activeAnimalWidgetMessage: "Active Herd: "});
     }
   })
-  .catch(error => this.setState({herdSize: -999,  activeAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : "Error in retrieving active herd size: " + error.toString())}));
+  .catch(error => this.setState({herdSize: -999,  activeAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Error in retrieving active herd size: Server Connection Error" : "Error in retrieving active herd size: " + error.toString())}));
 
 }
 
@@ -379,6 +410,7 @@ retrieveMilkingRecordOfMonth(){
      mainChart.labels = responseJson[0].days;
      mainChart.datasets[0].data = responseJson[0].volumes;
      mainChart.datasets[1].data = responseJson[0].averages;
+     mainChart.datasets[2].data = responseJson[0].milkedAnimals;
      mainChartOpts.scales.yAxes = [{ ticks: {
                                   beginAtZero: true,
                                   maxTicksLimit: 5,
@@ -419,8 +451,8 @@ retrievePregnantCount(){
 
 }
 
-retrieveHeiferCount(){
-  fetch(API_PREFIX+ '/imd-farm-management/animals/heifers', {
+retrieveDryCowCount(){
+  fetch(API_PREFIX+ '/imd-farm-management/animals/drycows', {
       method: "POST",
       headers: {
           'Accept': 'application/json',
@@ -433,13 +465,13 @@ retrieveHeiferCount(){
   .then(response => response.json())
   .then(responseJson => {
   if (responseJson.error) {
-     this.setState({heiferCount: -999, heiferWidgetMessage:  "Error in retrieving active heifer count: " + responseJson.message});
+     this.setState({dryCowCount: -999, dryCowsWidgetMessage:  "Error in retrieving active dry cows count: " + responseJson.message});
   }
   else {
-     this.setState({heiferCount: responseJson.length,  heiferWidgetMessage: "Heifers"});         
+     this.setState({dryCowCount: responseJson.length,  dryCowsWidgetMessage: "Dry"});         
   }
   })
-  .catch(error => this.setState({heiferCount: -999,  heiferWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" :  "Error in retrieving active heifer count: " + error.toString())}));
+  .catch(error => this.setState({dryCowCount: -999,  dryCowsWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" :  "Error in retrieving active dry cows count: " + error.toString())}));
 
 }
 
@@ -467,50 +499,6 @@ retrieveFemaleCalvesCount(){
   .catch(error => this.setState({femaleCalfCount: -999,  femaleCalfWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" :  "Error in retrieving active female calves count: " + error.toString())}));
 }
 
-retrieveInseminationHistory (){
-  let now =  new Date();
-  let inseminationHistory = {
-    datasets: [
-      {
-        label: 'Insemninations',
-        backgroundColor: 'rgba(255,255,255,.5)',
-        borderColor: 'rgba(255,255,255,0.55)',
-        // data: [1,2,3,0,5,6,2,1,3],
-      },
-    ],
-  };
-
-  fetch(API_PREFIX+ '/imd-farm-management/farm/inseminationhistory', {
-      method: "POST",
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        "start": "2017-01-31",
-        "end": now.getFullYear() + "-" + (now.getMonth()+1) + "-" + now.getDate(),
-        "steps": 1
-    })
-  })
-  .then(response => response.json())
-  .then(responseJson => {
-  if (responseJson.error) {
-    this.setState({herdSize: -999, activeAnimalWidgetMessage:  "Error in retrieving herd size history: " + responseJson.message});
-  }
-  else {
-    // alert(responseJson.months);
-    inseminationHistory.labels = responseJson.months;
-    inseminationHistory.datasets[0].data = responseJson.herdCounts;
-    this.setState({inseminationTrend: inseminationHistory});
-  }
-  })
-  .catch(error => this.setState({herdSize: -999,  activeAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" :  "Error in retrieving herd size history: " + error.toString())}));
-
-  inseminationHistory.labels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep'];//responseJson.months;
-  inseminationHistory.datasets[0].data = [3,3,2,2,1,0,0,2,5];
-  this.setState({inseminationTrend: inseminationHistory});
-
-}
 
 retrieveHerdSizeHistory(){
   let now =  new Date();
@@ -550,7 +538,7 @@ retrieveHerdSizeHistory(){
     this.setState({herdSizeTrend: herdSizeHistory});
   }
   })
-  .catch(error => this.setState({herdSize: -999,  activeAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" :  "Error in retrieving herd size history: " + error.toString())}));
+  .catch(error => this.setState({herdSize: -999,  activeAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Error in retrieving herd size information: Server Connection Error" :  "Error in retrieving herd size history: " + error.toString())}));
 
 
 }
@@ -622,9 +610,11 @@ retrieveLactatingCount() {
               mainChart.labels = responseJson[0].days;
               mainChart.datasets[0].data = responseJson[0].volumes;
               mainChart.datasets[1].data = responseJson[0].averages;
+              mainChart.datasets[2].data = responseJson[0].milkedAnimals;
              this.setState({monthVolumes: responseJson[0].volumes,
               monthDays:responseJson[0].days,
               monthAverages: responseJson[0].averages,
+              milkedAnimalsCount: responseJson[0].milkedAnimals,
               chartTitle: "Daily Milk Production",
               chartSubTitle: new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: 'long' }).format(new Date())
               });
@@ -661,6 +651,7 @@ retrieveLactatingCount() {
               mainChart.labels = responseJson[0].days;
               mainChart.datasets[0].data = responseJson[0].volumes;
               mainChart.datasets[1].data = responseJson[0].averages;
+              mainChart.datasets[2].data = responseJson[0].milkedAnimals;
              this.setState({monthVolumes: responseJson[0].volumes,
               monthDays:responseJson[0].days,
               monthAverages: responseJson[0].averages,
@@ -732,7 +723,8 @@ retrieveLactatingCount() {
           else {
             mainChart.labels = responseJson[0].dates;
             mainChart.datasets[0].data = responseJson[0].volumes;
-            // mainChart.datasets[1].data = responseJson[0].days;
+            mainChart.datasets[1].data = responseJson[0].averages;
+            mainChart.datasets[2].data = responseJson[0].milkedAnimals;
             mainChartOpts.scales.yAxes = [{ ticks: {
                                                       beginAtZero: true,
                                                       maxTicksLimit: 5,
@@ -741,7 +733,7 @@ retrieveLactatingCount() {
                                                       min: 150,
                                                     },
                                                   }]
-             this.setState({monthVolumes: responseJson[0].volumes,monthDays:responseJson[0].dates});
+             this.setState({monthVolumes: responseJson[0].volumes, monthDays:responseJson[0].dates});
              // alert(responseJson[0].days);
             this.setState({chartTitle: "Daily Milk Production",
             chartSubTitle: new Intl.DateTimeFormat('en-GB', { year: 'numeric' }).format(new Date())});
@@ -754,7 +746,11 @@ retrieveLactatingCount() {
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
 
   render() {
-    var {expectedCalvingThisMonthCount, inseminatedThisMonthList, expectedCalvingThisMonthList, breedingWidgetMessage, calvedThisMonthCount, inseminatedThisMonthCount, calvedThisMonthList, herdSizeTrend, inseminationTrend, previousPreviousMonth, previsousMonth, currentMonth, currentYear} = this.state;
+    var {expectedCalvingThisMonthCount, 
+      inseminatedThisMonthList, expectedCalvingThisMonthList, breedingWidgetMessage, abortedThisMonthCount, calvedThisMonthCount, 
+      inseminatedThisMonthCount, abortedThisMonthList, calvedThisMonthList, herdSizeTrend, inseminationTrend, 
+      expectedCalvingThisMonthLabel, abortedThisMonthLabel, calvedThisMonthLabel, inseminatedThisMonthLabel,
+      previousPreviousMonth, previsousMonth, currentMonth, currentYear} = this.state;
 
     return (
       <div className="animated fadeIn">
@@ -772,8 +768,9 @@ retrieveLactatingCount() {
                     </DropdownMenu>
                   </ButtonDropdown>
                 </ButtonGroup>
-                <div className="text-value" id="herdSize">{"Active Herd: " + this.state.herdSize + " " + this.state.activeAnimalWidgetMessage}</div>
+                <div className="text-value" id="herdSize">{this.state.activeAnimalWidgetMessage + (this.state.herdSize >= 0 ? this.state.herdSize : '')}</div>
                 <div> <Link to={"/animal/search?searchCode=lactatingcows"} style={{color: '#FFF' }} > <i className="fa fa-arrow-circle-right"></i></Link> {this.state.lactatingAnimalWidgetMessage + ': '} {this.state.lactatingAnimalCount} </div>
+                <div> <Link to={"/animal/search?searchCode=drycows"} style={{color: '#FFF' }} > <i className="fa fa-arrow-circle-right"></i></Link> {this.state.dryCowsWidgetMessage + ': '} {this.state.dryCowCount} </div>
                 <div> <Link to={"/animal/search?searchCode=pregnantcows"} style={{color: '#FFF' }} >  <i className="fa fa-arrow-circle-right"></i></Link> {this.state.pregnantAnimalWidgetMessage  + ': '} {this.state.pregnantCount} </div>
                 <div> <Link to={"/animal/search?searchCode=femalecalves"} style={{color: '#FFF' }} >  <i className="fa fa-arrow-circle-right"></i></Link> {this.state.femaleCalfWidgetMessage  + ': '} {this.state.femaleCalfCount} </div>
               </CardBody>
@@ -785,10 +782,11 @@ retrieveLactatingCount() {
           <Col xs="8" sm="5" lg="4">
             <Card className="text-white bg-info">
               <CardBody className="pb-0">
-                <div className="text-value" id="monthYear">{"Recent Breeding Events " + breedingWidgetMessage}</div>
-                <div> <Link title={'There ' + (expectedCalvingThisMonthCount <= 1 ? 'was ' + expectedCalvingThisMonthCount + ' animal who has or will complete its' : 'were ' + expectedCalvingThisMonthCount + ' animals who have or will complete their') +  ' nine months of pregnancy between the first of last month till the end of this month'} to={"/animal/search?animalTags=" + expectedCalvingThisMonthList} style={{color: '#FFF' }} > <i className="fa fa-arrow-circle-right"></i></Link> {'Expected Calvings: '} {expectedCalvingThisMonthCount} </div>
-                <div> <Link title={'There ' + (calvedThisMonthCount <= 1 ? 'was ' + calvedThisMonthCount + ' animal which was' : 'were ' + calvedThisMonthCount + ' animals which were') + ' born since the first of last month till today.'} to={"/animal/search?animalTags=" + calvedThisMonthList} style={{color: '#FFF' }} >  <i className="fa fa-arrow-circle-right"></i></Link> {'Calved: '} {calvedThisMonthCount} </div>
-                <div> <Link title={'The count ' + inseminatedThisMonthCount + ' includes ALL inseminations performed since the first of last month till today. If an animal was inseminated twice since the first of last month then it would have been counted twice in the count ' + inseminatedThisMonthCount + '; however when you click this arrow that animal will be shown only once in the list. This is why the count and the number of animals shown in the list may not always match.'} to={"/animal/search?animalTags=" + inseminatedThisMonthList} style={{color: '#FFF' }} > <i className="fa fa-arrow-circle-right"></i></Link> {'Inseminations Performed: '} {inseminatedThisMonthCount} </div>
+                <div className="text-value" id="monthYear">{breedingWidgetMessage}</div>
+                <div> <Link title={(expectedCalvingThisMonthCount === 0 ? 'There is no expected calving with in next 35 days' : (expectedCalvingThisMonthCount === 1 ? 'There is 1 expected calving with in next 35 days, In Sha Allah' : 'There are ' + expectedCalvingThisMonthCount + ' expected calvings with in next 35 days, In Sha Allah'))} to={expectedCalvingThisMonthCount === 0 ? '' : '/animal/search?animalTags=' + expectedCalvingThisMonthList} style={{color: '#FFF' }} > <i className="fa fa-arrow-circle-right"></i></Link> {expectedCalvingThisMonthLabel + ': '} {expectedCalvingThisMonthCount} </div>
+                <div> <Link title={'There ' + (calvedThisMonthCount <= 1 ? 'was ' + calvedThisMonthCount + ' animal which was' : 'were ' + calvedThisMonthCount + ' animals which were') + ' born in the last 35 days.'} to={calvedThisMonthCount === 0 ? '' : '/animal/search?animalTags=' + calvedThisMonthList} style={{color: '#FFF' }} >  <i className="fa fa-arrow-circle-right"></i></Link> {calvedThisMonthLabel + ': '} {calvedThisMonthCount} </div>
+                <div> <Link title={'There ' + (abortedThisMonthCount <= 1 ? 'was ' + abortedThisMonthCount + ' animal which' : 'were ' + abortedThisMonthCount + ' animals which') + ' aborted in the last 35 days.'} to={abortedThisMonthCount === 0 ? '' : '/animal/search?animalTags=' + abortedThisMonthList} style={{color: '#FFF' }} >  <i className="fa fa-arrow-circle-right"></i></Link> {abortedThisMonthLabel + ': '} {abortedThisMonthCount} </div>
+                <div> <Link title={'The count ' + inseminatedThisMonthCount + ' includes ALL inseminations/matings performed in the last 35 days. If an animal was inseminated twice in the last 35 days then it would have been counted twice in the count ' + inseminatedThisMonthCount + '; however when you click this arrow that animal will be shown only once in the list. This is why the count and the number of animals shown in the list may not always match.'} to={inseminatedThisMonthCount === 0 ? '' : '/animal/search?animalTags=' + inseminatedThisMonthList} style={{color: '#FFF' }} > <i className="fa fa-arrow-circle-right"></i></Link> {inseminatedThisMonthLabel + ': '} {inseminatedThisMonthCount} </div>
               </CardBody>
               <div className="chart-wrapper" style={{ height: '50px' }}>
                 <Line data={inseminationTrend} options={inseminationsHistoryOpts} height={30} />
