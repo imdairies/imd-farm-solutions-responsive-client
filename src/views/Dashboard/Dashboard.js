@@ -314,6 +314,7 @@ class Dashboard extends Component {
       this.retrieveMilkingRecordOfMonth();
    }
 
+
 retrieveRecentBreedingEvents() {
 
   let inseminationHistory = {
@@ -357,7 +358,7 @@ retrieveRecentBreedingEvents() {
                     inseminatedThisMonthList: responseJson.inseminatedThisMonthList,
                     expectedCalvingThisMonthLabel: "Upcoming Calvings", 
                     abortedThisMonthLabel: "Recent Abortions", 
-                    calvedThisMonthLabel: "Recent Calcings", 
+                    calvedThisMonthLabel: "Recent Calvings", 
                     inseminatedThisMonthLabel: "Recent Inseminations",
                     inseminationTrend: inseminationHistory
                   });
@@ -815,7 +816,7 @@ retrieveLactatingCount() {
                   </Col>
                 </Row>
                 <div className="chart-wrapper" style={{ height: 300 + 'px', marginTop: 40 + 'px' }} >
-                  <Line data={mainChart} options={mainChartOpts}/>
+                  <Line data={mainChart} options={mainChartOpts} />
                 </div>
               </CardBody>
             </Card>

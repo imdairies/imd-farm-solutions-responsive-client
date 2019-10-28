@@ -58,6 +58,7 @@ class AddFarmDailyMilk extends Component {
       toxinValue: "",
       temperatureInCentigrade: "",
       humidity: "",
+      lactatingCount: 0,
       eventAdditionalMessage: "Specify desired values and press Add",
       totalMilkMessage: "",
       previousTotalMilkMessage: "",
@@ -271,7 +272,7 @@ class AddFarmDailyMilk extends Component {
                      eventTimestamp = new Date(responseJson[i].recordDate + " " + responseJson[i].recordTime);                  
                 }
                 this.setState({animaltaglist: responseJson,
-                  timestamp: eventTimestamp,
+                  timestamp: eventTimestamp, lactatingCount: responseJson.length,
                   isLoaded: true, eventAdditionalMessage: "", messageColor: "success"});
                 this.calculateTotal(responseJson, true, true);
             }
@@ -460,7 +461,7 @@ class AddFarmDailyMilk extends Component {
                       <Form action="" method="post" className="form-horizontal">
                         <FormText color={messageColor}>&nbsp;{eventAdditionalMessage}</FormText>
                         <FormGroup row>
-                          <Label sm="4" htmlFor="input-normal"><strong>Environment</strong></Label>
+                          <Label sm="3" htmlFor="input-normal"><strong>Environment</strong></Label>
                           <Col sm="2">
                             <Input id="temperatureInCentigrade" maxlength="5" type="number"  min={0} max={60} step={0.1} name="temperatureInCentigrade" value={this.state.temperatureInCentigrade} onChange={this.handleValueChanged} placeholder="°C"  />
                           </Col>
@@ -469,7 +470,7 @@ class AddFarmDailyMilk extends Component {
                           </Col>
                         </FormGroup>
                         <FormGroup row>
-                          <Label sm="4" htmlFor="input-normal"><strong>Quality</strong></Label>
+                          <Label sm="3" htmlFor="input-normal"><strong>Quality</strong></Label>
                           <Col sm="2">
                             <Input id="fatValue" maxlength="5"  min={2} max={7} step={0.5} type="number" name="fatValue" value={this.state.fatValue} onChange={this.handleValueChanged} placeholder="Fat"  />
                           </Col>
@@ -520,7 +521,7 @@ class AddFarmDailyMilk extends Component {
                              </thead>
                              <tbody>
                                 <tr>
-                                  <th></th>
+                                  <th>{'🐄' + this.state.lactatingCount}</th>
                                   <th>
                                     <FormText color="success"><strong>&nbsp;{Math.round(farmAverageMonthInMilking*100)/100}</strong></FormText>
                                   </th>
