@@ -168,7 +168,7 @@ class AddSemenInventory extends Component {
   }
 
   calculateInvoice(price, discount, quantity) {
-    this.setState({invoice: price * ((100-discount)/100) * quantity});
+    this.setState({invoice: Math.round(price * ((100-discount)/100) * quantity)});
   }
 
   handleAdd(event) {

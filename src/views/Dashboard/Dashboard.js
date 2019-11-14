@@ -215,12 +215,12 @@ class Dashboard extends Component {
       monthDays:[],
       monthVolumes:[],
       monthAverages:[],
-      herdSize: -999,
-      lactatingAnimalCount: -999,
-      dryCowCount: -999,
-      femaleCalfCount:-999,
-      bullCount:3,
-      pregnantCount: -999,
+      herdSize: "loading...",
+      lactatingAnimalCount: "loading...",
+      dryCowCount: "loading...",
+      femaleCalfCount:"loading...",
+      bullCount:"loading...",
+      pregnantCount: "loading...",
       activeAnimalWidgetMessage: "",
       lactatingAnimalWidgetMessage: "",
       chartTitle: "Daily Milk Production",
@@ -230,13 +230,13 @@ class Dashboard extends Component {
       previsousPreviousMonthYear: "",
       currentMonth: "",
       currentYear: "",
-      expectedCalvingThisMonthCount: "-999", 
+      expectedCalvingThisMonthCount: "loading...", 
       expectedCalvingThisMonthList: "", 
-      calvedThisMonthCount : "-999", 
-      abortedThisMonthCount : "-999",
+      calvedThisMonthCount : "loading...", 
+      abortedThisMonthCount : "loading...",
       abortedThisMonthList : "",
       calvedThisMonthList : "", 
-      inseminatedThisMonthCount: "-999",
+      inseminatedThisMonthCount: "loading...",
       inseminatedThisMonthList: "",
       breedingWidgetMessage: "Recent Breeding Events",
       chartSubTitle: new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: 'long' }).format(new Date())
@@ -334,14 +334,14 @@ retrieveRecentBreedingEvents() {
   .then(response => response.json())
   .then(responseJson => {
     if (responseJson.error) {
-      this.setState({expectedCalvingThisMonth: -999, 
-        abortedThisMonthCount:-999, 
-        calvedThisMonthCount: -999, 
-        inseminatedThisMonthCount: -999, 
-        expectedCalvingThisMonthLabel: "Server Connection Error", 
-        abortedThisMonthLabel: "Server Connection Error", 
-        calvedThisMonthLabel: "Server Connection Error", 
-        inseminatedThisMonthLabel: "Server Connection Error",
+      this.setState({expectedCalvingThisMonthCount: "error", 
+        abortedThisMonthCount:"error", 
+        calvedThisMonthCount: "error", 
+        inseminatedThisMonthCount: "error", 
+        expectedCalvingThisMonthLabel: "Upcoming Calvings", 
+        abortedThisMonthLabel: "Recent Abortions", 
+        calvedThisMonthLabel: "Recent Calvings", 
+        inseminatedThisMonthLabel: "Recent Inseminations",
         breedingWidgetMessage: "Error in retrieving recent breeding info: " + responseJson.message});
     }
     else {
@@ -364,14 +364,19 @@ retrieveRecentBreedingEvents() {
                   });
     }
   })
-  .catch(error => this.setState({expectedCalvingThisMonth: -999, 
-        abortedThisMonthCount:-999, 
-        calvedThisMonthCount: -999, 
-        inseminatedThisMonthCount: -999,
-        expectedCalvingThisMonthLabel: error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : error.toString(), 
-        abortedThisMonthLabel: error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : error.toString(), 
-        calvedThisMonthLabel: error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : error.toString(), 
-        inseminatedThisMonthLabel: error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : error.toString(),
+  .catch(error => this.setState({expectedCalvingThisMonthCount: "error",
+        abortedThisMonthCount:"error", 
+        calvedThisMonthCount: "error", 
+        inseminatedThisMonthCount: "error",
+        expectedCalvingThisMonthLabel: "Upcoming Calvings", 
+        abortedThisMonthLabel: "Recent Abortions", 
+        calvedThisMonthLabel: "Recent Calvings", 
+        inseminatedThisMonthLabel: "Recent Inseminations",
+        //breedingWidgetMessage: "Error in retrieving recent breeding info: " + error.toString(),
+        // expectedCalvingThisMonthLabel: error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : error.toString(), 
+        // abortedThisMonthLabel: error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : error.toString(), 
+        // calvedThisMonthLabel: error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : error.toString(), 
+        // inseminatedThisMonthLabel: error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" : error.toString(),
     breedingWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Could not retrieve recent breeding information: Server Connection Error" : "Error in retrieving recent breeding info: " + error.toString())}));
 }
 
@@ -380,14 +385,15 @@ retrieveActiveHerdCount(){
   .then(response => response.json())
   .then(responseJson => {
     if (responseJson.error) {
-      this.setState({herdSize: -999, activeAnimalWidgetMessage: "Error in retrieving active herd size: " + responseJson.message});
+      this.setState({herdSize: "Error in retrieving active herd size: " + responseJson.message, 
+        activeAnimalWidgetMessage: "Active Herd: "});
     }
     else {
        this.setState({herdSize: responseJson.length,  activeAnimalWidgetMessage: "Active Herd: "});
     }
   })
-  .catch(error => this.setState({herdSize: -999,  activeAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Error in retrieving active herd size: Server Connection Error" : "Error in retrieving active herd size: " + error.toString())}));
-
+  .catch(error => this.setState({activeAnimalWidgetMessage: "Active Herd: ",
+    herdSize: (error.toString().indexOf("Failed to fetch") >= 0 ? "Error in retrieving active herd size: Server Connection Error" : "Error in retrieving active herd size: " + error.toString())}));
 }
 
 retrieveMilkingRecordOfMonth(){
@@ -405,7 +411,8 @@ retrieveMilkingRecordOfMonth(){
   .then(response => response.json())
   .then(responseJson => {
   if (responseJson.error) {
-     this.setState({lactatingAnimalCount: -999, lactatingAnimalWidgetMessage:  "Error in retrieving milking record: " + responseJson.message});
+     this.setState({lactatingAnimalWidgetMessage: "Lactating Animals",
+      lactatingAnimalCount: "Error in retrieving milking record: " + responseJson.message});
   }
   else {
      mainChart.labels = responseJson[0].days;
@@ -416,14 +423,15 @@ retrieveMilkingRecordOfMonth(){
                                   beginAtZero: true,
                                   maxTicksLimit: 5,
                                   stepSize: 25,
-                                  max: 400,
+                                  max: 450,
                                   min: 150,
                                 },
                               }];
      this.setState({monthVolumes: responseJson[0].volumes, monthDays:responseJson[0].days});
   }
   })
-  .catch(error => this.setState({lactatingAnimalCount: -999,  lactatingAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" :  "Error in retrieving milking record: " + error.toString())}));
+  .catch(error => this.setState({lactatingAnimalWidgetMessage: "Lactating Animals",
+    lactatingAnimalCount: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" :  "Error in retrieving milking record: " + error.toString())}));
 
 }
 
@@ -441,13 +449,15 @@ retrievePregnantCount(){
   .then(response => response.json())
   .then(responseJson => {
   if (responseJson.error) {
-     this.setState({pregnantCount: -999, lactatingAnimalWidgetMessage:  "Error in retrieving active pregnant count: " + responseJson.message});
+     this.setState({pregnantAnimalWidgetMessage: "Pregnant Animals" ,
+      pregnantCount: "Error in retrieving active pregnant count: " + responseJson.message});
   }
   else {
-     this.setState({pregnantCount: responseJson.length,  pregnantAnimalWidgetMessage: "Pregnant Herd"});         
+     this.setState({pregnantCount: responseJson.length,  pregnantAnimalWidgetMessage: "Pregnant Animals"});         
   }
   })
-  .catch(error => this.setState({pregnantCount: -999,  pregnantAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" :   "Error in retrieving active pregnant count: " + error.toString())}));
+  .catch(error => this.setState({pregnantAnimalWidgetMessage: "Pregnant Animals",
+    pregnantCount:(error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" :   "Error in retrieving active pregnant count: " + error.toString())}));
 
 
 }
@@ -466,13 +476,15 @@ retrieveDryCowCount(){
   .then(response => response.json())
   .then(responseJson => {
   if (responseJson.error) {
-     this.setState({dryCowCount: -999, dryCowsWidgetMessage:  "Error in retrieving active dry cows count: " + responseJson.message});
+     this.setState({dryCowCount: "Error in retrieving active dry cows count: " + responseJson.message,
+      dryCowsWidgetMessage: "Dry Animals"});
   }
   else {
-     this.setState({dryCowCount: responseJson.length,  dryCowsWidgetMessage: "Dry"});         
+     this.setState({dryCowCount: responseJson.length,  dryCowsWidgetMessage: "Dry Animals"});         
   }
   })
-  .catch(error => this.setState({dryCowCount: -999,  dryCowsWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" :  "Error in retrieving active dry cows count: " + error.toString())}));
+  .catch(error => this.setState({dryCowsWidgetMessage: "Dry Animals",
+    dryCowCount: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" :  "Error in retrieving active dry cows count: " + error.toString())}));
 
 }
 
@@ -491,13 +503,15 @@ retrieveFemaleCalvesCount(){
   .then(response => response.json())
   .then(responseJson => {
   if (responseJson.error) {
-     this.setState({femaleCalfCount: -999, femaleCalfWidgetMessage:  "Error in retrieving active female calves count: " + responseJson.message});
+     this.setState({femaleCalfWidgetMessage:  "Female Calves" ,
+      femaleCalfCount: "Error in retrieving active female calves count: " + responseJson.message});
   }
   else {
      this.setState({femaleCalfCount: responseJson.length,  femaleCalfWidgetMessage: "Female Calves"});         
   }
   })
-  .catch(error => this.setState({femaleCalfCount: -999,  femaleCalfWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" :  "Error in retrieving active female calves count: " + error.toString())}));
+  .catch(error => this.setState({femaleCalfWidgetMessage:  "Female Calves",
+    femaleCalfCount: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" :  "Error in retrieving active female calves count: " + error.toString())}));
 }
 
 
@@ -530,7 +544,7 @@ retrieveHerdSizeHistory(){
   .then(response => response.json())
   .then(responseJson => {
   if (responseJson.error) {
-    this.setState({herdSize: -999, activeAnimalWidgetMessage:  "Error in retrieving herd size history: " + responseJson.message});
+    this.setState({herdSize: "error", activeAnimalWidgetMessage:  "Error in retrieving herd size history: " + responseJson.message});
   }
   else {
     // alert(responseJson.months);
@@ -539,7 +553,7 @@ retrieveHerdSizeHistory(){
     this.setState({herdSizeTrend: herdSizeHistory});
   }
   })
-  .catch(error => this.setState({herdSize: -999,  activeAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Error in retrieving herd size information: Server Connection Error" :  "Error in retrieving herd size history: " + error.toString())}));
+  .catch(error => this.setState({herdSize: "error",  activeAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Error in retrieving herd size information: Server Connection Error" :  "Error in retrieving herd size history: " + error.toString())}));
 
 
 }
@@ -559,13 +573,17 @@ retrieveLactatingCount() {
   .then(response => response.json())
   .then(responseJson => {
   if (responseJson.error) {
-     this.setState({lactatingAnimalCount: -999, lactatingAnimalWidgetMessage:  "Error in retrieving active lactating count: " + responseJson.message});
+     this.setState({lactatingAnimalCount: "Error in retrieving active lactating count: " + responseJson.message,
+      lactatingAnimalWidgetMessage: "Lactating Animals"});
   }
   else {
-     this.setState({lactatingAnimalCount: responseJson.length,  lactatingAnimalWidgetMessage: "Lactating Herd"});         
+     this.setState({lactatingAnimalCount: responseJson.length, 
+      lactatingAnimalWidgetMessage: "Lactating Animals"});         
   }
   })
-  .catch(error => this.setState({lactatingAnimalCount: -999,  lactatingAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" :  "Error in retrieving active lactating count: " + error.toString())}));
+  // .catch(error => this.setState({lactatingAnimalCount: -999,  lactatingAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" :  "Error in retrieving active lactating count: " + error.toString())}));
+  .catch(error => this.setState({lactatingAnimalCount: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" :  "Error in retrieving active lactating count: " + error.toString()),
+    lactatingAnimalWidgetMessage:"Lactating Animals" }));
 }
 
 
@@ -605,7 +623,7 @@ retrieveLactatingCount() {
        .then(response => response.json())
         .then(responseJson => {
           if (responseJson.error) {
-             this.setState({lactatingAnimalCount: -999, lactatingAnimalWidgetMessage: responseJson.message});
+             this.setState({lactatingAnimalWidgetMessage: "Lactating Animals", lactatingAnimalCount: responseJson.message});
           }
           else {
               mainChart.labels = responseJson[0].days;
@@ -621,7 +639,8 @@ retrieveLactatingCount() {
               });
           }
         })
-        .catch(error => this.setState({lactatingAnimalCount: -999,  lactatingAnimalWidgetMessage: error.toString()}));
+        .catch(error => this.setState({lactatingAnimalWidgetMessage: "Lactating Animals",
+          lactatingAnimalCount:error.toString()}));
   }
   loadPreviousMonthData(){
       let now =  new Date();
@@ -646,7 +665,7 @@ retrieveLactatingCount() {
        .then(response => response.json())
         .then(responseJson => {
           if (responseJson.error) {
-             this.setState({lactatingAnimalCount: -999, lactatingAnimalWidgetMessage: responseJson.message});
+             this.setState({lactatingAnimalWidgetMessage: "Lactating Animals", lactatingAnimalCount: responseJson.message});
           }
           else {
               mainChart.labels = responseJson[0].days;
@@ -661,7 +680,8 @@ retrieveLactatingCount() {
               });
           }
         })
-        .catch(error => this.setState({lactatingAnimalCount: -999,  lactatingAnimalWidgetMessage: error.toString()}));
+        .catch(error => this.setState({lactatingAnimalWidgetMessage: "Lactating Animals",
+          lactatingAnimalCount: error.toString()}));
   }
   loadPreviousPreviousMonthData(){
       let now =  new Date();
@@ -688,7 +708,7 @@ retrieveLactatingCount() {
        .then(response => response.json())
         .then(responseJson => {
           if (responseJson.error) {
-             this.setState({lactatingAnimalCount: -999, lactatingAnimalWidgetMessage: responseJson.message});
+             this.setState({lactatingAnimalWidgetMessage: "Lactating Animals", lactatingAnimalCount: responseJson.message});
           }
           else {
               mainChart.labels = responseJson[0].days;
@@ -702,7 +722,7 @@ retrieveLactatingCount() {
               });
           }
         })
-        .catch(error => this.setState({lactatingAnimalCount: -999,  lactatingAnimalWidgetMessage: error.toString()}));
+        .catch(error => this.setState({lactatingAnimalWidgetMessage: "Lactating Animals", lactatingAnimalCount: error.toString()}));
   }
   loadCurrentYearData(){
       let now =  new Date();
@@ -719,7 +739,7 @@ retrieveLactatingCount() {
        .then(response => response.json())
         .then(responseJson => {
           if (responseJson.error) {
-             this.setState({lactatingAnimalCount: -999, lactatingAnimalWidgetMessage: responseJson.message});
+             this.setState({lactatingAnimalWidgetMessage: "Lactating Animals", lactatingAnimalCount: responseJson.message});
           }
           else {
             mainChart.labels = responseJson[0].dates;
@@ -740,7 +760,7 @@ retrieveLactatingCount() {
             chartSubTitle: new Intl.DateTimeFormat('en-GB', { year: 'numeric' }).format(new Date())});
           }
         })
-        .catch(error => this.setState({lactatingAnimalCount: -999,  lactatingAnimalWidgetMessage: error.toString()}));
+        .catch(error => this.setState({lactatingAnimalWidgetMessage: "Lactating Animals", lactatingAnimalCount: error.toString()}));
   }
 
 
