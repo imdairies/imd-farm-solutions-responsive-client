@@ -168,8 +168,6 @@ class UpdateAnimal extends Component {
 
   }
 
-
-
 retrieveAnimallWeightGraphData(animalTag){
   fetch(API_PREFIX+ '/imd-farm-management/animals/getgrowthdata', {
       method: "POST",
@@ -466,9 +464,6 @@ retrieveAnimallWeightGraphData(animalTag){
     })
     .catch(error => this.setState({feedAnalysisMessage: error.toString(), feedAnalysisMessageColor: "danger"}));
 
-
-
-
     this.setState({previousMonth: previousDate.getMonth()+1, previousYear: previousDate.getFullYear(), nextMonth: nextDate.getMonth()+1, nextYear: nextDate.getFullYear()});
     this.loadMilkingData(prevDate, recordDate, parsed.animalTag);
     this.setState({previousDate: previousDate, nextDate: nextDate});
@@ -661,7 +656,7 @@ retrieveAnimallWeightGraphData(animalTag){
     return (
       <div className="animated fadeIn">
         <Row>
-          <Col xs="12" xl="6">
+          <Col xs="10" xl="8">
             <Card>
               <CardHeader>
                 <i className="fa fa-align-justify"></i>Tag # <strong>{this.state.animalTag}</strong>
@@ -781,7 +776,7 @@ retrieveAnimallWeightGraphData(animalTag){
               </Row>
 
               <Row>
-                <Col md="6">
+                <Col md="8">
                   <Card>
                       <CardHeader>
                         <i className="fa fa-align-justify"></i><strong>Progney</strong><FormText color={progneyMessageColor}>&nbsp;{progneyMessage}</FormText>
@@ -960,7 +955,7 @@ retrieveAnimallWeightGraphData(animalTag){
         </Row>
 
         <Row>
-          <Col md="10">
+          <Col md="8">
             <Card>
                 <CardHeader>
                   <i className="fa fa-align-justify"></i>{"Life Events " + this.state.animalTag}<FormText color={eventMessageColor}>&nbsp;{eventAdditionalMessage}</FormText>
@@ -972,7 +967,6 @@ retrieveAnimallWeightGraphData(animalTag){
                           <th>#</th>
                           <th>Timestamp</th>
                           <th>Type</th>
-                          <th>Operator</th>
                           <th>Day(s) Ago</th>
                           <th>Age at Event</th>
                           <th>Comments</th>
@@ -984,7 +978,6 @@ retrieveAnimallWeightGraphData(animalTag){
                              <td>{eventlist.length - ++eventRecordCount + 1}</td>
                              <td width="10%" data-toggle="tooltip" title={item.eventTimeStamp.substring(item.eventTimeStamp.length-8).trim()}>{item.eventTimeStamp.substring(0,item.eventTimeStamp.length-8).trim()}</td>
                              <td><Link target="_blank" to={'/animal/event/update?eventTransactionID=' + item.eventTransactionID} >{item.eventShortDescription}</Link></td>
-                             <td>{item.eventOperator}</td>
                              <td>{item.daysFromToday}</td>
                              <td>{item.ageWhenOccurred}</td>
                              <td width="50%">{item.eventComments + " " + item.auxField1Value + " " + item.auxField2Value}</td>

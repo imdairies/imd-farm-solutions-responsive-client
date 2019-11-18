@@ -336,7 +336,7 @@ class SearchAnimal extends Component {
          <Col xs="7">
            <Fade timeout={this.state.timeout} in={this.state.fadeIn}>
             <Row>
-              <Col md="10">
+              <Col xs="10" lg="12">
                 <Card>
                   <CardHeader>
                     <i className="fa fa-align-justify"></i><strong>Animal Maintenance</strong>
@@ -376,6 +376,9 @@ class SearchAnimal extends Component {
                         <FormGroup row>
                           <Col>
                             <InputGroup>
+                                <InputGroupText>
+                                  <i className="fa icon-question fa-lg mt-1"></i>
+                                </InputGroupText>
 
                               <Dropdown isOpen={this.state.dropdownOpen[1]} toggle={() => {
                                 this.toggle(1);}}>
@@ -405,9 +408,13 @@ class SearchAnimal extends Component {
                               </Dropdown>
                             </InputGroup>                                
                           </Col>
-
+                        </FormGroup>
+                        <FormGroup row>
                           <Col>
                             <InputGroup>
+                                <InputGroupText>
+                                  <i className="fa icon-question fa-lg mt-1"></i>
+                                </InputGroupText>
                             <Dropdown isOpen={this.state.dropdownOpen[2]} size="md" toggle={() => {
                               this.toggle(2);}}>
                               <DropdownToggle caret>
@@ -436,11 +443,15 @@ class SearchAnimal extends Component {
                               </DropdownMenu>
                             </Dropdown>
 
-                            </InputGroup>
-                          </Col>
-                          <Col>
-                            <InputGroup>
-
+                              </InputGroup>
+                            </Col>
+                          </FormGroup>
+                          <FormGroup row>
+                            <Col>
+                              <InputGroup>
+                                <InputGroupText>
+                                  <i className="fa icon-question fa-lg mt-1"></i>
+                                </InputGroupText>
                               <Dropdown isOpen={this.state.dropdownOpen[3]} toggle={() => {
                                 this.toggle(3);
                               }}>
