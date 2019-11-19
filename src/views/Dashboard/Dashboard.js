@@ -17,6 +17,9 @@ import {
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities'
 import { Link } from 'react-router-dom';
+import Cookies from 'universal-cookie';
+import { Redirect } from 'react-router-dom';
+
 
 const brandSuccess = getStyle('--success')
 const brandInfo = getStyle('--info')
@@ -239,6 +242,7 @@ class Dashboard extends Component {
       inseminatedThisMonthCount: "loading...",
       inseminatedThisMonthList: "",
       breedingWidgetMessage: "Recent Breeding Events",
+      authenticated: true,
       chartSubTitle: new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: 'long' }).format(new Date())
     };
 
@@ -560,6 +564,8 @@ retrieveHerdSizeHistory(){
 
 retrieveLactatingCount() {
 
+
+
   fetch(API_PREFIX+ '/imd-farm-management/animals/lactatingcows', {
       method: "POST",
       headers: {
@@ -567,17 +573,22 @@ retrieveLactatingCount() {
           'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-          "animalTag": "%"
+          "animalTag": "%",
+          "loginToken": (new Cookies()).get('authToken'),
     })
   })
-  .then(response => response.json())
-  .then(responseJson => {
-  if (responseJson.error) {
-     this.setState({lactatingAnimalCount: "Error in retrieving active lactating count: " + responseJson.message,
+  .then(response => {
+    if (response.status === 401)
+      this.setState({authenticated : false});
+    return response.json();
+  })
+  .then(data => {
+  if (data.error) {
+     this.setState({lactatingAnimalCount: "Error in retrieving active lactating count: " + data.message,
       lactatingAnimalWidgetMessage: "Lactating Animals"});
   }
   else {
-     this.setState({lactatingAnimalCount: responseJson.length, 
+     this.setState({lactatingAnimalCount: data.length, 
       lactatingAnimalWidgetMessage: "Lactating Animals"});         
   }
   })
@@ -771,7 +782,9 @@ retrieveLactatingCount() {
       inseminatedThisMonthList, expectedCalvingThisMonthList, breedingWidgetMessage, abortedThisMonthCount, calvedThisMonthCount, 
       inseminatedThisMonthCount, abortedThisMonthList, calvedThisMonthList, herdSizeTrend, inseminationTrend, 
       expectedCalvingThisMonthLabel, abortedThisMonthLabel, calvedThisMonthLabel, inseminatedThisMonthLabel,
-      previousPreviousMonth, previsousMonth, currentMonth, currentYear} = this.state;
+      previousPreviousMonth, previsousMonth, currentMonth, currentYear, authenticated} = this.state;
+    if (!authenticated)
+      return (<Redirect to='/login'  />);
 
     return (
       <div className="animated fadeIn">

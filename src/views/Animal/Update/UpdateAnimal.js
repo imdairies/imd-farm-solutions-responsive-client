@@ -13,7 +13,9 @@ import { Link } from 'react-router-dom';
 import { Line } from 'react-chartjs-2';
 
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
-import { getStyle } from '@coreui/coreui/dist/js/coreui-utilities'
+import { getStyle } from '@coreui/coreui/dist/js/coreui-utilities';
+import Cookies from 'universal-cookie';
+
 
 const brandSuccess = getStyle('--success')
 const brandInfo = getStyle('--info')
@@ -153,6 +155,7 @@ class UpdateAnimal extends Component {
       progneyList: [],
       progneyMessageColor: "",
       progneyMessage: "",
+      authenticated: true
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleUpdate = this.handleUpdate.bind(this);
@@ -474,6 +477,11 @@ retrieveAnimallWeightGraphData(animalTag){
 
 
   retrieveAnimalAdvisement(animalTag) {
+      let th1List = [];
+      let th2List = [];
+      let th3List = [];
+      //alert((new Cookies()).get('authToken'));
+
       fetch(API_PREFIX+ '/imd-farm-management/advisement/retrieveanimaladvisement', {
           method: "POST",
           headers: {
@@ -485,22 +493,25 @@ retrieveAnimallWeightGraphData(animalTag){
             "advisementID":"%",
             "threshold1Violated": true,
             "threshold2Violated": true,
-            "threshold3Violated": true
+            "threshold3Violated": true,
+            "loginToken": (new Cookies()).get('authToken'),
         })
       })
-      .then(response => response.json())
-      .then(responseJson => {
-        if (responseJson.error) {
-           this.setState({alertList: []});
+      .then(response => {
+        if (response.status === 401)
+          this.setState({authenticated : false});
+        return response.json();
+      })
+      .then(data => {
+        if (data.error) {
+           th3List.push({ruleOutcomeMessage: data.message, ruleOutcomeShortMessage:data.message, animalTags:"", advisementRule: "!"});
+           this.setState({alertList: th3List});
         }
         else {
           // this.setState({alertList: responseJson, warningList: responseJson, infoList: responseJson});
-          let th1List = [];
-          let th2List = [];
-          let th3List = [];
           //alert(responseJson[0].animalTags)    
-          for (let i=0; i< responseJson.length; i++) {
-            let item = responseJson[i];
+          for (let i=0; i< data.length; i++) {
+            let item = data[i];
             if (item.severityThreshold === "THRESHOLD1") {
               th1List.push(item);
             } else if (item.severityThreshold === "THRESHOLD2") {
@@ -514,8 +525,8 @@ retrieveAnimallWeightGraphData(animalTag){
             th1List.push({ruleOutcomeMessage: "You seem to be managing this animal well. There are no special instructions pertainig to this animal.", ruleOutcomeShortMessage:"You seem to be managing this animal well. There is no special instructions pertainig to this animal.", animalTags:"", advisementRule: "THUMBSUP"});
 
           this.setState({alertList: th3List, warningList: th2List, infoList: th1List});
-          }
-        })
+        }
+      })
   }
 
 
@@ -647,11 +658,14 @@ retrieveAnimallWeightGraphData(animalTag){
 
   render() {
     var { progneyList, progneyMessageColor, progneyMessage, infoList, warningList, alertList, message, invalidAccess, lifecycleStageList, sireList, feedAnalysisMessageColor, feedAnalysisMessage, eventAdditionalMessage, eventMessageColor, messageColor, eventlist} = this.state;
-    var { weightGraphMessageColor, weightGraphMessage, genericMessage1, genericMessage2, month1MilkingRecord, month2MilkingRecord, message1Color, message2Color} = this.state;
+    var { authenticated, weightGraphMessageColor, weightGraphMessage, genericMessage1, genericMessage2, month1MilkingRecord, month2MilkingRecord, message1Color, message2Color} = this.state;
     let recordCount = 0;
     let eventRecordCount = 0;
     if (invalidAccess)
       return (<Redirect to='/animal/search'  />);
+    if (!authenticated)
+      return (<Redirect to='/login'  />);
+
     
     return (
       <div className="animated fadeIn">

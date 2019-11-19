@@ -7,6 +7,7 @@ import logo from '../../assets/img/brand/imdlogo.png';
 import sygnet from '../../assets/img/brand/sygnet.png';
 import Clock from 'react-live-clock';
 
+
 const propTypes = {
   children: PropTypes.node,
 };
@@ -14,6 +15,13 @@ const propTypes = {
 const defaultProps = {};
 
 class DefaultHeader extends Component {
+
+
+  componentDidMount() {
+    //alert((new Cookies()).get('authToken'));
+  }
+
+
   render() {
 
     // eslint-disable-next-line

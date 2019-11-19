@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Progress, TabContent, TabPane, ListGroup, ListGroupItem } from 'reactstrap';
 import PropTypes from 'prop-types';
 import { AppSwitch } from '@coreui/react'
+import Cookies from 'universal-cookie';
+import { Redirect } from 'react-router-dom';
 
 
 var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
@@ -16,6 +18,10 @@ const defaultProps = {};
 class DefaultAside extends Component {
 
   componentDidMount() {
+      let th1List = [];
+      let th2List = [];
+      let th3List = [];
+
       this.setState({alertList: [], warningList: [], infoList: []}); 
       fetch(API_PREFIX+ '/imd-farm-management/advisement/retrievealladvisement', {
           method: "POST",
@@ -28,19 +34,17 @@ class DefaultAside extends Component {
             "advisementID":"%",
             "threshold1Violated": true,
             "threshold2Violated": true,
-            "threshold3Violated": true
+            "threshold3Violated": true,
+            "loginToken": (new Cookies()).get('authToken'),
         })
       })
       .then(response => response.json())
       .then(responseJson => {
         if (responseJson.error) {
-           this.setState({alertList: []});
+           th3List.push({ruleOutcomeMessage: responseJson.message, ruleOutcomeShortMessage:responseJson.message, animalTags:"", advisementRule: "ACCESS_DENIED"});
+           this.setState({alertList: th3List});
         }
         else {
-          // this.setState({alertList: responseJson, warningList: responseJson, infoList: responseJson});
-          let th1List = [];
-          let th2List = [];
-          let th3List = [];
           //alert(responseJson[0].animalTags)    
           for (let i=0; i< responseJson.length; i++) {
             let item = responseJson[i];
@@ -70,7 +74,8 @@ class DefaultAside extends Component {
       activeTab: '1',
       alertList: [], 
       warningList: [], 
-      infoList: []
+      infoList: [],
+      authenticated: true,
     };
   }
 
@@ -83,10 +88,12 @@ class DefaultAside extends Component {
   }
 
   render() {
-    var { alertList, warningList, infoList} = this.state;
+    var { alertList, warningList, infoList, authenticated} = this.state;
 
     // eslint-disable-next-line
     const { children, ...attributes } = this.props;
+    if (!authenticated)
+      return (<Redirect to='/login'  />);
 
     return (
       <React.Fragment>

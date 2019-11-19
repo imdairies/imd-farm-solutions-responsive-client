@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import {FormText} from 'reactstrap';
 import { Button, Card, CardBody, CardGroup, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
+import Cookies from 'universal-cookie';
 
 var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
@@ -55,14 +56,43 @@ class Login extends Component {
            this.setState({messageText: responseJson.message, messageColor: "danger"});
         }
         else {
-           this.setState({messageText: "Authenticated(" + responseJson.authToken + ")", messageColor: "success"});
-           this.props.history.push('/dashboard');
+          this.setState({messageText: "Authenticated(" + responseJson.authToken + ")", messageColor: "success"});
+          (new Cookies()).set('authToken', responseJson.authToken, { path: '/' });
+          //alert(cookies.get('authToken'));
+          this.props.history.push('/dashboard');
         }
       })
       .catch(error => { 
-        this.setState({messageText: error.toString(), messageColor: "danger"})
+        this.setState({messageText: error.toString()==='TypeError: Failed to fetch' ? 'Connection Error: Unable to connect to IMD API' : error.toString(), messageColor: "danger"})
       });
     }
+  }
+
+  componentDidMount() {
+    fetch(API_PREFIX + '/imd-farm-management/user/logout', {
+        method: "POST",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          "loginToken": (new Cookies()).get('authToken'),
+      })
+    })
+    .then(response => response.json())
+    .then(responseJson => {
+      if (responseJson.error) {
+         //this.setState({messageText: responseJson.message, messageColor: "danger"});
+        (new Cookies()).remove('authToken');
+      }
+      else {
+        this.setState({messageText: responseJson.message, messageColor: "success"});
+        (new Cookies()).remove('authToken');
+      }
+    })
+    .catch(error => { 
+      (new Cookies()).remove('authToken');
+      this.setState({messageText: error.toString()==='TypeError: Failed to fetch' ? 'Connection Error: Unable to connect to IMD API Server' : error.toString(), messageColor: "danger"})});
   }
 
   render() {
