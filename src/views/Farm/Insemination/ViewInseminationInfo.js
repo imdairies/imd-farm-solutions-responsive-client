@@ -13,10 +13,8 @@ import {
 
 import { Link } from 'react-router-dom';
 import queryString from 'query-string';
-
-
-
-
+import Cookies from 'universal-cookie';
+import { Redirect } from 'react-router-dom';
 
 class ViewInseminationInfo extends Component {
   constructor(props) {
@@ -29,7 +27,8 @@ class ViewInseminationInfo extends Component {
       isLoaded: true,
       activeOnly: false,
       messageColor: "muted",
-      eventAdditionalMessage: "Enter search fields (you can use % for wild card searches) and press Search button"
+      eventAdditionalMessage: "Enter search fields (you can use % for wild card searches) and press Search button",
+      authenticated: true
     };
   }
 
@@ -57,29 +56,34 @@ class ViewInseminationInfo extends Component {
         body: JSON.stringify({
           "animalTag": "%",
           "animalType": "%",
-          "activeOnly": true
+          "activeOnly": true,
+          "loginToken": (new Cookies()).get('authToken'), 
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-        if (responseJson.error) {
-           this.setState({items: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+        if (data.error) {
+           this.setState({items: [], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
         }
         else {
           let i = 0;
           let item;
           let items = [];
-          for (i=0; i <responseJson.length; i++) {
-            item = responseJson[i];
+          for (i=0; i <data.length; i++) {
+            item = data[i];
             if ( (upcomingCalvings && (!item.daysSinceInsemination || item.daysSinceInsemination < 240)) || 
                  (recentInseminations && (!item.daysSinceInsemination || item.daysSinceInsemination >= 30))) {
               // don't include
               ;
             } else {
-              items.push(responseJson[i]);
+              items.push(data[i]);
             }
 
-           this.setState({items: items, isLoaded: true, eventAdditionalMessage: (responseJson.length === 1 ? responseJson.length + " matching record found" : responseJson.length + " matching records found"), messageColor: "success"});         
+           this.setState({items: items, isLoaded: true, eventAdditionalMessage: (data.length === 1 ? data.length + " matching record found" : data.length + " matching records found"), messageColor: "success"});         
 
            // this.setState({items: responseJson, isLoaded: true, eventAdditionalMessage: (responseJson.length === 1 ? responseJson.length + " matching record found" : responseJson.length + " matching records found"), messageColor: "success"});         
         }
@@ -90,8 +94,11 @@ class ViewInseminationInfo extends Component {
 
 
   render() {
-    var { isLoaded, items} = this.state;
+    var { isLoaded, items, authenticated} = this.state;
     let recordCount = 0;
+    if (!authenticated)
+      return (<Redirect to='/login'  />);
+
     return (
       <div className="animated fadeIn">
          <Row>

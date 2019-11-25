@@ -108,7 +108,7 @@ class UpdateAnimal extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      dropdownOpen: new Array(2).fill(false),
+      dropdownOpen: new Array(3).fill(false),
       activeIndex: 0,
       invalidAccess: false,
       collapse: true,
@@ -126,6 +126,7 @@ class UpdateAnimal extends Component {
       animalStatus: "",
       currentAge : "",
       alias: "",
+      gender: "",
       frontSideImageURL: "",
       backSideImageURL: "",
       rightSideImageURL:"",
@@ -168,8 +169,13 @@ class UpdateAnimal extends Component {
     this.retrieveAnimallWeightGraphData = this.retrieveAnimallWeightGraphData.bind(this);
     this.retrieveAnimalAdvisement = this.retrieveAnimalAdvisement.bind(this);
     this.retrieveAnimalProgney = this.retrieveAnimalProgney.bind(this);
+    this.handleGenderChange = this.handleGenderChange.bind(this);
 
   }
+
+handleGenderChange(event) {
+  this.setState({gender: event.target.value});
+}
 
 retrieveAnimallWeightGraphData(animalTag){
   fetch(API_PREFIX+ '/imd-farm-management/animals/getgrowthdata', {
@@ -179,7 +185,8 @@ retrieveAnimallWeightGraphData(animalTag){
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        "animalTag": animalTag 
+        "animalTag": animalTag,
+        "loginToken": (new Cookies()).get('authToken'), 
     })
   })
   .then(response => response.json())
@@ -325,7 +332,8 @@ retrieveAnimallWeightGraphData(animalTag){
         },
         body: JSON.stringify({
           "orgID": parsed.orgID,
-          "animalTag": parsed.animalTag
+          "animalTag": parsed.animalTag,
+          "loginToken": (new Cookies()).get('authToken'),
       })
     })
     .then(response => response.json())
@@ -342,6 +350,7 @@ retrieveAnimallWeightGraphData(animalTag){
                         isActive: responseJson[0].isActive, 
                         isLoaded: true,
                         animalDam: responseJson[0].animalDam,
+                        gender: (responseJson[0].gender === "F" ? "Female" : responseJson[0].gender === "M" ? "Male":""),
                         animalSire: responseJson[0].animalSire,
                         animalSireURL: (responseJson[0].isBornThroughAI ? responseJson[0].animalSireURL : '#/animal/update?animalTag=' + responseJson[0].animalSire + '&orgID=' + responseJson[0].orgID),
                         animalSireAlias: responseJson[0].animalSireAlias,
@@ -374,6 +383,7 @@ retrieveAnimallWeightGraphData(animalTag){
         },
         body: JSON.stringify({
           "categoryCode": "LCYCL",
+          "loginToken": (new Cookies()).get('authToken'),
       })
     })
     .then(response => response.json())
@@ -396,6 +406,7 @@ retrieveAnimallWeightGraphData(animalTag){
         },
         body: JSON.stringify({
           "animalTag":"",
+          "loginToken": (new Cookies()).get('authToken'),
       })
     })
     .then(response => response.json())
@@ -422,7 +433,8 @@ retrieveAnimallWeightGraphData(animalTag){
         // body: JSON.stringify(jsonString)
 
         body: JSON.stringify({
-          "animalTag": parsed.animalTag
+          "animalTag": parsed.animalTag,
+          "loginToken": (new Cookies()).get('authToken'),
       })
     })
     .then(response => response.json())
@@ -446,7 +458,8 @@ retrieveAnimallWeightGraphData(animalTag){
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          "animalTag": parsed.animalTag
+          "animalTag": parsed.animalTag,
+          "loginToken": (new Cookies()).get('authToken'),
       })
     })
     .then(response => response.json())
@@ -538,7 +551,8 @@ retrieveAnimallWeightGraphData(animalTag){
               'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            "animalTag":animalTag
+            "animalTag":animalTag,
+            "loginToken": (new Cookies()).get('authToken'),
         })
       })
       .then(response => response.json())
@@ -563,6 +577,7 @@ retrieveAnimallWeightGraphData(animalTag){
         body: JSON.stringify({
           "animalTag": animalTag,
           "milkingDateStr": prevDate.getFullYear() + '-' + (prevDate.getMonth()+1) + '-01',
+          "loginToken": (new Cookies()).get('authToken'),
       })
     })
     .then(response => response.json())
@@ -586,6 +601,7 @@ retrieveAnimallWeightGraphData(animalTag){
         body: JSON.stringify({
           "animalTag": animalTag,
           "milkingDateStr": recordDate.getFullYear() + '-' + (recordDate.getMonth()+1) + '-01',
+          "loginToken": (new Cookies()).get('authToken'),
       })
     })
     .then(response => response.json())
@@ -621,6 +637,8 @@ retrieveAnimallWeightGraphData(animalTag){
       this.setState({longdescription: event.target.value});
     if (event.target.id === "active")
       this.setState({activeIndicator: (event.target.checked ? "Y": "N")});
+    if (event.target.id === "gender")
+      this.setState({gender: event.target.value});
   }
 
   handleUpdate(event) {
@@ -637,9 +655,8 @@ retrieveAnimallWeightGraphData(animalTag){
             "gender" : (this.state.gender === "Female" ? "F" : "M"),
             "sire" : (this.state.animalSireAlias === "-- Select Sire --"  ? null : this.state.animalSireTag),
             "dateOfBirthStr": this.state.dateOfBirth,
-            "animalType": (this.state.animalType === "-- Animal Type --" ? null : this.state.animalType)
-            // "eventLongDescription": longDescr,
-            // "activeIndicator": active
+            "animalType": (this.state.animalType === "-- Animal Type --" ? null : this.state.animalType),
+            "loginToken": (new Cookies()).get('authToken'),
         })
       })
       .then(response => response.json())
@@ -694,6 +711,22 @@ retrieveAnimallWeightGraphData(animalTag){
                           <Label sm="4" htmlFor="input-normal">Alias</Label>
                           <Col sm="4">
                               <Input id="alias" type="text" maxLength="75" value={this.state.alias} onChange={this.handleChange} placeholder="Animal Alias"  />
+                          </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                          <Label sm="4" htmlFor="input-normal">Gender</Label>
+                          <Col sm="4">
+                              <Dropdown isOpen={this.state.dropdownOpen[2]} toggle={() => {
+                                this.toggle(2);
+                              }}>
+                                <DropdownToggle caret>
+                                  {this.state.gender}
+                                </DropdownToggle>
+                                <DropdownMenu onClick={this.handleGenderChange}>
+                                  <DropdownItem id="F" value="Female" >Female</DropdownItem>
+                                  <DropdownItem id="M" value="Male" >Male</DropdownItem>
+                                </DropdownMenu>
+                              </Dropdown>
                           </Col>
                         </FormGroup>
                         <FormGroup row>
@@ -972,7 +1005,7 @@ retrieveAnimallWeightGraphData(animalTag){
           <Col md="8">
             <Card>
                 <CardHeader>
-                  <i className="fa fa-align-justify"></i>{"Life Events " + this.state.animalTag}<FormText color={eventMessageColor}>&nbsp;{eventAdditionalMessage}</FormText>
+                  <i className="fa fa-align-justify"></i>{"Life Events of " + this.state.animalTag}<FormText color={eventMessageColor}>&nbsp;{eventAdditionalMessage}</FormText>
                 </CardHeader>
                 <CardBody>
                    <Table hover bordered striped responsive size="sm">
@@ -999,12 +1032,18 @@ retrieveAnimallWeightGraphData(animalTag){
                          ))}
                     </tbody>
                    </Table>
-                  <CardFooter>
-                    <FormText color={messageColor}>&nbsp;{message}</FormText>
-                    <Button type="button" size="md" color="primary" onClick={this.handleUpdate}><i className="fa fa-edit"></i>&nbsp;Update</Button>
-                </CardFooter>
               </CardBody>
             </Card>
+          </Col>
+        </Row>
+        <Row>
+          <Col md="8" align="center">
+            <Card>
+              <CardFooter>
+                <FormText color={messageColor}><p>{message}</p></FormText>
+                <Button type="button" size="md" color="primary" onClick={this.handleUpdate}><i className="fa fa-edit"></i>&nbsp;Update</Button>
+              </CardFooter>
+              </Card>
           </Col>
         </Row>
         </Fade>

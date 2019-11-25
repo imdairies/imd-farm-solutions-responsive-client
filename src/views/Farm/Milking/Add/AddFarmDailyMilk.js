@@ -28,6 +28,9 @@ import {
 import classnames from 'classnames';
 import { Link } from 'react-router-dom';
 import DateTimePicker from 'react-datetime-picker';
+import Cookies from 'universal-cookie';
+import { Redirect } from 'react-router-dom';
+
 var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 
@@ -63,6 +66,7 @@ class AddFarmDailyMilk extends Component {
       totalMilkMessage: "",
       previousTotalMilkMessage: "",
       avgTotalMilkMessage: "",
+      authenticated: true,
       farmAverageMonthInMilking: 0
     };
     this.handleAnimalTagSelected = this.handleAnimalTagSelected.bind(this);
@@ -256,25 +260,30 @@ class AddFarmDailyMilk extends Component {
                   "toxinValue": this.state.toxinValue,
                   "temperatureInCentigrade": this.state.temperatureInCentigrade,
                   "humidity": this.state.humidity,
-                  "timestamp": timestampValue
+                  "timestamp": timestampValue,
+                  "loginToken": (new Cookies()).get('authToken'), 
             })
           })
-          .then(response => response.json())
-          .then(responseJson => {
-            if (responseJson.error) {
-               this.setState({animaltaglist: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+          .then(response => {
+            if (response.status === 401)
+              this.setState({authenticated : false});
+            return response.json();
+          })
+          .then(data => {
+            if (data.error) {
+               this.setState({animaltaglist: [], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
             }
             else {
                 let eventTimestamp = this.state.timestamp;
                 let i=0;
-                for (i=0; i<responseJson.length;i++) {
-                  if (!(responseJson[i].recordDate === "" || responseJson[i].recordTime === ""))
-                     eventTimestamp = new Date(responseJson[i].recordDate + " " + responseJson[i].recordTime);                  
+                for (i=0; i<data.length;i++) {
+                  if (!(data[i].recordDate === "" || data[i].recordTime === ""))
+                     eventTimestamp = new Date(data[i].recordDate + " " + data[i].recordTime);                  
                 }
-                this.setState({animaltaglist: responseJson,
-                  timestamp: eventTimestamp, lactatingCount: responseJson.length,
+                this.setState({animaltaglist: data,
+                  timestamp: eventTimestamp, lactatingCount: data.length,
                   isLoaded: true, eventAdditionalMessage: "", messageColor: "success"});
-                this.calculateTotal(responseJson, true, true);
+                this.calculateTotal(data, true, true);
             }
           })
           .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -350,6 +359,7 @@ class AddFarmDailyMilk extends Component {
               "temperatureInCentigrade": this.state.temperatureInCentigrade,
               "humidity": this.state.humidity,
               "timestamp": this.state.timestamp,
+              "loginToken": (new Cookies()).get('authToken'), 
               farmMilkingEventRecords
              // "tagVolume1" : [{"tag":"012", "volume":"01"},{"tag":"014", "volume":"2"},{"tag":"015", "volume":"3"},{"tag":"017", "volume":"4"},{"tag":"019", "volume":"5"},{"tag":"020", "volume":"6"},{"tag":"021", "volume":"7"},{"tag":"023", "volume":"8"},{"tag":"025", "volume":"9"},{"tag":"026", "volume":"10"},{"tag":"027", "volume":"11"},{"tag":"029", "volume":"12"},{"tag":"030", "volume":"11"},{"tag":"031", "volume":"13"},{"tag":"034", "volume":"14"},{"tag":"035", "volume":"15"},{"tag":"036", "volume":"16"}]
           })
@@ -387,12 +397,16 @@ class AddFarmDailyMilk extends Component {
   }
 
   render() {
-    var { farmAverageMonthInMilking, eventAdditionalMessage, messageColor, addOrUpdate, totalMilkMessage, animaltaglist, previousTotalMilkMessage, avgTotalMilkMessage} = this.state;
+
+    var { authenticated, farmAverageMonthInMilking, eventAdditionalMessage, messageColor, addOrUpdate, totalMilkMessage, animaltaglist, previousTotalMilkMessage, avgTotalMilkMessage} = this.state;
     let recordCount = 0;
     //var yesterday = this.state.timestamp;
     let days = this.state.timestamp.getDate();
     let month = this.state.timestamp.getMonth();
     let year = this.state.timestamp.getFullYear();
+    if (!authenticated)
+      return (<Redirect to='/login'  />);
+
     if (days > 1) {
       days = days -1;
     } else {

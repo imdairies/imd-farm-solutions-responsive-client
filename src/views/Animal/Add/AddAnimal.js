@@ -25,6 +25,8 @@ import {
 import classnames from 'classnames';
 import { Link } from 'react-router-dom';
 import DateTimePicker from 'react-datetime-picker';
+import { Redirect } from 'react-router-dom';
+import Cookies from 'universal-cookie';
 
 var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
@@ -59,6 +61,7 @@ class AddAnimal extends Component {
       animalType: "-- Animal Type --",
       animalDamTag: "-- Select Dam --",
       aiIndicator: "Yes",
+      authenticated: true,
 //      activeIndicator : "N" ,
       messageColor: "muted",
       message: "Specify desired values and press Add"
@@ -89,15 +92,20 @@ class AddAnimal extends Component {
         body: JSON.stringify({
           "categoryCode": "LCYCL",
           "activeIndicator": "Y",
+          "loginToken": (new Cookies()).get('authToken')
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({animaltypelist: [], isLoaded: true, message: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({animaltypelist: [], isLoaded: true, message: data.message, messageColor: "danger"});
       }
       else {
-         this.setState({animaltypelist: responseJson, isLoaded: true, message: "", messageColor: "success"});         
+         this.setState({animaltypelist: data, isLoaded: true, message: "", messageColor: "success"});         
       }
     })
     .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
@@ -111,15 +119,20 @@ class AddAnimal extends Component {
         body: JSON.stringify({
           "categoryCode": "BREED",
           "activeIndicator": "Y",
+          "loginToken": (new Cookies()).get('authToken')
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({breedList: [], isLoaded: true, message: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({breedList: [], isLoaded: true, message: data.message, messageColor: "danger"});
       }
       else {
-         this.setState({breedList: responseJson, isLoaded: true, message: "", messageColor: "success"});         
+         this.setState({breedList: data, isLoaded: true, message: "", messageColor: "success"});         
       }
     })
     .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
@@ -134,15 +147,20 @@ class AddAnimal extends Component {
         },
         body: JSON.stringify({
           "animalTag":"%",
+          "loginToken": (new Cookies()).get('authToken')
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({sireList: [], isLoaded: true, message: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({sireList: [], isLoaded: true, message: data.message, messageColor: "danger"});
       }
       else {
-         this.setState({sireList: responseJson, isLoaded: true, message: "", messageColor: "success"});         
+         this.setState({sireList: data, isLoaded: true, message: "", messageColor: "success"});         
       }
     })
     .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
@@ -155,15 +173,20 @@ class AddAnimal extends Component {
         },
         body: JSON.stringify({
           "animalTag":"%",
+          "loginToken": (new Cookies()).get('authToken')
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({damList: [], isLoaded: true, message: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({damList: [], isLoaded: true, message: data.message, messageColor: "danger"});
       }
       else {
-         this.setState({damList: responseJson, isLoaded: true, message: "", messageColor: "success"});         
+         this.setState({damList: data, isLoaded: true, message: "", messageColor: "success"});         
       }
     })
     .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
@@ -270,7 +293,8 @@ class AddAnimal extends Component {
             "dateOfBirthStr": this.state.timestampOfBirth.toLocaleString(),
             "herdJoiningDttmStr": this.state.timestampOfJoining.toLocaleString(),
             "aiInd": this.state.aiIndicator,
-            "animalType": (this.state.animalType === "-- Animal Type --" ? null : this.state.animalType)
+            "animalType": (this.state.animalType === "-- Animal Type --" ? null : this.state.animalType),
+            "loginToken": (new Cookies()).get('authToken')
             // "eventLongDescription": longDescr,
             // "activeIndicator": active
         })
@@ -299,9 +323,11 @@ class AddAnimal extends Component {
 
 
   render() {
-    var { message, messageColor, animaltypelist, sireList, damList, breedList} = this.state;
+    var { authenticated, message, messageColor, animaltypelist, sireList, damList, breedList} = this.state;
     let recordCount = 0;
     let damRecordCount = 0;
+    if (!authenticated) 
+      return (<Redirect to='/login'  />);
     return (
       <div className="animated fadeIn">
         <Row>

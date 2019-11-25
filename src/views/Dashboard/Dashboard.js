@@ -409,7 +409,8 @@ retrieveMilkingRecordOfMonth(){
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        "milkingDateStr": now.getFullYear() + "-" + (now.getMonth()+1) + "-1" 
+        "milkingDateStr": now.getFullYear() + "-" + (now.getMonth()+1) + "-1",
+        "loginToken": (new Cookies()).get('authToken'), 
     })
   })
   .then(response => response.json())
@@ -447,7 +448,8 @@ retrievePregnantCount(){
           'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-          "animalTag": "%"
+          "animalTag": "%",
+          "loginToken": (new Cookies()).get('authToken'),
     })
   })
   .then(response => response.json())
@@ -474,17 +476,22 @@ retrieveDryCowCount(){
           'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-          "animalTag": "%"
+          "animalTag": "%",
+          "loginToken": (new Cookies()).get('authToken'),
     })
   })
-  .then(response => response.json())
-  .then(responseJson => {
-  if (responseJson.error) {
-     this.setState({dryCowCount: "Error in retrieving active dry cows count: " + responseJson.message,
+  .then(response => {
+    if (response.status === 401)
+      this.setState({authenticated : false});
+    return response.json();
+  })
+  .then(data => {
+  if (data.error) {
+     this.setState({dryCowCount: "Error in retrieving active dry cows count: " + data.message,
       dryCowsWidgetMessage: "Dry Animals"});
   }
   else {
-     this.setState({dryCowCount: responseJson.length,  dryCowsWidgetMessage: "Dry Animals"});         
+     this.setState({dryCowCount: data.length,  dryCowsWidgetMessage: "Dry Animals"});         
   }
   })
   .catch(error => this.setState({dryCowsWidgetMessage: "Dry Animals",
@@ -501,7 +508,8 @@ retrieveFemaleCalvesCount(){
           'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-          "animalTag": "%"
+          "animalTag": "%",
+          "loginToken": (new Cookies()).get('authToken'),
     })
   })
   .then(response => response.json())
@@ -542,7 +550,8 @@ retrieveHerdSizeHistory(){
       body: JSON.stringify({
         "start": "2017-01-31",
         "end": now.getFullYear() + "-" + (now.getMonth()+1) + "-" + now.getDate(),
-        "steps": 1
+        "steps": 1,
+        "loginToken": (new Cookies()).get('authToken'),
     })
   })
   .then(response => response.json())
@@ -563,8 +572,6 @@ retrieveHerdSizeHistory(){
 }
 
 retrieveLactatingCount() {
-
-
 
   fetch(API_PREFIX+ '/imd-farm-management/animals/lactatingcows', {
       method: "POST",
@@ -628,7 +635,8 @@ retrieveLactatingCount() {
                 'Content-Type': 'application/json'
               },
               body: JSON.stringify({
-                "milkingDateStr": now.getFullYear() + "-" + (now.getMonth()+1) + "-1" 
+                "milkingDateStr": now.getFullYear() + "-" + (now.getMonth()+1) + "-1",
+                "loginToken": (new Cookies()).get('authToken'), 
             })
           })
        .then(response => response.json())
@@ -670,7 +678,8 @@ retrieveLactatingCount() {
                 'Content-Type': 'application/json'
               },
               body: JSON.stringify({
-                "milkingDateStr": prevYear + "-" + prevMonth + "-1" 
+                "milkingDateStr": prevYear + "-" + prevMonth + "-1",
+                "loginToken": (new Cookies()).get('authToken'), 
             })
           })
        .then(response => response.json())
@@ -713,7 +722,8 @@ retrieveLactatingCount() {
                 'Content-Type': 'application/json'
               },
               body: JSON.stringify({
-                "milkingDateStr": prevYear + "-" + prevMonth + "-1" 
+                "milkingDateStr": prevYear + "-" + prevMonth + "-1",
+                "loginToken": (new Cookies()).get('authToken'), 
             })
           })
        .then(response => response.json())
@@ -744,7 +754,8 @@ retrieveLactatingCount() {
                 'Content-Type': 'application/json'
               },
               body: JSON.stringify({
-                "milkingDateStr": now.getFullYear() 
+                "milkingDateStr": now.getFullYear(),
+                "loginToken": (new Cookies()).get('authToken'), 
             })
           })
        .then(response => response.json())

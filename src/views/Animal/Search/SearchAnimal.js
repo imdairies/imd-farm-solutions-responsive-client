@@ -1,4 +1,10 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
+import queryString from 'query-string';
+import classnames from 'classnames';
+import { Redirect } from 'react-router-dom';
+import Cookies from 'universal-cookie';
+
 
 import {
    Button,
@@ -26,9 +32,6 @@ import {
   DropdownToggle 
 } from 'reactstrap';
 
-import { Link } from 'react-router-dom';
-import queryString from 'query-string';
-import classnames from 'classnames';
 var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 
@@ -53,12 +56,14 @@ class SearchAnimal extends Component {
       animalSireAlias: "-- Select Sire --",
       animalDamTag: "-- Select Dam --",
       gender: "-- Select Gender --",
+      genderValue: "",
       activeOnly: false,
       messageColor: "muted",
       animaltypelist: [],
       sireList:[],
       damList: [],
-      eventAdditionalMessage: "Enter search fields and press Search button"
+      eventAdditionalMessage: "Enter search fields and press Search button",
+      authenticated: true
     };
     this.handleAnimalTagValueChange = this.handleAnimalTagValueChange.bind(this);
     this.handleActiveOnly = this.handleActiveOnly.bind(this);
@@ -103,15 +108,20 @@ class SearchAnimal extends Component {
         },
         body: JSON.stringify({
           "categoryCode": "LCYCL",
+          "loginToken": (new Cookies()).get('authToken')
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({animaltypelist: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({animaltypelist: [], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
       }
       else {
-         this.setState({animaltypelist: responseJson, isLoaded: true});         
+         this.setState({animaltypelist: data, isLoaded: true});         
       }
     })
     .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -130,7 +140,8 @@ class SearchAnimal extends Component {
           body: JSON.stringify({
             "animalTag": "",
             "animalType":searchTypeCD,
-            "activeOnly": true
+            "activeOnly": true,
+            "loginToken": (new Cookies()).get('authToken')
         })
       })
       .then(response => response.json())
@@ -156,7 +167,8 @@ class SearchAnimal extends Component {
           body: JSON.stringify({
             "animalTag": "",
             "animalType":searchTypeCD,
-            "activeOnly": true
+            "activeOnly": true,
+            "loginToken": (new Cookies()).get('authToken')
         })
       })
       .then(response => response.json())
@@ -180,7 +192,9 @@ class SearchAnimal extends Component {
           body: JSON.stringify({
             "animalTag": animalTags,
             "animalType":"%",
-            "activeOnly": false
+            "activeOnly": false,
+            "loginToken": (new Cookies()).get('authToken')
+
         })
       })
       .then(response => response.json())
@@ -202,6 +216,8 @@ class SearchAnimal extends Component {
         },
         body: JSON.stringify({
           "animalTag":"%",
+          "loginToken": (new Cookies()).get('authToken')
+
       })
     })
     .then(response => response.json())
@@ -215,7 +231,7 @@ class SearchAnimal extends Component {
     })
     .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
 
-    fetch(API_PREFIX + '/imd-farm-management/animals/getactivedams', {
+    fetch(API_PREFIX + '/imd-farm-management/animals/getalldams', {
         method: "POST",
         headers: {
             'Accept': 'application/json',
@@ -223,6 +239,8 @@ class SearchAnimal extends Component {
         },
         body: JSON.stringify({
           "animalTag":"%",
+          "loginToken": (new Cookies()).get('authToken')
+
       })
     })
     .then(response => response.json())
@@ -259,10 +277,10 @@ class SearchAnimal extends Component {
 
 
   handleGenderChange(event) {
- if (event.target.value === "-1")
-      this.setState({gender: "-- Select Gender --"});
+    if (event.target.id === "?")
+      this.setState({gender: "-- Select Gender --", genderValue: ""});
     else 
-       this.setState({gender: event.target.value});
+      this.setState({gender: event.target.value, genderValue:event.target.id});
   }
 
   handleDobToChange(event) {
@@ -293,27 +311,32 @@ class SearchAnimal extends Component {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
-        // body: JSON.stringify(jsonString)
+        // body: JSON.stringify(jsonString)        
 
         body: JSON.stringify({
           "animalTag": this.state.animalTag,
           "animalType": (this.state.animalType === "-- Animal Type --" || this.state.animalType === "ALL" ? null : this.state.animalType),
           "sire": (this.state.animalSireTag === "-- Select Sire --" || this.state.animalSireTag === "ALL" ? null : this.state.animalSireTag),
           "dam": (this.state.animalDamTag === "-- Select Dam --" || this.state.animalDamTag === "ALL" ? null : this.state.animalDamTag),
-          "gender": this.state.gender,
+          "gender": this.state.genderValue,
           "dateOfBirthStr": this.state.dobFrom,
           "dobFrom": this.state.dobFrom,
           "dobTo": this.state.dobTo,
-          "activeOnly": this.state.activeOnly
+          "activeOnly": this.state.activeOnly,
+          "loginToken": (new Cookies()).get('authToken')
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({items: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({items: [], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
       }
       else {
-         this.setState({items: responseJson, isLoaded: true, eventAdditionalMessage: (responseJson.length === 1 ? responseJson.length + " matching record found" : responseJson.length + " matching records found"), messageColor: "success"});         
+         this.setState({items: data, isLoaded: true, eventAdditionalMessage: (data.length === 1 ? data.length + " matching record found" : data.length + " matching records found"), messageColor: "success"});         
       }
     })
     .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -325,10 +348,12 @@ class SearchAnimal extends Component {
   }
 
   render() {
-    var { isLoaded, sireList, damList, items, animaltypelist, eventAdditionalMessage, messageColor } = this.state;
+    var { authenticated, isLoaded, sireList, damList, items, animaltypelist, eventAdditionalMessage, messageColor } = this.state;
     let recordCount = 0;
     let sireCount = 0;
     let damRecordCount = 0;
+    if (!authenticated)
+      return (<Redirect to='/login'  />);
 
     return (
       <div className="animated fadeIn">
@@ -459,7 +484,7 @@ class SearchAnimal extends Component {
                                   {this.state.gender}
                                 </DropdownToggle>
                                 <DropdownMenu onClick={this.handleGenderChange}>
-                                  <DropdownItem id="?" value="-1">-- Select Gender --</DropdownItem>
+                                  <DropdownItem id="?" value="-- Select Gender --">-- Select Gender --</DropdownItem>
                                   <DropdownItem id="F" value="Female" >Female</DropdownItem>
                                   <DropdownItem id="M" value="Male" >Male</DropdownItem>
                                 </DropdownMenu>
