@@ -26,6 +26,8 @@ import {
 import { AppSwitch } from '@coreui/react'
 import classnames from 'classnames';
 import { Link } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
+import Cookies from 'universal-cookie';
 var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 
@@ -48,6 +50,7 @@ class AddLookup extends Component {
       lookupValueCode : "" ,
       shortdescription: "",
       longdescription: "",
+      authenticated: true,
       activeIndicator : "N" ,
       additionalField1: "",
       messageColor: "muted",
@@ -63,7 +66,6 @@ class AddLookup extends Component {
     // alert(event.target.id + " " + this.state.categoryCodeList[event.target.id].lookupValueCode);
     this.setState({categoryCode: this.state.categoryCodeList[event.target.id].lookupValueCode,
       codeDescription:this.state.categoryCodeList[event.target.id].shortDescription});
-
   }
 
 
@@ -87,15 +89,20 @@ class AddLookup extends Component {
         },
         body: JSON.stringify({
           "categoryCode": "LVCTG",
+          "loginToken": (new Cookies()).get('authToken')
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({categoryCodeList: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({categoryCodeList: [], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
       }
       else {
-         this.setState({categoryCodeList: responseJson, isLoaded: true, eventAdditionalMessage: "", messageColor: "success"});         
+         this.setState({categoryCodeList: data, isLoaded: true, eventAdditionalMessage: "", messageColor: "success"});         
       }
     })
     .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -163,16 +170,21 @@ class AddLookup extends Component {
             "shortDescription": shortDescr,
             "longDescription": longDescr,
             "additionalField1": addFld1,
-            "activeIndicator": active
+            "activeIndicator": active,
+            "loginToken": (new Cookies()).get('authToken')
         })
       })
-      .then(response => response.json())
-      .then(responseJson => {
-        if (responseJson.error) {
-           this.setState({isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+      .then(response => {
+        if (response.status === 401)
+          this.setState({authenticated : false});
+        return response.json();
+      })
+      .then(data => {
+        if (data.error) {
+           this.setState({isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
         }
         else {
-           this.setState({isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "success"});         
+           this.setState({isLoaded: true, eventAdditionalMessage: data.message, messageColor: "success"});         
         }
       })
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -180,8 +192,10 @@ class AddLookup extends Component {
   }
 
   render() {
-    var { eventAdditionalMessage, categoryCodeList, messageColor} = this.state;
+    var { authenticated, eventAdditionalMessage, categoryCodeList, messageColor} = this.state;
     let itemCount = 0;
+    if (!authenticated)
+      return (<Redirect to='/login'  />);
     return (
       <div className="animated fadeIn">
         <Row>

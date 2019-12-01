@@ -29,6 +29,8 @@ import { Link } from 'react-router-dom';
 import queryString from 'query-string';
 import DateTimePicker from 'react-datetime-picker';
 import 'moment-timezone';
+import { Redirect } from 'react-router-dom';
+import Cookies from 'universal-cookie';
 
 const moment = require('moment-timezone'); //moment-timezone
 
@@ -57,6 +59,7 @@ class AddAnimalEvent extends Component {
       alias: "",
       dirty: false,
       longdescription: "",
+      authenticated: true,
       messageColor: "muted",
       timestamp:  new Date(moment.tz("Asia/Aqtau").year(),
         moment.tz("Asia/Aqtau").month(),moment.tz("Asia/Aqtau").date(),
@@ -233,15 +236,20 @@ class AddAnimalEvent extends Component {
         },
         body: JSON.stringify({
           "categoryCode": "OPRTR",
+          "loginToken": (new Cookies()).get('authToken')
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({operatorlist: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({operatorlist: [], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
       }
       else {
-         this.setState({operatorlist: responseJson, isLoaded: true, eventAdditionalMessage: "", messageColor: "success"});         
+         this.setState({operatorlist: data, isLoaded: true, eventAdditionalMessage: "", messageColor: "success"});         
       }
     })
     .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -338,7 +346,8 @@ class AddAnimalEvent extends Component {
               'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            "animalTag": "%"
+            "animalTag": "%",
+            "loginToken": (new Cookies()).get('authToken')
         })
       })
       .then(response => response.json())
@@ -361,7 +370,8 @@ class AddAnimalEvent extends Component {
           },
           body: JSON.stringify({
           "categoryCode": field1DataUnit,
-          "lookupValueCode": "%"
+          "lookupValueCode": "%",
+          "loginToken": (new Cookies()).get('authToken')
         })
       })
       .then(response => response.json())
@@ -400,7 +410,8 @@ class AddAnimalEvent extends Component {
               'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            "animalTag": "%"
+            "animalTag": "%",
+            "loginToken": (new Cookies()).get('authToken')
         })
       })
       .then(response => response.json())
@@ -698,7 +709,7 @@ class AddAnimalEvent extends Component {
   }
 
   render() {
-    var { field1list, field2list,field3list,field4list, nextLifecycleStageList, eventAdditionalMessage, messageColor, eventlist, operatorlist} = this.state;
+    var { authenticated, field1list, field2list,field3list,field4list, nextLifecycleStageList, eventAdditionalMessage, messageColor, eventlist, operatorlist} = this.state;
     let eventCount = 0;
     let field1Count = 0;
     let field2Count = 0;
@@ -736,6 +747,8 @@ class AddAnimalEvent extends Component {
     let shouldUpdateInventoryDisplay = this.state.inventoryUpdateLabel ? {} : {display : 'none'};
 
     let nextLifecycleStageDisplay = (this.state.nextLifecycleStageDisplay ? {} : {display : 'none'});
+    if (!authenticated)
+      return (<Redirect to='/login'  />);
 
     return (
       <div className="animated fadeIn">

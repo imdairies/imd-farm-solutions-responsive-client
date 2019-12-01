@@ -12,6 +12,8 @@ import {
 } from 'reactstrap';
 
 import { Link } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
+import Cookies from 'universal-cookie';
 
 
 
@@ -35,6 +37,7 @@ class FeedList extends Component {
       activeOnly: false,
       messageColor: "muted",
       animaltypelist: [],
+      authenticated: true,
       eventAdditionalMessage: "Processing..."
     };
     this.handleAnimalTagValueChanged = this.handleAnimalTagValueChanged.bind(this);
@@ -69,18 +72,21 @@ class FeedList extends Component {
         body: JSON.stringify({
           "animalTag": this.state.animalTag,
           "animalType": (this.state.animalType === "-- Animal Type --" || this.state.animalType === "ALL" ? null : this.state.animalType),
-          "activeOnly": this.state.activeOnly
+          "activeOnly": this.state.activeOnly,
+          "loginToken": (new Cookies()).get('authToken')
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-        alert(responseJson.message);
-         this.setState({animalFeedInfo: [], feedItems:[], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({animalFeedInfo: [], feedItems:[], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
       }
       else {
-      // alert(responseJson.feedItems.feedPlanItems[0].shortDescription);
-         this.setState({animalFeedInfo: responseJson.animalFeedInfo, feedItems: responseJson.feedItems.feedPlanItems, isLoaded: true, eventAdditionalMessage: "", messageColor: "success"});         
+         this.setState({animalFeedInfo: data.animalFeedInfo, feedItems: data.feedItems.feedPlanItems, isLoaded: true, eventAdditionalMessage: "", messageColor: "success"});         
       }
     })
     .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -103,8 +109,11 @@ class FeedList extends Component {
   }
 
   render() {
-    var { feedItems, animalFeedInfo, eventAdditionalMessage } = this.state;
+    var { authenticated, feedItems, animalFeedInfo, eventAdditionalMessage } = this.state;
     let recordCount = 0;
+    if (!authenticated) 
+      return (<Redirect to='/login'  />);
+
     return (
       <div className="animated fadeIn">
          

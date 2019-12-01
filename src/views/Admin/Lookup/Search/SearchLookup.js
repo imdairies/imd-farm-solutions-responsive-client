@@ -26,6 +26,8 @@ import {
 import { Link } from 'react-router-dom';
 import queryString from 'query-string';
 import classnames from 'classnames';
+import { Redirect } from 'react-router-dom';
+import Cookies from 'universal-cookie';
 var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 
@@ -44,6 +46,7 @@ class SearchLookup extends Component {
       items: [],
       isLoaded: true,
       categoryCode: "",
+      authenticated: true,
       lookupValueCode : "" ,
       messageColor: "muted",
       eventAdditionalMessage: "Enter search fields (you can use % for wild card searches) and press Search button"
@@ -81,16 +84,21 @@ class SearchLookup extends Component {
 
         body: JSON.stringify({
           "categoryCode": this.state.categoryCode,
-          "lookupValueCode": this.state.lookupValueCode
+          "lookupValueCode": this.state.lookupValueCode,
+          "loginToken": (new Cookies()).get('authToken')
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({items: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({items: [], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
       }
       else {
-         this.setState({items: responseJson, isLoaded: true, eventAdditionalMessage: (responseJson.length === 1 ? responseJson.length + " matching record found" : responseJson.length + " matching records found"), messageColor: "success"});         
+         this.setState({items: data, isLoaded: true, eventAdditionalMessage: (data.length === 1 ? data.length + " matching record found" : data.length + " matching records found"), messageColor: "success"});         
       }
     })
     .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -105,8 +113,10 @@ class SearchLookup extends Component {
   }
 
   render() {
-    var { isLoaded, items, eventAdditionalMessage, messageColor } = this.state;
+    var { authenticated, isLoaded, items, eventAdditionalMessage, messageColor } = this.state;
     let recordCount = 0;
+    if (!authenticated)
+      return (<Redirect to='/login'  />);
     return (
       <div className="animated fadeIn">
          <Row>

@@ -27,6 +27,10 @@ export default {
           name: 'Fee Plan', 
           url: '/admin/feedplan/search',
         },
+        {
+          name: 'Message Catalog', 
+          url: '/admin/messagecatalog/search',
+        },
       ],
     },
     {  

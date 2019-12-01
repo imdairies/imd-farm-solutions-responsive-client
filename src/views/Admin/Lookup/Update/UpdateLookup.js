@@ -23,6 +23,8 @@ import { AppSwitch } from '@coreui/react'
 import classnames from 'classnames';
 import queryString from 'query-string';
 import { Link } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
+import Cookies from 'universal-cookie';
 var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 
@@ -45,6 +47,7 @@ class UpdateLookup extends Component {
       activeIndicator : "N" ,
       additionalField1: "",
       additionalField2: "",
+      authenticated: true,
       additionalField3: "",
       messageColor: "muted",
       eventAdditionalMessage: "Edit desired values and press Update"
@@ -69,19 +72,24 @@ class UpdateLookup extends Component {
         },
         body: JSON.stringify({
           "categoryCode": parsed.categoryCode,
-          "lookupValueCode": parsed.lookupValueCode
+          "lookupValueCode": parsed.lookupValueCode,
+          "loginToken": (new Cookies()).get('authToken')
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({items: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({items: [], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
       }
       else {
-         this.setState({items: responseJson, shortdescription: responseJson[0].shortDescription, longdescription: responseJson[0].longDescription, additionalField1: responseJson[0].additionalField1, additionalField2: responseJson[0].additionalField2, additionalField3: responseJson[0].additionalField3, isActive: responseJson[0].isActive,  isLoaded: true, eventAdditionalMessage: (responseJson.length === 1 ? "Edit the desired values and press Update button" : "We expected to receive only one record matching the event code '" + parsed.eventCode + "' but we received " + responseJson.length), messageColor: "muted"});
-          if (responseJson.length > 1)
+         this.setState({items: data, shortdescription: data[0].shortDescription, longdescription: data[0].longDescription, additionalField1: data[0].additionalField1, additionalField2: data[0].additionalField2, additionalField3: data[0].additionalField3, isActive: data[0].isActive,  isLoaded: true, eventAdditionalMessage: (data.length === 1 ? "Edit the desired values and press Update button" : "We expected to receive only one record matching the event code '" + parsed.eventCode + "' but we received " + data.length), messageColor: "muted"});
+          if (data.length > 1)
             this.setState({messageColor: "danger"});
-         if (responseJson[0].isActive)
+         if (data[0].isActive)
           document.getElementById("active").checked = true;
          else 
           document.getElementById("active").checked = false;
@@ -158,16 +166,20 @@ class UpdateLookup extends Component {
             "additionalField1": addFld1,
             "additionalField2": addFld2,
             "additionalField3": addFld3,
-            "activeIndicator": active
+            "activeIndicator": active,
+            "loginToken": (new Cookies()).get('authToken')
         })
       })
-      .then(response => response.json())
-      .then(responseJson => {
-        if (responseJson.error) {
-           this.setState({isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
-        }
-        else {
-           this.setState({isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "success"});         
+      .then(response => {
+        if (response.status === 401)
+          this.setState({authenticated : false});
+        return response.json();
+      })
+      .then(data => {
+        if (data.error) {
+           this.setState({isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
+        } else {
+           this.setState({isLoaded: true, eventAdditionalMessage: data.message, messageColor: "success"});         
         }
       })
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -175,9 +187,9 @@ class UpdateLookup extends Component {
   }
 
   render() {
-    var {eventAdditionalMessage, messageColor} = this.state;
-    // if (invalidAccess)
-    //   return (<Redirect to='/admin/lookup/search'  />);
+    var {authenticated, eventAdditionalMessage, messageColor} = this.state;
+    if (!authenticated)
+      return (<Redirect to='/login'  />);
     return (
       <div className="animated fadeIn">
         <Row>

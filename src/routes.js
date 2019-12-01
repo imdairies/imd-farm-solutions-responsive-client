@@ -53,6 +53,9 @@ const UploadMilkRecord    = React.lazy(() => import('./views/Admin/MilkingRecord
 const SearchFeedPlan    = React.lazy(() => import('./views/Admin/FeedPlan/Search'));
 const AddFeedPlan    = React.lazy(() => import('./views/Admin/FeedPlan/Add'));
 
+const SearchMessage    = React.lazy(() => import('./views/Admin/MessageCatalog/Search'));
+const AddMessage    = React.lazy(() => import('./views/Admin/MessageCatalog/Add'));
+const UpdateMessage    = React.lazy(() => import('./views/Admin/MessageCatalog/Update'));
 
  
 const SearchAnimalEvent = React.lazy(() => import('./views/Animal/Event/Search'));
@@ -138,6 +141,12 @@ const routes = [
 
   { path: '/admin/feedplan/search', name: 'SearchFeedPlan', component: SearchFeedPlan },
   { path: '/admin/feedplan/add', name: 'AddFeedPlan', component: AddFeedPlan }, 
+
+  { path: '/admin/messagecatalog/search', name: 'SearchMessage', component: SearchMessage },
+  { path: '/admin/messagecatalog/add', name: 'AddMessage', component: AddMessage },
+  { path: '/admin/messagecatalog/update', name: 'UpdateMessage', component: UpdateMessage },
+
+
 
   { path: '/admin/sire/search/', name: 'SearchSire', component: SearchSire },
   { path: '/admin/sire/add/'   , name: 'AddSire'   , component: AddSire    },

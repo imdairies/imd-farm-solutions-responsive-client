@@ -26,6 +26,8 @@ import {
 
 import { Link } from 'react-router-dom';
 import classnames from 'classnames';
+import { Redirect } from 'react-router-dom';
+import Cookies from 'universal-cookie';
 var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 
@@ -49,7 +51,8 @@ class SearchFeedPlan extends Component {
       activeOnly: false,
       messageColor: "muted",
       cohortTypelist: [],
-      additionalMessage: "Select Cohort Type"
+      additionalMessage: "Select Cohort Type",
+      authenticated: true
     };
 
     this.handleCohortTypeSelected = this.handleCohortTypeSelected.bind(this);
@@ -78,15 +81,20 @@ class SearchFeedPlan extends Component {
         },
         body: JSON.stringify({
           "categoryCode": "FEEDCOHORT",
+          "loginToken": (new Cookies()).get('authToken')
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({cohortTypelist: [], isLoaded: true, additionalMessage: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({cohortTypelist: [], isLoaded: true, additionalMessage: data.message, messageColor: "danger"});
       }
       else {
-         this.setState({cohortTypelist: responseJson, isLoaded: true, additionalMessage: "", messageColor: "success"});         
+         this.setState({cohortTypelist: data, isLoaded: true, additionalMessage: "", messageColor: "success"});         
       }
     })
     .catch(error => this.setState({additionalMessage: error.toString(), messageColor: "danger"}));
@@ -112,15 +120,20 @@ class SearchFeedPlan extends Component {
         // body: JSON.stringify(jsonString)
 
         body: JSON.stringify({
-          "animalType": (this.state.cohortType === "-- Feed Cohort --" || this.state.cohortType === "ALL" ? null : this.state.cohortType)
+          "animalType": (this.state.cohortType === "-- Feed Cohort --" || this.state.cohortType === "ALL" ? null : this.state.cohortType),
+          "loginToken": (new Cookies()).get('authToken')
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({items: [], isLoaded: true, additionalMessage: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({items: [], isLoaded: true, additionalMessage: data.message, messageColor: "danger"});
       } else {
-         this.setState({items: responseJson, isLoaded: true, additionalMessage: (responseJson.length === 1 ? responseJson.length + " matching record found" : responseJson.length + " matching records found"), messageColor: "success"});         
+         this.setState({items: data, isLoaded: true, additionalMessage: (data.length === 1 ? data.length + " matching record found" : data.length + " matching records found"), messageColor: "success"});         
       }
     })
     .catch(error => this.setState({additionalMessage: error.toString(), messageColor: "danger"}));
@@ -132,8 +145,10 @@ class SearchFeedPlan extends Component {
   }
 
   render() {
-    var { isLoaded, items, cohortTypelist, additionalMessage, messageColor } = this.state;
+    var { authenticated, isLoaded, items, cohortTypelist, additionalMessage, messageColor } = this.state;
     let recordCount = 0;
+    if (!authenticated)
+      return (<Redirect to='/login'  />);
     return (
       <div className="animated fadeIn">
          <Row>

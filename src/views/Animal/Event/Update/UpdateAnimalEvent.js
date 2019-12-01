@@ -26,6 +26,8 @@ import classnames from 'classnames';
 import { Link } from 'react-router-dom';
 import queryString from 'query-string';
 import DateTimePicker from 'react-datetime-picker';
+import { Redirect } from 'react-router-dom';
+import Cookies from 'universal-cookie';
 
 
 
@@ -94,6 +96,7 @@ class UpdateAnimalEvent extends Component {
       field4YesNoDisplay : false,
 
       commentsFieldDisplay: false,
+      authenticated: true,
 
 
       messageColor: "muted",
@@ -132,15 +135,20 @@ class UpdateAnimalEvent extends Component {
         },
         body: JSON.stringify({
           "categoryCode": "OPRTR",
+          "loginToken": (new Cookies()).get('authToken')
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({operatorlist: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({operatorlist: [], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
       }
       else {
-         this.setState({operatorlist: responseJson, isLoaded: true, eventAdditionalMessage: "", messageColor: "success"});         
+         this.setState({operatorlist: data, isLoaded: true, eventAdditionalMessage: "", messageColor: "success"});         
       }
     })
     .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));  
@@ -153,48 +161,54 @@ class UpdateAnimalEvent extends Component {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          "eventTransactionID": parsed.eventTransactionID
+          "eventTransactionID": parsed.eventTransactionID,
+          "loginToken": (new Cookies()).get('authToken')
+
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({animalTag: "", isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({animalTag: "", isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
       }
       else {
-         this.setState({animalTag: responseJson[0].animalTag, 
-          eventCode: responseJson[0].eventShortDescription, 
-          eventCodeID: responseJson[0].eventCode,
-          eventComments: responseJson[0].eventComments,
+         this.setState({animalTag: data[0].animalTag, 
+          eventCode: data[0].eventShortDescription, 
+          eventCodeID: data[0].eventCode,
+          eventComments: data[0].eventComments,
           
-          field1Label: responseJson[0].eventField1Label,
-          field1Value: responseJson[0].auxField1Value,
-          field1DataUnit:responseJson[0].eventField1DataUnit,
-          field1DataType: responseJson[0].eventField1DataType,
-          field1DropdownDisplayValue: responseJson[0].auxField1Value,
+          field1Label: data[0].eventField1Label,
+          field1Value: data[0].auxField1Value,
+          field1DataUnit:data[0].eventField1DataUnit,
+          field1DataType: data[0].eventField1DataType,
+          field1DropdownDisplayValue: data[0].auxField1Value,
           
-          field2Label: responseJson[0].eventField2Label,
-          field2Value: responseJson[0].auxField2Value,
-          field2DataUnit:responseJson[0].eventField2DataUnit,
-          field2DataType: responseJson[0].eventField2DataType,
-          field2DropdownDisplayValue: responseJson[0].auxField2Value,
+          field2Label: data[0].eventField2Label,
+          field2Value: data[0].auxField2Value,
+          field2DataUnit:data[0].eventField2DataUnit,
+          field2DataType: data[0].eventField2DataType,
+          field2DropdownDisplayValue: data[0].auxField2Value,
 
-          field3Label: responseJson[0].eventField3Label,
-          field3Value: responseJson[0].auxField3Value,
-          field3DataUnit:responseJson[0].eventField3DataUnit,
-          field3DataType: responseJson[0].eventField3DataType,
-          field3DropdownDisplayValue: responseJson[0].auxField3Value,
+          field3Label: data[0].eventField3Label,
+          field3Value: data[0].auxField3Value,
+          field3DataUnit:data[0].eventField3DataUnit,
+          field3DataType: data[0].eventField3DataType,
+          field3DropdownDisplayValue: data[0].auxField3Value,
 
-          field4Label: responseJson[0].eventField4Label,
-          field4Value: responseJson[0].auxField4Value,
-          field4DataUnit:responseJson[0].eventField4DataUnit,
-          field4DataType: responseJson[0].eventField4DataType,
-          field4DropdownDisplayValue: responseJson[0].auxField4Value,
+          field4Label: data[0].eventField4Label,
+          field4Value: data[0].auxField4Value,
+          field4DataUnit:data[0].eventField4DataUnit,
+          field4DataType: data[0].eventField4DataType,
+          field4DropdownDisplayValue: data[0].auxField4Value,
 
-          eventOperator: responseJson[0].eventOperator,
-          operatorID: responseJson[0].eventOperatorID,
+          eventOperator: data[0].eventOperator,
+          operatorID: data[0].eventOperatorID,
           commentsFieldDisplay:true,
-          timestamp: new Date(responseJson[0].eventTimeStamp),
+          timestamp: new Date(data[0].eventTimeStamp),
           timestampPickerDisplay: true,
           eventOperatorDisplay: true,
           animalTagDisplay: true,
@@ -202,7 +216,7 @@ class UpdateAnimalEvent extends Component {
           // auxField1Value: responseJson[0].auxField1Value,
           isLoaded: true, 
           eventAdditionalMessage: "", messageColor: "success"}); 
-        this.showHideFields(responseJson[0]);
+        this.showHideFields(data[0]);
       }
     })
     .catch(error => this.setState({animalTag:"",  eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -310,7 +324,8 @@ showHideFields(responseJsonRecord) {
               'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            "animalTag": "%"
+            "animalTag": "%",
+            "loginToken": (new Cookies()).get('authToken')
         })
       })
       .then(response => response.json())
@@ -340,7 +355,8 @@ showHideFields(responseJsonRecord) {
           },
           body: JSON.stringify({
           "categoryCode": field1DataUnit,
-          "lookupValueCode": "%"
+          "lookupValueCode": "%",
+          "loginToken": (new Cookies()).get('authToken')
         })
       })
       .then(response => response.json())
@@ -388,7 +404,8 @@ showHideFields(responseJsonRecord) {
               'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            "animalTag": "%"
+            "animalTag": "%",
+            "loginToken": (new Cookies()).get('authToken')
         })
       })
       .then(response => response.json())
@@ -418,7 +435,8 @@ showHideFields(responseJsonRecord) {
           },
           body: JSON.stringify({
           "categoryCode": field2DataUnit,
-          "lookupValueCode": "%"
+          "lookupValueCode": "%",
+          "loginToken": (new Cookies()).get('authToken')
         })
       })
       .then(response => response.json())
@@ -472,7 +490,8 @@ showHideFields(responseJsonRecord) {
               'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            "animalTag": "%"
+            "animalTag": "%",
+            "loginToken": (new Cookies()).get('authToken')
         })
       })
       .then(response => response.json())
@@ -502,7 +521,8 @@ showHideFields(responseJsonRecord) {
           },
           body: JSON.stringify({
           "categoryCode": field3DataUnit,
-          "lookupValueCode": "%"
+          "lookupValueCode": "%",
+          "loginToken": (new Cookies()).get('authToken')
         })
       })
       .then(response => response.json())
@@ -552,7 +572,8 @@ showHideFields(responseJsonRecord) {
               'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            "animalTag": "%"
+            "animalTag": "%",
+            "loginToken": (new Cookies()).get('authToken')
         })
       })
       .then(response => response.json())
@@ -582,7 +603,8 @@ showHideFields(responseJsonRecord) {
           },
           body: JSON.stringify({
           "categoryCode": field4DataUnit,
-          "lookupValueCode": "%"
+          "lookupValueCode": "%",
+          "loginToken": (new Cookies()).get('authToken')
         })
       })
       .then(response => response.json())
@@ -734,7 +756,8 @@ handleField3DropdownValueChanged(event) {
               'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            "eventTransactionID": this.state.eventTransactionID
+            "eventTransactionID": this.state.eventTransactionID,
+            "loginToken": (new Cookies()).get('authToken')
         })
       })
       .then(response => response.json())
@@ -832,7 +855,8 @@ handleField3DropdownValueChanged(event) {
               "auxField1Value": this.state.field1Value,
               "auxField2Value" : this.state.field2Value,
               "auxField3Value" : this.state.field3Value,
-              "auxField4Value" : this.state.field4Value
+              "auxField4Value" : this.state.field4Value,
+              "loginToken": (new Cookies()).get('authToken')
           })
         })
         .then(response => response.json())
@@ -849,7 +873,7 @@ handleField3DropdownValueChanged(event) {
     }
 
   render() {
-    var { field1list, field2list, field3list, field4list, eventAdditionalMessage, messageColor, operatorlist} = this.state;
+    var { authenticated, field1list, field2list, field3list, field4list, eventAdditionalMessage, messageColor, operatorlist} = this.state;
     let field1Count = 0;
     let field2Count = 0;
     let field3Count = 0;
@@ -887,6 +911,8 @@ handleField3DropdownValueChanged(event) {
 
     let animalTagDisplay = this.state.animalTagDisplay ? {} : {display : 'none'};
     let eventCodeDisplay = this.state.eventCodeDisplay ? {} : {display : 'none'};
+    if (!authenticated)
+      return (<Redirect to='/login'  />);
 
     return (
       <div className="animated fadeIn">
