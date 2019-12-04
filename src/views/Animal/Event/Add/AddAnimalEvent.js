@@ -254,7 +254,6 @@ class AddAnimalEvent extends Component {
     })
     .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
 
-
    }
 
   toggleFade() {
@@ -350,13 +349,17 @@ class AddAnimalEvent extends Component {
             "loginToken": (new Cookies()).get('authToken')
         })
       })
-      .then(response => response.json())
-      .then(responseJson => {
-        if (responseJson.error) {
-           this.setState({field1list:[], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+      .then(response => {
+        if (response.status === 401)
+          this.setState({authenticated : false});
+        return response.json();
+      })
+      .then(data => {
+        if (data.error) {
+           this.setState({field1list:[], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
         }
         else {
-           this.setState({field1list: responseJson, isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "success"});         
+           this.setState({field1list: data, isLoaded: true, eventAdditionalMessage: data.message, messageColor: "success"});         
         }
       })
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -374,13 +377,17 @@ class AddAnimalEvent extends Component {
           "loginToken": (new Cookies()).get('authToken')
         })
       })
-      .then(response => response.json())
-      .then(responseJson => {
-        if (responseJson.error) {
-           this.setState({field1list:[], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+      .then(response => {
+        if (response.status === 401)
+          this.setState({authenticated : false});
+        return response.json();
+      })
+      .then(data => {
+        if (data.error) {
+           this.setState({field1list:[], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
         }
         else {
-           this.setState({field1list: responseJson, isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "success"});
+           this.setState({field1list: data, isLoaded: true, eventAdditionalMessage: data.message, messageColor: "success"});
         }
       })
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -414,13 +421,17 @@ class AddAnimalEvent extends Component {
             "loginToken": (new Cookies()).get('authToken')
         })
       })
-      .then(response => response.json())
-      .then(responseJson => {
-        if (responseJson.error) {
-           this.setState({field2list:[], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+      .then(response => {
+          if (response.status === 401)
+            this.setState({authenticated : false});
+          return response.json();
+        })
+        .then(data => {
+          if (data.error) {
+           this.setState({field2list:[], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
         }
         else {
-           this.setState({field2list: responseJson, isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "success"});         
+           this.setState({field2list: data, isLoaded: true, eventAdditionalMessage: data.message, messageColor: "success"});         
         }
       })
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -434,16 +445,21 @@ class AddAnimalEvent extends Component {
           },
           body: JSON.stringify({
           "categoryCode": field2DataUnit,
-          "lookupValueCode": "%"
+          "lookupValueCode": "%",
+          "loginToken": (new Cookies()).get('authToken')  
         })
       })
-      .then(response => response.json())
-      .then(responseJson => {
-        if (responseJson.error) {
-           this.setState({field2list:[], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+      .then(response => {
+          if (response.status === 401)
+            this.setState({authenticated : false});
+          return response.json();
+        })
+        .then(data => {
+          if (data.error) {
+           this.setState({field2list:[], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
         }
         else {
-           this.setState({field2list: responseJson, isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "success"});         
+           this.setState({field2list: data, isLoaded: true, eventAdditionalMessage: data.message, messageColor: "success"});         
         }
       })
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -477,16 +493,21 @@ class AddAnimalEvent extends Component {
               'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            "animalTag": "%"
+            "animalTag": "%",
+            "loginToken": (new Cookies()).get('authToken')
         })
       })
-      .then(response => response.json())
-      .then(responseJson => {
-        if (responseJson.error) {
-           this.setState({field3list:[], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+      .then(response => {
+          if (response.status === 401)
+            this.setState({authenticated : false});
+          return response.json();
+        })
+        .then(data => {
+          if (data.error) {
+           this.setState({field3list:[], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
         }
         else {
-           this.setState({field3list: responseJson, isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "success"});         
+           this.setState({field3list: data, isLoaded: true, eventAdditionalMessage: data.message, messageColor: "success"});         
         }
       })
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -500,16 +521,21 @@ class AddAnimalEvent extends Component {
           },
           body: JSON.stringify({
           "categoryCode": field3DataUnit,
-          "lookupValueCode": "%"
+          "lookupValueCode": "%",
+          "loginToken": (new Cookies()).get('authToken')
         })
       })
-      .then(response => response.json())
-      .then(responseJson => {
-        if (responseJson.error) {
-           this.setState({field3list:[], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+      .then(response => {
+          if (response.status === 401)
+            this.setState({authenticated : false});
+          return response.json();
+        })
+        .then(data => {
+          if (data.error) {
+           this.setState({field3list:[], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
         }
         else {
-           this.setState({field3list: responseJson, isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "success"});         
+           this.setState({field3list: data, isLoaded: true, eventAdditionalMessage: data.message, messageColor: "success"});         
         }
       })
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -541,16 +567,21 @@ class AddAnimalEvent extends Component {
               'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            "animalTag": "%"
+            "animalTag": "%",
+            "loginToken": (new Cookies()).get('authToken')
         })
       })
-      .then(response => response.json())
-      .then(responseJson => {
-        if (responseJson.error) {
-           this.setState({field4list:[], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+      .then(response => {
+          if (response.status === 401)
+            this.setState({authenticated : false});
+          return response.json();
+        })
+        .then(data => {
+          if (data.error) {
+           this.setState({field4list:[], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
         }
         else {
-           this.setState({field4list: responseJson, isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "success"});         
+           this.setState({field4list: data, isLoaded: true, eventAdditionalMessage: data.message, messageColor: "success"});         
         }
       })
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -564,16 +595,21 @@ class AddAnimalEvent extends Component {
           },
           body: JSON.stringify({
           "categoryCode": field4DataUnit,
-          "lookupValueCode": "%"
+          "lookupValueCode": "%",
+          "loginToken": (new Cookies()).get('authToken')
         })
       })
-      .then(response => response.json())
-      .then(responseJson => {
-        if (responseJson.error) {
-           this.setState({field4list:[], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+      .then(response => {
+          if (response.status === 401)
+            this.setState({authenticated : false});
+          return response.json();
+        })
+        .then(data => {
+          if (data.error) {
+           this.setState({field4list:[], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
         }
         else {
-           this.setState({field4list: responseJson, isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "success"});         
+           this.setState({field4list: data, isLoaded: true, eventAdditionalMessage: data.message, messageColor: "success"});         
         }
       })
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -688,19 +724,24 @@ class AddAnimalEvent extends Component {
             "auxField3Value": this.state.field3Value,
             "auxField4Value": this.state.field4Value,
             "nextLifeCycleStage": (this.state.nextLifecycleStageValue === "--Select Next Lifecycle Stage--" ? "":this.state.nextLifecycleStageValue),
-            "operatorID": this.state.operatorID
+            "operatorID": this.state.operatorID,
+            "loginToken": (new Cookies()).get('authToken')
         })
       })
-      .then(response => response.json())
-      .then(responseJson => {
-        if (responseJson.error) {
-           this.setState({isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+      .then(response => {
+          if (response.status === 401)
+            this.setState({authenticated : false});
+          return response.json();
+        })
+        .then(data => {
+        if (data.error) {
+           this.setState({isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
         }
         else {
-          if (responseJson.message.indexOf("ERROR") >= 0)
-           this.setState({isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "warning"});
+          if (data.message.indexOf("ERROR") >= 0)
+           this.setState({isLoaded: true, eventAdditionalMessage: data.message, messageColor: "warning"});
           else
-           this.setState({isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "success"});
+           this.setState({isLoaded: true, eventAdditionalMessage: data.message, messageColor: "success"});
            document.getElementById("addButton").disabled = true;
         }
       })

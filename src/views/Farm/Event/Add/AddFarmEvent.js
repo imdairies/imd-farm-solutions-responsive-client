@@ -24,6 +24,8 @@ import {
 import { Link } from 'react-router-dom';
 import DateTimePicker from 'react-datetime-picker';
 import 'moment-timezone';
+import { Redirect } from 'react-router-dom';
+import Cookies from 'universal-cookie';
 
 const moment = require('moment-timezone'); //moment-timezone
 
@@ -47,6 +49,7 @@ class AddFarmEvent extends Component {
       operator: "-- Select Operator --",
       operatorID:"",
       alias: "",
+      authenticated: true,
       longdescription: "",
       messageColor: "muted",
       timestamp:  new Date(moment.tz("Asia/Aqtau").year(),
@@ -198,16 +201,21 @@ handleField1DropdownValueChanged(event) {
         body: JSON.stringify({
           "animalTag": this.state.animalTag,
           "animalType": (event.target.value === "-- Select Animal --" || event.target.value === "ALL" ? null : event.target.value),
-          "activeOnly": true
+          "activeOnly": true,
+          "loginToken": (new Cookies()).get('authToken')
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({animalTagList: [], isLoaded: true, animalListMessage: responseJson.message, animalListMessageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({animalTagList: [], isLoaded: true, animalListMessage: data.message, animalListMessageColor: "danger"});
       }
       else {
-         this.setState({animalTagList: responseJson, isLoaded: true, animalListMessage: (responseJson.length === 1 ? responseJson.length + " matching record found" : responseJson.length + " matching records found"), animalListMessageColor: "success"});         
+         this.setState({animalTagList: data, isLoaded: true, animalListMessage: (data.length === 1 ? data.length + " matching record found" : data.length + " matching records found"), animalListMessageColor: "success"});         
       }
     })
     .catch(error => this.setState({animalListMessage: error.toString(), animalListMessageColor: "danger"}));
@@ -243,16 +251,21 @@ handleField1DropdownValueChanged(event) {
         },
         body: JSON.stringify({
           "categoryCode": "LCYCL",
-          "activeIndicator": "Y"
+          "activeIndicator": "Y",
+          "loginToken": (new Cookies()).get('authToken')
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({animaltypelist: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({animaltypelist: [], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
       }
       else {
-         this.setState({animaltypelist: responseJson, isLoaded: true, eventAdditionalMessage: "", messageColor: "success"});         
+         this.setState({animaltypelist: data, isLoaded: true, eventAdditionalMessage: "", messageColor: "success"});         
       }
     })
     .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -282,15 +295,20 @@ handleField1DropdownValueChanged(event) {
         },
         body: JSON.stringify({
           "categoryCode": "OPRTR",
+          "loginToken": (new Cookies()).get('authToken')
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({operatorlist: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({operatorlist: [], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
       }
       else {
-         this.setState({operatorlist: responseJson, isLoaded: true, eventAdditionalMessage: "", messageColor: "success"});         
+         this.setState({operatorlist: data, isLoaded: true, eventAdditionalMessage: "", messageColor: "success"});         
       }
     })
     .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -363,16 +381,21 @@ handleField1DropdownValueChanged(event) {
               'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            "animalTag": "%"
-        })
+            "animalTag": "%",
+          "loginToken": (new Cookies()).get('authToken')
       })
-      .then(response => response.json())
-      .then(responseJson => {
-        if (responseJson.error) {
-           this.setState({field1list:[], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+    })
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+           this.setState({field1list:[], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
         }
         else {
-           this.setState({field1list: responseJson, isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "success"});         
+           this.setState({field1list: data, isLoaded: true, eventAdditionalMessage: data.message, messageColor: "success"});         
         }
       })
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -386,16 +409,21 @@ handleField1DropdownValueChanged(event) {
           },
           body: JSON.stringify({
           "categoryCode": field1DataUnit,
-          "lookupValueCode": "%"
-        })
+          "lookupValueCode": "%",
+          "loginToken": (new Cookies()).get('authToken')
       })
-      .then(response => response.json())
-      .then(responseJson => {
-        if (responseJson.error) {
-           this.setState({field1list:[], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+    })
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+           this.setState({field1list:[], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
         }
         else {
-           this.setState({field1list: responseJson, isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "success"});
+           this.setState({field1list: data, isLoaded: true, eventAdditionalMessage: data.message, messageColor: "success"});
         }
       })
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -425,16 +453,21 @@ handleField1DropdownValueChanged(event) {
               'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            "animalTag": "%"
-        })
+            "animalTag": "%",
+          "loginToken": (new Cookies()).get('authToken')
       })
-      .then(response => response.json())
-      .then(responseJson => {
-        if (responseJson.error) {
-           this.setState({field2list:[], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+    })
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+           this.setState({field2list:[], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
         }
         else {
-           this.setState({field2list: responseJson, isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "success"});         
+           this.setState({field2list: data, isLoaded: true, eventAdditionalMessage: data.message, messageColor: "success"});         
         }
       })
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -448,16 +481,21 @@ handleField1DropdownValueChanged(event) {
           },
           body: JSON.stringify({
           "categoryCode": field2DataUnit,
-          "lookupValueCode": "%"
+          "lookupValueCode": "%",
+          "loginToken": (new Cookies()).get('authToken')
         })
       })
-      .then(response => response.json())
-      .then(responseJson => {
-        if (responseJson.error) {
-           this.setState({field2list:[], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+      .then(response => {
+        if (response.status === 401)
+          this.setState({authenticated : false});
+        return response.json();
+      })
+      .then(data => {
+        if (data.error) {
+           this.setState({field2list:[], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
         }
         else {
-           this.setState({field2list: responseJson, isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "success"});         
+           this.setState({field2list: data, isLoaded: true, eventAdditionalMessage: data.message, messageColor: "success"});         
         }
       })
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -537,21 +575,24 @@ handleField1DropdownValueChanged(event) {
             "eventComments": this.state.commentsValue,
             "auxField1Value": this.state.field1Value,
             "auxField2Value": this.state.field2Value,
-            "operatorID": this.state.operatorID
-            // "eventLongDescription": longDescr,
-            // "activeIndicator": active
+            "operatorID": this.state.operatorID,
+            "loginToken": (new Cookies()).get('authToken')
+          })
         })
-      })
-      .then(response => response.json())
-      .then(responseJson => {
-        if (responseJson.error) {
-           this.setState({isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+        .then(response => {
+          if (response.status === 401)
+            this.setState({authenticated : false});
+          return response.json();
+        })
+        .then(data => {
+          if (data.error) {
+           this.setState({isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
         }
         else {
-          if (responseJson.message.indexOf("ERROR") >= 0)
-           this.setState({isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "warning"});
+          if (data.message.indexOf("ERROR") >= 0)
+           this.setState({isLoaded: true, eventAdditionalMessage: data.message, messageColor: "warning"});
           else
-           this.setState({isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "success"});
+           this.setState({isLoaded: true, eventAdditionalMessage: data.message, messageColor: "success"});
         }
       })
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -560,7 +601,7 @@ handleField1DropdownValueChanged(event) {
 
   render() {
 
-    var { animaltypelist, animalListMessageColor, animalListMessage,field1list, field2list, eventAdditionalMessage, messageColor, animalTagList, eventlist, operatorlist} = this.state;
+    var { authenticated, animaltypelist, animalListMessageColor, animalListMessage,field1list, field2list, eventAdditionalMessage, messageColor, animalTagList, eventlist, operatorlist} = this.state;
     let eventCount = 0;
     let field1Count = 0;
     let field2Count = 0;
@@ -580,6 +621,8 @@ handleField1DropdownValueChanged(event) {
     let commentsFieldDisplay  = this.state.commentsFieldDisplay ? {} : {display : 'none'};
     
     let animalIndex = 0;
+    if (!authenticated) 
+      return (<Redirect to='/login'  />);
 
     return (
       <div className="animated fadeIn">
