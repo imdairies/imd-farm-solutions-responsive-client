@@ -24,6 +24,8 @@ import {
 } from 'reactstrap';
 import classnames from 'classnames';
 import { Link } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
+import Cookies from 'universal-cookie';
 
 var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
@@ -42,9 +44,8 @@ class AddSire extends Component {
       animalTag : "" ,
       alias: "",
       sireList:[],
-
+      authenticated: true,
       controller: "",
-
       sireOriginCode: "",
       sireOrignDescription: "",
       isFarmSire: false,
@@ -89,23 +90,28 @@ class AddSire extends Component {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          "animalTag": event.target.value
+          "animalTag": event.target.value,
+          "loginToken": (new Cookies()).get('authToken')
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-        this.setState({message: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+        this.setState({message: data.message, messageColor: "danger"});
       } else {
         this.setState({
-            animalTag: responseJson[0].animalTag, 
-            breed : responseJson[0].breed,
-            alias: responseJson[0].alias,
+            animalTag: data[0].animalTag, 
+            breed : data[0].breed,
+            alias: data[0].alias,
             semenInd : false,
-            semenCompany: responseJson[0].orgID,
-            recordURL: serverURL + "#/animal/update?animalTag=" + responseJson[0].animalTag + "&orgID=" + responseJson[0].orgID,
-            controller : responseJson[0].orgID,
-            photoURL:  responseJson[0].rightSideImageURL,
+            semenCompany: data[0].orgID,
+            recordURL: serverURL + "#/animal/update?animalTag=" + data[0].animalTag + "&orgID=" + data[0].orgID,
+            controller : data[0].orgID,
+            photoURL:  data[0].rightSideImageURL,
             currentSexListPrice: "",
             discountSexPercentage: "",
             currentConventionalListPrice: "",
@@ -132,16 +138,21 @@ class AddSire extends Component {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          "categoryCode": "CONTROLLER"
+          "categoryCode": "CONTROLLER",
+          "loginToken": (new Cookies()).get('authToken')
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({categoryCodeList: [], isLoaded: true, message: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({categoryCodeList: [], isLoaded: true, message: data.message, messageColor: "danger"});
       }
       else {
-         this.setState({categoryCodeList: responseJson, isLoaded: true, message: "", messageColor: "success"});         
+         this.setState({categoryCodeList: data, isLoaded: true, message: "", messageColor: "success"});         
       }
     })
     .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
@@ -154,16 +165,21 @@ class AddSire extends Component {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          "categoryCode": "BREED"
+          "categoryCode": "BREED",
+          "loginToken": (new Cookies()).get('authToken')
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({breedCodeList: [], isLoaded: true, message: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({breedCodeList: [], isLoaded: true, message: data.message, messageColor: "danger"});
       }
       else {
-         this.setState({breedCodeList: responseJson, isLoaded: true, message: "", messageColor: "success"});         
+         this.setState({breedCodeList: data, isLoaded: true, message: "", messageColor: "success"});         
       }
     })
     .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
@@ -175,16 +191,21 @@ class AddSire extends Component {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          "categoryCode": "SMNMR"
+          "categoryCode": "SMNMR",
+          "loginToken": (new Cookies()).get('authToken')
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({semenCompanyCodeList: [], isLoaded: true, message: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({semenCompanyCodeList: [], isLoaded: true, message: data.message, messageColor: "danger"});
       }
       else {
-         this.setState({semenCompanyCodeList: responseJson, isLoaded: true, message: "", messageColor: "success"});         
+         this.setState({semenCompanyCodeList: data, isLoaded: true, message: "", messageColor: "success"});         
       }
     })
     .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
@@ -256,15 +277,20 @@ setupFarmSireInformation() {
         },
         body: JSON.stringify({
           "animalTag":"%",
+          "loginToken": (new Cookies()).get('authToken')
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({sireList: [], isLoaded: true, message: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({sireList: [], isLoaded: true, message: data.message, messageColor: "danger"});
       }
       else {
-         this.setState({sireList: responseJson, isLoaded: true, message: "", messageColor: "success"});         
+         this.setState({sireList: data, isLoaded: true, message: "", messageColor: "success"});         
       }
     })
     .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
@@ -322,16 +348,21 @@ setupFarmSireInformation() {
             "currentSexListPrice": this.state.currentSexListPrice,
             "discountSexPercentage": this.state.discountSexPercentage,
             "currentConventionalListPrice": this.state.currentConventionalListPrice,
-            "discountConventionalPercentage": this.state.discountConventionalPercentage
-        })
+            "discountConventionalPercentage": this.state.discountConventionalPercentage,
+          "loginToken": (new Cookies()).get('authToken')
       })
-      .then(response => response.json())
-      .then(responseJson => {
-        if (responseJson.error) {
-           this.setState({isLoaded: true, message: responseJson.message, messageColor: "danger"});
+    })
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+           this.setState({isLoaded: true, message: data.message, messageColor: "danger"});
         }
         else {
-           this.setState({isLoaded: true, message: responseJson.message, messageColor: "success"});         
+           this.setState({isLoaded: true, message: data.message, messageColor: "success"});         
         }
       })
       .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
@@ -349,11 +380,13 @@ setupFarmSireInformation() {
 
 
   render() {
-    var { message, messageColor, categoryCodeList, breedCodeList, sireList, semenCompanyCodeList} = this.state;
+    var { message, authenticated,messageColor, categoryCodeList, breedCodeList, sireList, semenCompanyCodeList} = this.state;
     let showFarmSireFields = this.state.isFarmSire ? {} : {display : 'none'};
     let showExternalSireFields = this.state.isExternalSire ? {} : {display : 'none'};
     let hide = this.state.isExternalSire || this.state.isFarmSire ? {} : {display : 'none'};
 
+    if (!authenticated) 
+      return (<Redirect to='/login'  />);
     return (
       <div className="animated fadeIn">
         <Row>

@@ -20,7 +20,10 @@ import queryString from 'query-string';
 import classnames from 'classnames';
 import { Link } from 'react-router-dom';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
-import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities'
+import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities';
+import { Redirect } from 'react-router-dom';
+import Cookies from 'universal-cookie';
+
 var data1 = [];
 var data2 = [];
 const brandSuccess = getStyle('--success')
@@ -126,6 +129,7 @@ class ViewMilking extends Component {
       month1Date: "",
       month2Date: "",
       month2MilkingRecord: [],
+      authenticated: true,
       genericMessage1: "Processing ...",
       genericMessage2: "Processing ..."
     };
@@ -189,23 +193,28 @@ class ViewMilking extends Component {
         },
         body: JSON.stringify({
           "animalTag": animalTag,
-          "milkingDateStr": prevDate.getFullYear() + '-' + (prevDate.getMonth()+1) + '-01'
+          "milkingDateStr": prevDate.getFullYear() + '-' + (prevDate.getMonth()+1) + '-01',
+          "loginToken": (new Cookies()).get('authToken')
+        })
       })
-    })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({month1MilkingRecord: [], isLoaded: true, genericMessage1: "Following error occurred while processing the request: " + responseJson.message, message1Color: "danger"});
+      .then(response => {
+        if (response.status === 401)
+          this.setState({authenticated : false});
+        return response.json();
+      })
+      .then(data => {
+        if (data.error) {
+         this.setState({month1MilkingRecord: [], isLoaded: true, genericMessage1: "Following error occurred while processing the request: " + data.message, message1Color: "danger"});
       }
       else {
-        for (let i = 0; i<responseJson.length; i++) {
-          dayVolume1 = (responseJson[i].milkVol1 === "" ? 0 : responseJson[i].milkVol1) + (responseJson[i].milkVol2 === "" ? 0 : responseJson[i].milkVol2) + (responseJson[i].milkVol3 === "" ? 0 : responseJson[i].milkVol3);
+        for (let i = 0; i<data.length; i++) {
+          dayVolume1 = (data[i].milkVol1 === "" ? 0 : data[i].milkVol1) + (data[i].milkVol2 === "" ? 0 : data[i].milkVol2) + (data[i].milkVol3 === "" ? 0 : data[i].milkVol3);
           sum1 = sum1 + dayVolume1;
           if (dayVolume1 > max1) 
             max1 = dayVolume1;
         }
-        average1 = Math.round((sum1 / responseJson.length)*100)/100;
-        this.setState({month1MilkingRecord: responseJson, month1Sum: sum1, month1Max: max1, month1Avg: average1, isLoaded: true, genericMessage1: (responseJson.length === 1 ? responseJson.length + " record found" : responseJson.length + " records found"), message1Color: "success"});
+        average1 = Math.round((sum1 / data.length)*100)/100;
+        this.setState({month1MilkingRecord: data, month1Sum: sum1, month1Max: max1, month1Avg: average1, isLoaded: true, genericMessage1: (data.length === 1 ? data.length + " record found" : data.length + " records found"), message1Color: "success"});
       }
     })
     .catch(error => this.setState({genericMessage1: "Following error occurred while processing the request: " + error.toString(), message1Color: "danger"}));
@@ -220,24 +229,29 @@ class ViewMilking extends Component {
         },
         body: JSON.stringify({
           "animalTag": animalTag,
-          "milkingDateStr": recordDate.getFullYear() + '-' + (recordDate.getMonth()+1) + '-01'
+          "milkingDateStr": recordDate.getFullYear() + '-' + (recordDate.getMonth()+1) + '-01',
+          "loginToken": (new Cookies()).get('authToken')
+        })
       })
-    })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({month2MilkingRecord: [], isLoaded: true, genericMessage2: "Following error occurred while processing the request: " + responseJson.message, message2Color: "danger"});
+      .then(response => {
+        if (response.status === 401)
+          this.setState({authenticated : false});
+        return response.json();
+      })
+      .then(data => {
+        if (data.error) {
+         this.setState({month2MilkingRecord: [], isLoaded: true, genericMessage2: "Following error occurred while processing the request: " + data.message, message2Color: "danger"});
       }
       else {
-        for (let i = 0; i<responseJson.length; i++) {
-          dayVolume2 = (responseJson[i].milkVol1 === "" ? 0 : responseJson[i].milkVol1) + (responseJson[i].milkVol2 === "" ? 0 : responseJson[i].milkVol2) + (responseJson[i].milkVol3 === "" ? 0 : responseJson[i].milkVol3);
+        for (let i = 0; i<data.length; i++) {
+          dayVolume2 = (data[i].milkVol1 === "" ? 0 : data[i].milkVol1) + (data[i].milkVol2 === "" ? 0 : data[i].milkVol2) + (data[i].milkVol3 === "" ? 0 : data[i].milkVol3);
           sum2 = sum2 + dayVolume2;
           if (dayVolume2 > max2) 
             max2 = dayVolume2;
         }
         // average = Math.round(((sum / responseJson.length)*10)/10);
-        average2 = Math.round((sum2 / responseJson.length)*100)/100;
-        this.setState({month2MilkingRecord: responseJson, month2Sum: sum2, month2Max: max2, month2Avg: average2, isLoaded: true, genericMessage2: (responseJson.length === 1 ? responseJson.length + " record found" : responseJson.length + " records found"), message2Color: "success"});
+        average2 = Math.round((sum2 / data.length)*100)/100;
+        this.setState({month2MilkingRecord: data, month2Sum: sum2, month2Max: max2, month2Avg: average2, isLoaded: true, genericMessage2: (data.length === 1 ? data.length + " record found" : data.length + " records found"), message2Color: "success"});
         // this.setState({month2MilkingRecord: responseJson, isLoaded: true, genericMessage2: (responseJson.length === 1 ? responseJson.length + " record found" : responseJson.length + " records found"), message2Color: "success"});         
       }
     })
@@ -252,28 +266,33 @@ class ViewMilking extends Component {
             },
             body: JSON.stringify({
               "animalTag": animalTag,
-              "milkingDateStr": prevDate.getFullYear() + '-' + (prevDate.getMonth()+1) + '-01'
-          })
+              "milkingDateStr": prevDate.getFullYear() + '-' + (prevDate.getMonth()+1) + '-01',
+          "loginToken": (new Cookies()).get('authToken')
         })
-     .then(response => response.json())
-      .then(responseJson => {
-        if (responseJson.error) {
-           this.setState({genericMessage: responseJson.message});
+      })
+      .then(response => {
+        if (response.status === 401)
+          this.setState({authenticated : false});
+        return response.json();
+      })
+      .then(data => {
+        if (data.error) {
+           this.setState({genericMessage: data.message});
         }
         else {
           let averageMonth = [];
           let day = 0;
           let secondMonth = false;
-           for (let i = 0; i< responseJson[0].volumes.length; i++){
-              if (day > responseJson[0].days[i]) {
+           for (let i = 0; i< data[0].volumes.length; i++){
+              if (day > data[0].days[i]) {
                 secondMonth = true;
               } else {
-                day = responseJson[0].days[i];
+                day = data[0].days[i];
               }
              averageMonth.push(secondMonth ? average2: average1);
            }
-           mainChart.labels = responseJson[0].days;
-           mainChart.datasets[0].data = responseJson[0].volumes;
+           mainChart.labels = data[0].days;
+           mainChart.datasets[0].data = data[0].volumes;
            mainChart.datasets[1].data = averageMonth;
            //mainChart.datasets[1].data = responseJson[0].volumes;
            mainChartOpts.scales.yAxes = [{ ticks: {
@@ -284,7 +303,7 @@ class ViewMilking extends Component {
                                         min: 0,
                                       },
                                     }];
-           this.setState({monthVolumes: responseJson[0].volumes, monthDays:responseJson[0].days});
+           this.setState({monthVolumes: data[0].volumes, monthDays:data[0].days});
 
         }
       })
@@ -340,9 +359,9 @@ class ViewMilking extends Component {
 
 
   render() {
-    var { genericMessage1, genericMessage2, month1MilkingRecord, month2MilkingRecord, message1Color, message2Color} = this.state;
-    // if (invalidAccess)
-    //   return (<Redirect to='/animal/search'  />);
+    var { authenticated, genericMessage1, genericMessage2, month1MilkingRecord, month2MilkingRecord, message1Color, message2Color} = this.state;
+    if (!authenticated) 
+      return (<Redirect to='/login'  />);
     return (
       <div className="animated fadeIn">
         <Nav tabs>

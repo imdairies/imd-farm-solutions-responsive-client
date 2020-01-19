@@ -179,11 +179,11 @@ var mainChartOpts = {
       {
         ticks: {
           beginAtZero: true,
-          maxTicksLimit: 5,
+          // maxTicksLimit: 5,
 //          stepSize: Math.ceil(250 / 5),
-          stepSize: Math.ceil(500 / 100),
-          max: 400,
-          min: 300,
+          // stepSize: Math.ceil(500 / 100),
+          // max: 400,
+          // min: 300,
         },
       }],
   },
@@ -204,6 +204,7 @@ class Dashboard extends Component {
     this.toggle = this.toggle.bind(this);
     this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
     this.loadCurrentYearData = this.loadCurrentYearData.bind(this);
+    this.loadPreviousYearData = this.loadPreviousYearData.bind(this);
     this.loadCurrentMonthData = this.loadCurrentMonthData.bind(this);
     this.retrieveLactatingCount = this.retrieveLactatingCount.bind(this);
     this.retrieveDryCowCount = this.retrieveDryCowCount.bind(this);
@@ -233,6 +234,8 @@ class Dashboard extends Component {
       previsousPreviousMonthYear: "",
       currentMonth: "",
       currentYear: "",
+      previousYear: "",
+      chartErrorMessage: "",
       expectedCalvingThisMonthCount: "loading...", 
       expectedCalvingThisMonthList: "", 
       calvedThisMonthCount : "loading...", 
@@ -249,6 +252,8 @@ class Dashboard extends Component {
     let month = new Date().getMonth();
     let year = new Date().getFullYear();
     this.state.currentYear = year;
+    this.setState({previousYear: year -1});
+    this.state.previousYear = year - 1;
     this.state.previsousMonthYear = year;
     this.state.previsousPreviousMonthYear = year;
     if (month === 0) {
@@ -333,7 +338,6 @@ retrieveRecentBreedingEvents() {
   };
 
 
-  // fetch(API_PREFIX+ '/imd-farm-management/animals/allactive')
   fetch(API_PREFIX+ '/imd-farm-management/farm/recentbreedingevents')
   .then(response => response.json())
   .then(responseJson => {
@@ -416,8 +420,7 @@ retrieveMilkingRecordOfMonth(){
   .then(response => response.json())
   .then(responseJson => {
   if (responseJson.error) {
-     this.setState({lactatingAnimalWidgetMessage: "Lactating Animals",
-      lactatingAnimalCount: "Error in retrieving milking record: " + responseJson.message});
+     this.setState({chartErrorMessage: "Error in retrieving milking record: " + responseJson.message});
   }
   else {
      mainChart.labels = responseJson[0].days;
@@ -427,16 +430,15 @@ retrieveMilkingRecordOfMonth(){
      mainChartOpts.scales.yAxes = [{ ticks: {
                                   beginAtZero: true,
                                   maxTicksLimit: 5,
-                                  stepSize: 25,
-                                  max: 450,
-                                  min: 150,
+                                  stepSize: 50,
+                                  max: responseJson[0].max,
+                                  min: responseJson[0].min,
                                 },
                               }];
-     this.setState({monthVolumes: responseJson[0].volumes, monthDays:responseJson[0].days});
+     this.setState({chartErrorMessage: "", monthVolumes: responseJson[0].volumes, monthDays:responseJson[0].days});
   }
   })
-  .catch(error => this.setState({lactatingAnimalWidgetMessage: "Lactating Animals",
-    lactatingAnimalCount: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" :  "Error in retrieving milking record: " + error.toString())}));
+  .catch(error => this.setState({chartErrorMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Server Connection Error" :  "Error in retrieving milking record: " + error.toString())}));
 
 }
 
@@ -567,8 +569,6 @@ retrieveHerdSizeHistory(){
   }
   })
   .catch(error => this.setState({herdSize: "error",  activeAnimalWidgetMessage: (error.toString().indexOf("Failed to fetch") >= 0 ? "Error in retrieving herd size information: Server Connection Error" :  "Error in retrieving herd size history: " + error.toString())}));
-
-
 }
 
 retrieveLactatingCount() {
@@ -624,6 +624,8 @@ retrieveLactatingCount() {
       this.loadCurrentMonthData();
     } else if (radioSelected === 4) {
       this.loadCurrentYearData();
+    } else if (radioSelected === 5) {
+      this.loadPreviousYearData();
     }
   }
   loadCurrentMonthData(){
@@ -642,14 +644,14 @@ retrieveLactatingCount() {
        .then(response => response.json())
         .then(responseJson => {
           if (responseJson.error) {
-             this.setState({lactatingAnimalWidgetMessage: "Lactating Animals", lactatingAnimalCount: responseJson.message});
+             this.setState({chartErrorMessage: responseJson.message});
           }
           else {
               mainChart.labels = responseJson[0].days;
               mainChart.datasets[0].data = responseJson[0].volumes;
               mainChart.datasets[1].data = responseJson[0].averages;
               mainChart.datasets[2].data = responseJson[0].milkedAnimals;
-             this.setState({monthVolumes: responseJson[0].volumes,
+             this.setState({chartErrorMessage: "", monthVolumes: responseJson[0].volumes,
               monthDays:responseJson[0].days,
               monthAverages: responseJson[0].averages,
               milkedAnimalsCount: responseJson[0].milkedAnimals,
@@ -658,8 +660,7 @@ retrieveLactatingCount() {
               });
           }
         })
-        .catch(error => this.setState({lactatingAnimalWidgetMessage: "Lactating Animals",
-          lactatingAnimalCount:error.toString()}));
+        .catch(error => this.setState({chartErrorMessage: 'Following error occurred while retrieving the information:' + error.toString()}));
   }
   loadPreviousMonthData(){
       let now =  new Date();
@@ -685,14 +686,14 @@ retrieveLactatingCount() {
        .then(response => response.json())
         .then(responseJson => {
           if (responseJson.error) {
-             this.setState({lactatingAnimalWidgetMessage: "Lactating Animals", lactatingAnimalCount: responseJson.message});
+             this.setState({chartErrorMessage: responseJson.message});
           }
           else {
               mainChart.labels = responseJson[0].days;
               mainChart.datasets[0].data = responseJson[0].volumes;
               mainChart.datasets[1].data = responseJson[0].averages;
               mainChart.datasets[2].data = responseJson[0].milkedAnimals;
-             this.setState({monthVolumes: responseJson[0].volumes,
+             this.setState({chartErrorMessage: "", monthVolumes: responseJson[0].volumes,
               monthDays:responseJson[0].days,
               monthAverages: responseJson[0].averages,
               chartTitle: "Daily Milk Production",
@@ -700,8 +701,7 @@ retrieveLactatingCount() {
               });
           }
         })
-        .catch(error => this.setState({lactatingAnimalWidgetMessage: "Lactating Animals",
-          lactatingAnimalCount: error.toString()}));
+        .catch(error => this.setState({chartErrorMessage: 'The following error occurred while retrieving the information: ' + error.toString()}));
   }
   loadPreviousPreviousMonthData(){
       let now =  new Date();
@@ -729,13 +729,13 @@ retrieveLactatingCount() {
        .then(response => response.json())
         .then(responseJson => {
           if (responseJson.error) {
-             this.setState({lactatingAnimalWidgetMessage: "Lactating Animals", lactatingAnimalCount: responseJson.message});
+             this.setState({chartErrorMessage: responseJson.message});
           }
           else {
               mainChart.labels = responseJson[0].days;
               mainChart.datasets[0].data = responseJson[0].volumes;
               mainChart.datasets[1].data = responseJson[0].averages;
-             this.setState({monthVolumes: responseJson[0].volumes,
+             this.setState({chartErrorMessage: "", monthVolumes: responseJson[0].volumes,
               monthDays:responseJson[0].days,
               monthAverages: responseJson[0].averages,
               chartTitle: "Daily Milk Production",
@@ -743,7 +743,7 @@ retrieveLactatingCount() {
               });
           }
         })
-        .catch(error => this.setState({lactatingAnimalWidgetMessage: "Lactating Animals", lactatingAnimalCount: error.toString()}));
+        .catch(error => this.setState({chartErrorMessage: 'The following error occurred while retrieving the information: ' + error.toString()}));
   }
   loadCurrentYearData(){
       let now =  new Date();
@@ -761,7 +761,7 @@ retrieveLactatingCount() {
        .then(response => response.json())
         .then(responseJson => {
           if (responseJson.error) {
-             this.setState({lactatingAnimalWidgetMessage: "Lactating Animals", lactatingAnimalCount: responseJson.message});
+             this.setState({chartErrorMessage: responseJson.message});
           }
           else {
             mainChart.labels = responseJson[0].dates;
@@ -771,20 +771,59 @@ retrieveLactatingCount() {
             mainChartOpts.scales.yAxes = [{ ticks: {
                                                       beginAtZero: true,
                                                       maxTicksLimit: 5,
-                                                      stepSize: 25,
-                                                      max: 450,
-                                                      min: 150,
+                                                      stepSize: 50,
+                                                      max: responseJson[0].max,
+                                                      min: responseJson[0].min,
                                                     },
                                                   }]
-             this.setState({monthVolumes: responseJson[0].volumes, monthDays:responseJson[0].dates});
+             this.setState({chartErrorMessage: "", monthVolumes: responseJson[0].volumes, monthDays:responseJson[0].dates});
              // alert(responseJson[0].days);
             this.setState({chartTitle: "Daily Milk Production",
             chartSubTitle: new Intl.DateTimeFormat('en-GB', { year: 'numeric' }).format(new Date())});
           }
         })
-        .catch(error => this.setState({lactatingAnimalWidgetMessage: "Lactating Animals", lactatingAnimalCount: error.toString()}));
+        .catch(error => this.setState({chartErrorMessage: 'The following error occurred while retrieving the information: ' + error.toString()}));
   }
 
+  loadPreviousYearData(){
+      let now =  new Date();
+      fetch(API_PREFIX+ '/imd-farm-management/milkinginfo/milkingrecordofeachdayofyear', {
+              method: "POST",
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                "milkingDateStr": now.getFullYear() - 1,
+                "loginToken": (new Cookies()).get('authToken'), 
+            })
+          })
+       .then(response => response.json())
+        .then(responseJson => {
+          if (responseJson.error) {
+             this.setState({chartErrorMessage: responseJson.message});
+          }
+          else {
+            mainChart.labels = responseJson[0].dates;
+            mainChart.datasets[0].data = responseJson[0].volumes;
+            mainChart.datasets[1].data = responseJson[0].averages;
+            mainChart.datasets[2].data = responseJson[0].milkedAnimals;
+            mainChartOpts.scales.yAxes = [{ ticks: {
+                                                      beginAtZero: true,
+                                                      maxTicksLimit: 5,
+                                                      stepSize: 50,
+                                                      max: responseJson[0].max,
+                                                      min: responseJson[0].min,
+                                                    },
+                                                  }]
+             this.setState({chartErrorMessage: "", monthVolumes: responseJson[0].volumes, monthDays:responseJson[0].dates});
+             // alert(responseJson[0].days);
+            this.setState({chartTitle: "Daily Milk Production",
+            chartSubTitle: new Intl.DateTimeFormat('en-GB', { year: 'numeric' }).format(new Date())});
+          }
+        })
+        .catch(error => this.setState({chartErrorMessage: 'The following error occurred while retrieving the information: ' + error.toString()}));
+  }
 
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
 
@@ -793,7 +832,7 @@ retrieveLactatingCount() {
       inseminatedThisMonthList, expectedCalvingThisMonthList, breedingWidgetMessage, abortedThisMonthCount, calvedThisMonthCount, 
       inseminatedThisMonthCount, abortedThisMonthList, calvedThisMonthList, herdSizeTrend, inseminationTrend, 
       expectedCalvingThisMonthLabel, abortedThisMonthLabel, calvedThisMonthLabel, inseminatedThisMonthLabel,
-      previousPreviousMonth, previsousMonth, currentMonth, currentYear, authenticated} = this.state;
+      previousPreviousMonth, previsousMonth, currentMonth, currentYear, authenticated, previousYear, chartErrorMessage} = this.state;
     if (!authenticated)
       return (<Redirect to='/login'  />);
 
@@ -846,11 +885,12 @@ retrieveLactatingCount() {
                 <Row>
                   <Col sm="5">
                     <CardTitle className="mb-0">{this.state.chartTitle}</CardTitle>
-                    <div className="small text-muted">{this.state.chartSubTitle}</div>
+                    <div className={chartErrorMessage === '' ? 'small text-muted' : 'small text-danger' }>{this.state.chartSubTitle + (chartErrorMessage === '' ? '' :  ' (' + chartErrorMessage + ')')}</div>
                   </Col>
                   <Col sm="7" className="d-none d-sm-inline-block">
                     <ButtonToolbar className="float-right" aria-label="Toolbar with button groups">
                       <ButtonGroup className="mr-3" aria-label="First group">
+                        <Button color="outline-secondary" onClick={() => this.onRadioBtnClick(5)} active={this.state.radioSelected === 5}>{previousYear}</Button>
                         <Button color="outline-secondary" onClick={() => this.onRadioBtnClick(1)} active={this.state.radioSelected === 1}>{previousPreviousMonth}</Button>
                         <Button color="outline-secondary" onClick={() => this.onRadioBtnClick(2)} active={this.state.radioSelected === 2}>{previsousMonth}</Button>
                         <Button color="outline-secondary" onClick={() => this.onRadioBtnClick(3)} active={this.state.radioSelected === 3}>{currentMonth}</Button>

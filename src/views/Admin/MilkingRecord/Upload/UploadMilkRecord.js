@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import Cookies from 'universal-cookie';
+import { Redirect } from 'react-router-dom';
 
 import {
   Button,
@@ -48,6 +50,7 @@ class UploadMilkRecord extends Component {
       fat: "",
       lr: "",
       toxin: "",
+      authenticated: true,
       milkRecords : ""
     };
     this.handleParseOrCommit = this.handleParseOrCommit.bind(this);
@@ -175,28 +178,33 @@ class UploadMilkRecord extends Component {
             },
             body: JSON.stringify({
               "shouldAdd": this.state.parseOrCommit === "Commit" ? true : false,
-              "inputDelimitedFileContents" : fileContents
-          })
+              "inputDelimitedFileContents" : fileContents,
+              "loginToken": (new Cookies()).get('authToken'),
         })
-        .then(response => response.json())
-        .then(responseJson => {
-          if (responseJson.error) {
-             this.setState({isLoaded: true, outcomeMessage: responseJson.message, messageColor: "danger"});
+      })
+      .then(response => {
+        if (response.status === 401)
+          this.setState({authenticated : false});
+        return response.json();
+      })
+      .then(data => {
+      if (data.error) {
+             this.setState({isLoaded: true, outcomeMessage: data.message, messageColor: "danger"});
           }
           else {
             if ( wasParseOrCommit === "Parse") {
               // successfully parsed
-              outcomeMessage = responseJson.message + ". You may commit the records now.";
+              outcomeMessage = data.message + ". You may commit the records now.";
             } else {
               // committing
-               this.setState({isLoaded: true, outcomeMessage: responseJson.message, messageColor: "success"});
-               for (let i=0; i< responseJson.length; i++) {
-                if (responseJson[i].outcome === "ERROR") {
-                  outcomeMessage += responseJson[i].tag + " ";
+               this.setState({isLoaded: true, outcomeMessage: data.message, messageColor: "success"});
+               for (let i=0; i< data.length; i++) {
+                if (data[i].outcome === "ERROR") {
+                  outcomeMessage += data[i].tag + " ";
                 }
               }
               if (outcomeMessage === "") {
-                outcomeMessage = "All " + responseJson.length + " milking information(s) updated successfully";
+                outcomeMessage = "All " + data.length + " milking information(s) updated successfully";
                 this.setState({outcomeMessage: outcomeMessage, messageColor:"success"});
               } else {
                 outcomeMessage = "Milking information for the following tag numbers could not be updated, the rest have been updated successfully:" + outcomeMessage;
@@ -206,16 +214,16 @@ class UploadMilkRecord extends Component {
             this.setState({showParseResult: wasParseOrCommit === "Parse" ? true : false, 
               parseOrCommit: (wasParseOrCommit === "Parse" ? "Commit": "Parse"),
               isLoaded: true,
-              date: responseJson.date,
-              time: responseJson.time,
-              event: responseJson.event,
-              temperature: responseJson.temperature,
-              humidity: responseJson.humidity,
-              fat: responseJson.fat,
-              lr: responseJson.lr,
-              toxin: responseJson.toxin,
-              totalMilkRecords: responseJson.totalMilkRecords,
-              totalVolume: responseJson.totalVolume,
+              date: data.date,
+              time: data.time,
+              event: data.event,
+              temperature: data.temperature,
+              humidity: data.humidity,
+              fat: data.fat,
+              lr: data.lr,
+              toxin: data.toxin,
+              totalMilkRecords: data.totalMilkRecords,
+              totalVolume: data.totalVolume,
               outcomeMessage: outcomeMessage,
               messageColor: "success"});
             }
@@ -226,9 +234,12 @@ class UploadMilkRecord extends Component {
   }
 
   render() {
-    var { date,time,event,temp,humidity,fat,lr,toxin,cowTags,milkRecords, outcomeMessage, messageColor, parseOrCommit} = this.state;
+    var { authenticated, date,time,event,temp,humidity,fat,lr,toxin,cowTags,milkRecords, outcomeMessage, messageColor, parseOrCommit} = this.state;
     //var yesterday = this.state.timestamp;
     let parsingResultsDisplay  = this.state.showParseResult ? {} : {display : 'none'};
+    if (!authenticated)
+      return (<Redirect to='/login'  />);
+
     return (
       <div className="animated fadeIn">
         <Row>

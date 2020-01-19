@@ -27,6 +27,8 @@ import {
 
 import { Link } from 'react-router-dom';
 import classnames from 'classnames';
+import { Redirect } from 'react-router-dom';
+import Cookies from 'universal-cookie';
 var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 //var API_PREFIX = 'http://52.14.65.112:8080';
 
@@ -52,6 +54,7 @@ class SearchAnimalEvent extends Component {
       animalTag: "",
       messageColor: "muted",
       animaltaglist: [],
+      authenticated: true,
       eventAdditionalMessage: "Enter Animal Tag and press search button",
       testDate: new Date()
     };
@@ -140,16 +143,21 @@ class SearchAnimalEvent extends Component {
 
           body: JSON.stringify({
             "animalTag": this.state.animalTag,
-            "eventCode": this.state.eventCodeID
-        })
+            "eventCode": this.state.eventCodeID,
+            "loginToken": (new Cookies()).get('authToken')
       })
-      .then(response => response.json())
-      .then(responseJson => {
-        if (responseJson.error) {
-           this.setState({eventlist: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+    })
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+           this.setState({eventlist: [], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
         }
         else {
-           this.setState({eventlist: responseJson, isLoaded: true, eventAdditionalMessage: (responseJson.length === 1 ? responseJson.length + " life time event found" : responseJson.length + " life time events found"), messageColor: "success"});
+           this.setState({eventlist: data, isLoaded: true, eventAdditionalMessage: (data.length === 1 ? data.length + " life time event found" : data.length + " life time events found"), messageColor: "success"});
         }
       })
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -162,8 +170,10 @@ class SearchAnimalEvent extends Component {
   }
 
   render() {
-    var { isLoaded, eventlist, eventSearchFilterlist, eventAdditionalMessage, messageColor } = this.state;
+    var { authenticated, isLoaded, eventlist, eventSearchFilterlist, eventAdditionalMessage, messageColor } = this.state;
     let recordCount = 0;
+    if (!authenticated)
+      return (<Redirect to='/login'  />);
     return (
       <div className="animated fadeIn">
          <Row>

@@ -83,7 +83,7 @@ class Tooltips extends Component {
           </CardHeader>
           <CardBody>
             {/*eslint-disable-next-line*/}
-            <p>Somewhere in here is a <a href="#" id="TooltipExample">tooltip</a>.</p>
+            <p id="TooltipExample">Somewhere in here is a tooltip</p>
             <Tooltip placement="right" isOpen={this.state.tooltipOpen[0]} target="TooltipExample" toggle={() => {this.toggle(0);}}>
               Hello world!
             </Tooltip>

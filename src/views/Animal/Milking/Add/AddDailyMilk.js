@@ -27,6 +27,9 @@ import classnames from 'classnames';
 import { Link } from 'react-router-dom';
 import queryString from 'query-string';
 import DateTimePicker from 'react-datetime-picker';
+import { Redirect } from 'react-router-dom';
+import Cookies from 'universal-cookie';
+
 var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 
@@ -51,6 +54,7 @@ class AddDailyMilk extends Component {
       lrValue: "",
       toxinValue: "",
       temperatureInCentigrade: "",
+      authenticated: true,
       humidity: "",
       eventAdditionalMessage: "Specify desired values and press Add"
     };
@@ -105,15 +109,20 @@ class AddDailyMilk extends Component {
         },
         body: JSON.stringify({
           "animalTag": "%",
+          "loginToken": (new Cookies()).get('authToken')
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({animaltaglist: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({animaltaglist: [], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
       }
       else {
-         this.setState({animaltaglist: responseJson, isLoaded: true, eventAdditionalMessage: "", messageColor: "success"});         
+         this.setState({animaltaglist: data, isLoaded: true, eventAdditionalMessage: "", messageColor: "success"});         
       }
     })
     .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -179,16 +188,21 @@ class AddDailyMilk extends Component {
             "toxinValue": this.state.toxinValue,
             "temperatureInCentigrade": this.state.temperatureInCentigrade,
             "humidity": this.state.humidity,
-            "timestamp": this.state.timestamp
+            "timestamp": this.state.timestamp,
+          "loginToken": (new Cookies()).get('authToken')
         })
       })
-      .then(response => response.json())
-      .then(responseJson => {
-        if (responseJson.error) {
-           this.setState({isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+      .then(response => {
+        if (response.status === 401)
+          this.setState({authenticated : false});
+        return response.json();
+      })
+      .then(data => {
+        if (data.error) {
+           this.setState({isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
         }
         else {
-           this.setState({isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "success"});         
+           this.setState({isLoaded: true, eventAdditionalMessage: data.message, messageColor: "success"});         
         }
       })
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -196,7 +210,9 @@ class AddDailyMilk extends Component {
   }
 
   render() {
-    var { eventAdditionalMessage, messageColor, animaltaglist} = this.state;
+    var { authenticated, eventAdditionalMessage, messageColor, animaltaglist} = this.state;
+    if (!authenticated) 
+      return (<Redirect to='/login'  />);
     return (
       <div className="animated fadeIn">
         <Row>

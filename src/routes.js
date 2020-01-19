@@ -75,6 +75,7 @@ const ViewInseminationInfo = React.lazy(() => import('./views/Farm/Insemination'
 
 const SearchSire = React.lazy(() => import('./views/Admin/Sire/Search'));
 const AddSire    = React.lazy(() => import('./views/Admin/Sire/Add'));
+const ViewSireRecord    = React.lazy(() => import('./views/Admin/Sire/ViewSireRecord'));
 
 const AddSemenInventory    = React.lazy(() => import('./views/Inventory/Sire/AddSemenInventory'));
 const SearchSemenInventory    = React.lazy(() => import('./views/Inventory/Sire/Search/SearchSemenInventory'));
@@ -147,9 +148,10 @@ const routes = [
   { path: '/admin/messagecatalog/update', name: 'UpdateMessage', component: UpdateMessage },
 
 
-
   { path: '/admin/sire/search/', name: 'SearchSire', component: SearchSire },
-  { path: '/admin/sire/add/'   , name: 'AddSire'   , component: AddSire    },
+  { path: '/admin/sire/add/'   , name: 'AddSire'   , component: AddSire },
+  { path: '/admin/sire/viewrecord/'   , name: 'ViewSireRecord'   , component: ViewSireRecord },
+
 
   { path: '/animal/event/search', name: 'SearchAnimalEvent', component: SearchAnimalEvent },
   { path: '/animal/event/add', name: 'AddAnimalEvent', component: AddAnimalEvent },

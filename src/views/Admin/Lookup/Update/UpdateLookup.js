@@ -43,7 +43,9 @@ class UpdateLookup extends Component {
       categoryCode: "",
       lookupValueCode : "" ,
       shortdescription: "",
+      shortDescriptionMessageCd: "",
       longdescription: "",
+      longDescriptionMessageCd: "",
       activeIndicator : "N" ,
       additionalField1: "",
       additionalField2: "",
@@ -86,7 +88,7 @@ class UpdateLookup extends Component {
          this.setState({items: [], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
       }
       else {
-         this.setState({items: data, shortdescription: data[0].shortDescription, longdescription: data[0].longDescription, additionalField1: data[0].additionalField1, additionalField2: data[0].additionalField2, additionalField3: data[0].additionalField3, isActive: data[0].isActive,  isLoaded: true, eventAdditionalMessage: (data.length === 1 ? "Edit the desired values and press Update button" : "We expected to receive only one record matching the event code '" + parsed.eventCode + "' but we received " + data.length), messageColor: "muted"});
+         this.setState({items: data, shortDescriptionMessageCd: data[0].shortDescriptionMessageCd, shortdescription: data[0].shortDescription, longDescriptionMessageCd: data[0].longDescriptionMessageCd ,longdescription: data[0].longDescription, additionalField1: data[0].additionalField1, additionalField2: data[0].additionalField2, additionalField3: data[0].additionalField3, isActive: data[0].isActive,  isLoaded: true, eventAdditionalMessage: (data.length === 1 ? "Edit the desired values and press Update button" : "We expected to receive only one record matching the event code '" + parsed.eventCode + "' but we received " + data.length), messageColor: "muted"});
           if (data.length > 1)
             this.setState({messageColor: "danger"});
          if (data[0].isActive)
@@ -105,8 +107,12 @@ class UpdateLookup extends Component {
       this.setState({lookupValueCode: event.target.value});
     if (event.target.id === "shortdescription")
       this.setState({shortdescription: event.target.value});
+    if (event.target.id === "shortDescriptionMessageCd")
+      this.setState({shortDescriptionMessageCd: event.target.value});
     if (event.target.id === "longdescription")
       this.setState({longdescription: event.target.value});
+    if (event.target.id === "longDescriptionMessageCd")
+      this.setState({longDescriptionMessageCd: event.target.value});
     if (event.target.id === "active")
       this.setState({activeIndicator: (event.target.checked ? "Y": "N")});
     if (event.target.id === "additionalField1")
@@ -125,7 +131,9 @@ class UpdateLookup extends Component {
     let addFld2 = document.getElementById("additionalField2").value;
     let addFld3 = document.getElementById("additionalField3").value;
     let shortDescr = document.getElementById("shortdescription").value;
+    let shortDescrCD = document.getElementById("shortDescriptionMessageCd").value;
     let longDescr = document.getElementById("longdescription").value;
+    let longDescrCD = document.getElementById("longDescriptionMessageCd").value;
     let active = (document.getElementById("active").checked ? "Y" : "N");
 
     if (ctgryCode.length === 0) {
@@ -140,17 +148,26 @@ class UpdateLookup extends Component {
     } else if (longDescr.length === 0) {
       this.setState({messageColor: "danger", eventAdditionalMessage: "Please enter a valid Long Description"});
       document.getElementById("longdescription").focus();
+    } else if (shortDescrCD.length === 0) {
+      this.setState({messageColor: "danger", eventAdditionalMessage: "Please enter a valid Short Description Message Code. This code will used to implement multi-lingual functionality for this lookup item."});
+      document.getElementById("shortDescriptionMessageCd").focus();
+    } else if (longDescrCD.length === 0) {
+      this.setState({messageColor: "danger", eventAdditionalMessage: "Please enter a valid Long Description Message Code. This code will used to implement multi-lingual functionality for this lookup item."});
+      document.getElementById("longDescriptionMessageCd").focus();
     } else {
       this.setState({categoryCode: ctgryCode, 
         lookupValueCode: lkupCd,
         shortdescription: shortDescr, 
+        shortDescriptionMessageCd: shortDescrCD, 
         longdescription:  longDescr, 
+        longDescriptionMessageCd:  longDescrCD, 
         additionalField1:  addFld1, 
         additionalField2:  addFld2, 
         additionalField3:  addFld3, 
         activeIndicator:  active,
         eventAdditionalMessage: "Processing ..."
       });
+      // alert(shortDescrCD + " " + longDescrCD);
 
       fetch(API_PREFIX + '/imd-farm-management/lookupvalues/update', {
           method: "POST",
@@ -163,6 +180,8 @@ class UpdateLookup extends Component {
             "lookupValueCode": lkupCd,
             "shortDescription": shortDescr,
             "longDescription": longDescr,
+            "shortDescriptionMessageCd": shortDescrCD, 
+            "longDescriptionMessageCd":  longDescrCD, 
             "additionalField1": addFld1,
             "additionalField2": addFld2,
             "additionalField3": addFld3,
@@ -256,11 +275,23 @@ class UpdateLookup extends Component {
                           </Col>
                         </FormGroup>
                         <FormGroup row>
+                          <Label sm="4" htmlFor="input-normal">Message Code</Label>
+                          <Col sm="8">
+                              <Input id="shortDescriptionMessageCd" type="text" maxLength="75" value={this.state.shortDescriptionMessageCd} onChange={this.handleChange} placeholder="Short Description Message Code"  />
+                          </Col>
+                        </FormGroup>
+                        <FormGroup row>
                           <Col md="4">
                             <Label htmlFor="textarea-input">Long Description</Label>
                           </Col>
                           <Col md="8">
                             <Input id="longdescription" type="textarea" name="longdescription" rows="5" value={this.state.longdescription} onChange={this.handleChange} placeholder="Long Description"  />
+                          </Col>
+                        </FormGroup>
+                        <FormGroup row> 
+                          <Label sm="4" htmlFor="input-normal">Message Code</Label>
+                          <Col sm="8">
+                              <Input id="longDescriptionMessageCd" type="text" maxLength="75" value={this.state.longDescriptionMessageCd} onChange={this.handleChange} placeholder="Long Description Message Code"  />
                           </Col>
                         </FormGroup>
                         <FormGroup row>

@@ -29,6 +29,9 @@ import {
 import { Link } from 'react-router-dom';
 import queryString from 'query-string';
 import classnames from 'classnames';
+import { Redirect } from 'react-router-dom';
+import Cookies from 'universal-cookie';
+
 var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 
@@ -51,6 +54,7 @@ class SearchAnimalMilking extends Component {
       animalType: "-- Animal Type --",
       activeOnly: false,
       messageColor: "muted",
+      authenticated: true,
       animaltypelist: [],
       eventAdditionalMessage: "Enter search fields (you can use % for wild card searches) and press Search button"
     };
@@ -86,15 +90,20 @@ class SearchAnimalMilking extends Component {
         },
         body: JSON.stringify({
           "categoryCode": "LCYCL",
+          "loginToken": (new Cookies()).get('authToken')
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({animaltypelist: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({animaltypelist: [], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
       }
       else {
-         this.setState({animaltypelist: responseJson, isLoaded: true, eventAdditionalMessage: "", messageColor: "success"});         
+         this.setState({animaltypelist: data, isLoaded: true, eventAdditionalMessage: "", messageColor: "success"});         
       }
     })
     .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -126,16 +135,21 @@ class SearchAnimalMilking extends Component {
         body: JSON.stringify({
           "animalTag": this.state.animalTag,
           "animalType": (this.state.animalType === "-- Animal Type --" || this.state.animalType === "ALL" ? null : this.state.animalType),
-          "activeOnly": this.state.activeOnly
+          "activeOnly": this.state.activeOnly,
+          "loginToken": (new Cookies()).get('authToken')
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({items: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({items: [], isLoaded: true, eventAdditionalMessage: data.message, messageColor: "danger"});
       }
       else {
-         this.setState({items: responseJson, isLoaded: true, eventAdditionalMessage: (responseJson.length === 1 ? responseJson.length + " matching record found" : responseJson.length + " matching records found"), messageColor: "success"});         
+         this.setState({items: data, isLoaded: true, eventAdditionalMessage: (data.length === 1 ? data.length + " matching record found" : data.length + " matching records found"), messageColor: "success"});         
       }
     })
     .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
@@ -147,8 +161,10 @@ class SearchAnimalMilking extends Component {
   }
 
   render() {
-    var { isLoaded, items, animaltypelist, eventAdditionalMessage, messageColor } = this.state;
+    var { authenticated, isLoaded, items, animaltypelist, eventAdditionalMessage, messageColor } = this.state;
     let recordCount = 0;
+    if (!authenticated) 
+      return (<Redirect to='/login'  />);
     return (
       <div className="animated fadeIn">
          <Row>

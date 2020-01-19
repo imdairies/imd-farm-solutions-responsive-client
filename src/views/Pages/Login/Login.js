@@ -63,7 +63,7 @@ class Login extends Component {
         }
       })
       .catch(error => { 
-        this.setState({messageText: error.toString()==='TypeError: Failed to fetch' ? 'Connection Error: Unable to connect to IMD API' : error.toString(), messageColor: "danger"})
+        this.setState({messageText: error.toString()==='TypeError: Failed to fetch' ? 'Connection Error: Unable to connect to IMD API Server' : error.toString(), messageColor: "danger"})
       });
     }
   }

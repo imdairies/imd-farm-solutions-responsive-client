@@ -136,8 +136,9 @@ class FeedList extends Component {
                               <th rowspan="2">Age</th>
                               <th rowspan="2">Cohort</th>
                               <th rowspan="2">Weight (kg)</th>
+                              <th rowspan="2">Milk Avg (lpd)</th>
                               <th colspan="2">DM (Kg)</th>
-                              <th colspan="2">CP (Kg)</th>
+                              <th colspan="2">CP (Kg)</th> 
                               <th colspan="2">ME (MJ)</th>
                                {feedItems.map(item => (
                                 <th rowspan="2">{item.shortDescription} <br/>{item.dailyIntake + ' ' + item.units}</th>
@@ -160,6 +161,7 @@ class FeedList extends Component {
                                  <td width="22%">{item.currentAge}</td>
                                  <td width="10%" title = {item.feedCohortDeterminatationCriteria}>{item.feedCohortTypeShortDescr}</td>
                                  <td> {item.weight === "" ? "?" : item.weight}</td>
+                                 <td> {item.milkingAverage === "" ? "-" : item.milkingAverage}</td>
                                  <td>{item.nutritionalNeedsDryMatter}</td>
                                  <td bgcolor={item.planAchievedDM < item.nutritionalNeedsDryMatter ? "#F4DCDB" : "#DDF5DF"}>{item.planAchievedDM}</td>
                                  <td>{item.nutritionalNeedsCrudeProtein}</td>
@@ -167,7 +169,7 @@ class FeedList extends Component {
                                  <td>{item.nutritionalNeedsMetabloizableEnergy}</td>
                                  <td bgcolor={item.planAchievedME < item.nutritionalNeedsMetabloizableEnergy ? "#F4DCDB" : "#DDF5DF"}>{item.planAchievedME}</td>
                                  {item.feedPlanItems.map(foodItem => (
-                                  <td>{foodItem.dailyIntake}</td>
+                                  <td title={'Rs' + foodItem.costOfIntake}>{foodItem.dailyIntake}</td>
                                     ))}
                              </tr>
                              ))}

@@ -24,6 +24,8 @@ import {
 import classnames from 'classnames';
 import { Link } from 'react-router-dom';
 import DateTimePicker from 'react-datetime-picker';
+import { Redirect } from 'react-router-dom';
+import Cookies from 'universal-cookie';
 
 
 class AddSemenInventory extends Component {
@@ -45,7 +47,7 @@ class AddSemenInventory extends Component {
       ordertimestamp: new Date(),
       rcvdtimestamp : new Date(),
       inventorytimestamp : new Date(),
-
+      authenticated: true,
       message: "",
       messageColor: "muted"
     };
@@ -68,19 +70,24 @@ class AddSemenInventory extends Component {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          "animalTag": "%"
+          "animalTag": "%",
+          "loginToken": (new Cookies()).get('authToken')
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-        this.setState({message: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+        this.setState({message: data.message, messageColor: "danger"});
       } else {
         let count = 0;
         let sireList = [];
-        for (; count < responseJson.length; count++) {
-          if (responseJson[count].semenInd === 'Y') 
-            sireList.push(responseJson[count]);
+        for (; count < data.length; count++) {
+          if (data[count].semenInd === 'Y') 
+            sireList.push(data[count]);
         }
         this.setState({ sireList: sireList, message:""});
       }
@@ -202,16 +209,21 @@ class AddSemenInventory extends Component {
             "invoiceAmount": this.state.invoice,
             "receivedDttmStr": this.state.rcvdtimestamp.getFullYear() + "-" + (this.state.rcvdtimestamp.getMonth()+1) + "-" + this.state.rcvdtimestamp.getDate() + " " + this.state.rcvdtimestamp.getHours() + ":" + this.state.rcvdtimestamp.getMinutes(),
             "inventoryAddDttmStr": this.state.inventorytimestamp.getFullYear() + "-" + (this.state.inventorytimestamp.getMonth()+1) + "-" + this.state.inventorytimestamp.getDate() + " " + this.state.inventorytimestamp.getHours() + ":" + this.state.inventorytimestamp.getMinutes(),
-            "orderDttmStr": this.state.ordertimestamp.getFullYear() + "-" + (this.state.ordertimestamp.getMonth()+1) + "-" + this.state.ordertimestamp.getDate() + " " + this.state.ordertimestamp.getHours() + ":" + this.state.ordertimestamp.getMinutes()
+            "orderDttmStr": this.state.ordertimestamp.getFullYear() + "-" + (this.state.ordertimestamp.getMonth()+1) + "-" + this.state.ordertimestamp.getDate() + " " + this.state.ordertimestamp.getHours() + ":" + this.state.ordertimestamp.getMinutes(),
+            "loginToken": (new Cookies()).get('authToken')
         })
       })
-      .then(response => response.json())
-      .then(responseJson => {
-        if (responseJson.error) {
-           this.setState({message: responseJson.message, messageColor: "danger"});
+      .then(response => {
+        if (response.status === 401)
+          this.setState({authenticated : false});
+        return response.json();
+      })
+      .then(data => {
+        if (data.error) {
+           this.setState({message: data.message, messageColor: "danger"});
         }
         else {
-           this.setState({message: responseJson.message, messageColor: "success"});         
+           this.setState({message: data.message, messageColor: "success"});         
         }
       })
       .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
@@ -243,8 +255,10 @@ class AddSemenInventory extends Component {
 
 
   render() {
-    var { message, messageColor, sireList} = this.state;
+    var { message, authenticated, messageColor, sireList} = this.state;
     let sireCount = 0;
+    if (!authenticated) 
+      return (<Redirect to='/login'  />);
 
     return (
       <div className="animated fadeIn">
@@ -297,7 +311,7 @@ class AddSemenInventory extends Component {
                                     },
                                   },
                                 }}>
-                                {sireList.map(sire => (sire.semenInd === 'Y' ? <DropdownItem id={sireCount++} value={sire.animalTag + '-' + sire.alias}>{sire.animalTag + '-' + sire.alias}</DropdownItem> : ''))}
+                                {sireList.map(sire => (sire.semenInd === 'Y' ? <DropdownItem id={sireCount++} value={sire.animalTag + '-' + sire.alias}>{sire.alias  + '-' + sire.animalTag}</DropdownItem> : ''))}
                               </DropdownMenu>
                             </Dropdown>
                           </Col>

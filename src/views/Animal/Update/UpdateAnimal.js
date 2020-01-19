@@ -123,6 +123,7 @@ class UpdateAnimal extends Component {
       orgID : "",
       animalTag : "",
       dateOfBirth: "",
+      weight: "",
       animalStatus: "",
       currentAge : "",
       alias: "",
@@ -131,13 +132,21 @@ class UpdateAnimal extends Component {
       backSideImageURL: "",
       rightSideImageURL:"",
       leftSideImageURL:"",
+      frontSideImageURLThumb: "",
+      backSideImageURLThumb: "",
+      rightSideImageURLThumb:"",
+      leftSideImageURLThumb:"",
       longdescription: "",
       activeIndicator : "N" ,
       messageColor: "muted",
       lifecycleStageList: [],
+      performanceRatings: [],
       sireList:[],
       animalSireURL: "",
+      totalPerformanceRating: "-1",
       eventAdditionalMessage: "Loading events ...",
+      performanceRatingMessageColor: "",
+      performanceRatingMessage: "Processing ...",
       genericMessage: "Processing ...",
       eventMessageColor: "muted",
       month1MilkingRecord: [],
@@ -147,6 +156,7 @@ class UpdateAnimal extends Component {
       genericMessage1: "Processing ...",
       genericMessage2: "Processing ...",
       feedCohort: "",
+      feedPlanItems: [],
       planAnalysisComments: "",
       weightGraphMessageColor: "success", 
       weightGraphMessage: "", 
@@ -170,6 +180,7 @@ class UpdateAnimal extends Component {
     this.retrieveAnimalAdvisement = this.retrieveAnimalAdvisement.bind(this);
     this.retrieveAnimalProgney = this.retrieveAnimalProgney.bind(this);
     this.handleGenderChange = this.handleGenderChange.bind(this);
+    this.createThumbnailURL = this.createThumbnailURL.bind(this);
 
   }
 
@@ -293,6 +304,14 @@ retrieveAnimallWeightGraphData(animalTag){
     });
   }
 
+  createThumbnailURL(originalURL) {
+        let thumbnail = originalURL;
+        var index = thumbnail.lastIndexOf(".");
+        var res = thumbnail.substring(index, thumbnail.length);
+        thumbnail = thumbnail.substring(0,index) + "_thumb" + res;
+        //alert(thumbnail);
+        return thumbnail;
+  }
 
   handleTabClick(targetID) {
    //alert(targetID + " was clicked");
@@ -342,10 +361,18 @@ retrieveAnimallWeightGraphData(animalTag){
          this.setState({items: [], isLoaded: true, genericMessage: responseJson.message, messageColor: "danger"});
       }
       else {
+        //let frontThumb = (responseJson[0].frontSideImageURL ? responseJson[0].frontSideImageURL : "/assets/img/cow-photos/1.png");
+        // var index = frontThumb.lastIndexOf(".");
+        // var res = frontThumb.substring(index, frontThumb.length);
+        // frontThumb = frontThumb.substring(0,index) + "_thumb" + res;
+        // alert(frontThumb);
+        //alert(this.createThumbnailURL(frontThumb));
+
          this.setState({items: responseJson, 
                         animalTag: responseJson[0].animalTag , 
                         animalStatus: responseJson[0].animalStatus, 
                         dateOfBirth: responseJson[0].dateOfBirth.substring(0,10),
+                        weight: responseJson[0].weight,
                         isDateOfBirthEstimated: responseJson[0].isDateOfBirthEstimated,
                         isActive: responseJson[0].isActive, 
                         isLoaded: true,
@@ -360,10 +387,16 @@ retrieveAnimallWeightGraphData(animalTag){
                         backSideImageURL: (responseJson[0].backSideImageURL ? responseJson[0].backSideImageURL : "/assets/img/cow-photos/2.png"),
                         rightSideImageURL : (responseJson[0].rightSideImageURL ? responseJson[0].rightSideImageURL : "/assets/img/cow-photos/3.png"),
                         leftSideImageURL : (responseJson[0].leftSideImageURL ? responseJson[0].leftSideImageURL : "/assets/img/cow-photos/4.png"),
+                        frontSideImageURLThumb : this.createThumbnailURL((responseJson[0].frontSideImageURL ? responseJson[0].frontSideImageURL : "/assets/img/cow-photos/1.png")),
+                        backSideImageURLThumb: this.createThumbnailURL((responseJson[0].backSideImageURL ? responseJson[0].backSideImageURL : "/assets/img/cow-photos/2.png")),
+                        rightSideImageURLThumb : this.createThumbnailURL((responseJson[0].rightSideImageURL ? responseJson[0].rightSideImageURL : "/assets/img/cow-photos/3.png")),
+                        leftSideImageURLThumb : this.createThumbnailURL((responseJson[0].leftSideImageURL ? responseJson[0].leftSideImageURL : "/assets/img/cow-photos/4.png")),
                         animalType: responseJson[0].animalTypeCD,
                         eventAdditionalMessage: (responseJson.length === 1 ? "Edit the desired values and press Search button" : "We expected to receive only one record matching the event code '" + parsed.eventCode + "' but we received " + responseJson.length), messageColor: "muted"});
           if (responseJson.length > 1)
             this.setState({messageColor: "danger"});
+
+
 
         images.push({src:this.state.frontSideImageURL,altText:'',header:'Front View'});
         images.push({src:this.state.backSideImageURL,altText:'',header:'Rear View'});
@@ -460,21 +493,33 @@ retrieveAnimallWeightGraphData(animalTag){
         body: JSON.stringify({
           "animalTag": parsed.animalTag,
           "loginToken": (new Cookies()).get('authToken'),
+        })
       })
-    })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({feedAnalysisMessage: responseJson.message, feedAnalysisMessageColor: "danger"});
+      .then(response => {
+        if (response.status === 401)
+          this.setState({authenticated : false});
+        return response.json();
+      })
+      .then(data => {
+        if (data.error) {
+         this.setState({feedAnalysisMessage: data.message, feedAnalysisMessageColor: "danger"});
       }
       else {
-         this.setState({feedCohort: responseJson[0].animalFeedCohortDeterminatationMessage,
-                        feedCohortTypeShortDescr: responseJson[0].feedCohortTypeShortDescr,
-                        planAnalysisComments: responseJson[0].planAnalysisComments,
-                        nutritionalNeedsDryMatter: responseJson[0].nutritionalNeedsDryMatter,
-                        nutritionalNeedsCrudeProtein: responseJson[0].nutritionalNeedsCrudeProtein,
-                        nutritionalNeedsTDN: responseJson[0].nutritionalNeedsTDN,
-                        nutritionalNeedsMetabloizableEnergy: responseJson[0].nutritionalNeedsMetabloizableEnergy,
+         this.setState({feedCohort: data.feedCohortTypeShortDescr,
+                        feedCohortTypeCD: data.feedCohortTypeCD,
+                        feedCohortTypeShortDescr: data.feedCohortTypeShortDescr,
+                        planAnalysisComments: data.feedPlan.planAnalysisComments,
+                        nutritionalNeedsDryMatter: data.nutritionalNeedsDryMatter,
+                        nutritionalNeedsCrudeProtein: data.nutritionalNeedsCrudeProtein,
+                        nutritionalNeedsTDN: data.nutritionalNeedsTDN,
+                        weight: data.weight,
+                        milkingAverage: data.milkingAverage,
+                        nutritionalNeedsMetabloizableEnergy: data.nutritionalNeedsMetabloizableEnergy,
+                        planCost: data.feedPlan[0].planCost,
+                        planAchievedDM: data.feedPlan[0].planAchievedDM,
+                        planAchievedCP: data.feedPlan[0].planAchievedCP,
+                        planAchievedME: data.feedPlan[0].planAchievedME,
+                        feedPlanItems: data.feedPlan[0].feedPlanItems,
                         feedAnalysisMessage: "", feedAnalysisMessageColor: "success"});         
       }
     })
@@ -486,6 +531,51 @@ retrieveAnimallWeightGraphData(animalTag){
     this.retrieveAnimallWeightGraphData(parsed.animalTag);
     this.retrieveAnimalAdvisement(parsed.animalTag);
     this.retrieveAnimalProgney(parsed.animalTag);
+    this.retrievePerformanceRating(parsed.animalTag);
+  }
+
+  retrievePerformanceRating(animalTag) {
+      fetch(API_PREFIX+ '/imd-farm-management/performance/evaluateanimalperformance', {
+          method: "POST",
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            "animalTag":animalTag,
+            "loginToken": (new Cookies()).get('authToken'),
+        })
+      })
+      .then(response => {
+        if (response.status === 401)
+          this.setState({authenticated : false});
+        return response.json();
+      })
+      .then(data => {
+        if (data.error) {
+           this.setState({performanceRatings:[], 
+            performanceRatingMessage: data.message, 
+            performanceRatingMessageColor: "danger"});
+        }
+        else {
+          //alert(data.length);
+          let index = 0;
+          let totalRating = 0;
+          let divisor = 0;
+          for (index=0; index < data.length; index++) {
+            if (data[index].starRating >=0) {
+              totalRating += data[index].starRating;
+              divisor++;
+            }
+          }
+          if (divisor > 0) {
+            totalRating = totalRating / divisor;
+          }
+          this.setState({totalPerformanceRating: Math.round(totalRating*100)/100, performanceRatings: data, performanceRatingMessage: "", performanceRatingMessageColor: "success"});
+          }
+        })
+    .catch(error => this.setState({performanceRatingMessage: "Following error occurred while processing the request: " + error.toString(), performanceRatingMessageColor: "danger"}));
+
   }
 
 
@@ -671,29 +761,29 @@ retrieveAnimallWeightGraphData(animalTag){
       .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
   }
 
-
-
   render() {
-    var { progneyList, progneyMessageColor, progneyMessage, infoList, warningList, alertList, message, invalidAccess, lifecycleStageList, sireList, feedAnalysisMessageColor, feedAnalysisMessage, eventAdditionalMessage, eventMessageColor, messageColor, eventlist} = this.state;
-    var { authenticated, weightGraphMessageColor, weightGraphMessage, genericMessage1, genericMessage2, month1MilkingRecord, month2MilkingRecord, message1Color, message2Color} = this.state;
+    var { feedPlanItems, progneyList, progneyMessageColor, progneyMessage, infoList, warningList, alertList, message, invalidAccess, lifecycleStageList, sireList, feedAnalysisMessageColor, feedAnalysisMessage, eventAdditionalMessage, eventMessageColor, messageColor, eventlist} = this.state;
+    var { totalPerformanceRating, performanceRatingMessage, performanceRatingMessageColor, performanceRatings, authenticated, weightGraphMessageColor, weightGraphMessage, genericMessage1, genericMessage2, month1MilkingRecord, month2MilkingRecord, message1Color, message2Color} = this.state;
     let recordCount = 0;
     let eventRecordCount = 0;
     if (invalidAccess)
       return (<Redirect to='/animal/search'  />);
     if (!authenticated)
       return (<Redirect to='/login'  />);
-
-    
+   
     return (
       <div className="animated fadeIn">
         <Row>
-          <Col xs="10" xl="8">
+          <Col xs="8" xl="6">
             <Card>
               <CardHeader>
-                <i className="fa fa-align-justify"></i>Tag # <strong>{this.state.animalTag}</strong>
+                <strong>{'# ' + this.state.animalTag + ' - TPI: ' + this.state.totalPerformanceRating} </strong>
               </CardHeader>
               <CardBody>
-                 <UncontrolledCarousel items={images} />
+                 <a href={this.state.frontSideImageURL} target="_blank" rel="noopener noreferrer" ><img src={this.state.frontSideImageURLThumb}  width="20%" alt={'front'} /></a>&nbsp;&nbsp;
+                 <a href={this.state.backSideImageURL} target="_blank" rel="noopener noreferrer" ><img src={this.state.backSideImageURLThumb}  width="20%" alt={'back'} /></a>&nbsp;&nbsp;
+                 <a href={this.state.rightSideImageURL} target="_blank" rel="noopener noreferrer" ><img src={this.state.rightSideImageURLThumb}  width="20%" alt={'right'} /></a>&nbsp;&nbsp;
+                 <a href={this.state.leftSideImageURL} target="_blank" rel="noopener noreferrer" ><img src={this.state.leftSideImageURLThumb}  width="20%" alt={'left'} /></a>
               </CardBody>
             </Card>
           </Col>
@@ -882,22 +972,130 @@ retrieveAnimallWeightGraphData(animalTag){
                 <Col md="8">
                   <Card>
                     <CardHeader>
+                      <i className="fa fa-align-justify"></i><strong>Performance Indicator</strong>
+                    </CardHeader>
+                    <CardBody>
+                      <FormText color={performanceRatingMessageColor}>&nbsp;{performanceRatingMessage}</FormText>
+                      <Table hover bordered striped responsive size="sm">
+                         <tr key="weight">
+                           <th width="55%">Milestone</th>
+                           <th width="15%">Performance</th>
+                         </tr>
+                        <tbody>
+                           {performanceRatings.map(rating => (
+                               <tr key="{rating.code}">
+                                <td width="55%">{rating.shortDescription}</td>
+                                <td width="15%">
+                                   <img src={"/assets/img/" + rating.starRating + "_stars.png"}  width="50%" alt={rating.starRating + " stars"} title={rating.evaluationResultMessage}/>
+                                </td>
+                             </tr>
+                             ))}
+                        </tbody>
+                      </Table>
+                    </CardBody>
+                  </Card>
+                </Col>
+              </Row>
+
+
+
+              <Row>
+                <Col md="8">
+                  <Card>
+                    <CardHeader>
                       <i className="fa fa-align-justify"></i><strong>Feed Information</strong>{' (' + this.state.feedCohortTypeShortDescr + ')'}<FormText color={feedAnalysisMessageColor}>&nbsp;{feedAnalysisMessage}</FormText>
                     </CardHeader>
                     <CardBody>
                       <Form action="" method="post" className="form-horizontal">
                         <FormGroup row>
-                          <Col sm="10">{this.state.feedCohort}</Col>
+                          The feed plan given in this section has been derived using&nbsp;<Link target='_blank' to={'/admin/feedplan/search?feedCohort=' + this.state.feedCohortTypeCD}>these</Link>&nbsp;feed configurations.
                         </FormGroup>
+                          <Row>
+                            <Col>
+                             <Table hover bordered striped responsive size="sm">
+                              <tr>
+                                <th colspan="2">Statistic</th>
+                              </tr> 
+                               <tbody>
+                                 <tr key="weight">
+                                   <td width="20%">Animal Feed Cohort</td>
+                                   <td width="40%">{this.state.feedCohort}</td>
+                                 </tr>
+                                 <tr key="weight">
+                                   <td width="20%">Last Measured Weight</td>
+                                   <td width="40%">{this.state.weight + ' kgs.'}</td>
+                                 </tr>
+                                 <tr key="weight">
+                                   <td width="20%">Recent Milk Average</td>
+                                   <td width="40%">{this.state.milkingAverage ? this.state.milkingAverage + ' liters/day' : ''}</td>
+                                 </tr>
+                                </tbody>
+                             </Table>
+                          </Col>
+                        </Row>
                         <FormGroup row>
-                          <Col sm="10">{this.state.planAnalysisComments}</Col>                          
+                          Feed the animal the following items in the specified quantity.
                         </FormGroup>
+                          <Row>
+                            <Col>
+                             <Table hover bordered striped responsive size="sm">
+                              <tr>
+                                <th>Feed Item</th>
+                                <th>Qty</th>
+                                <th>Cost</th>
+                              </tr> 
+                               <tbody>
+                                 {feedPlanItems.map(feedPlanItem => (
+                                     <tr key="{feedPlanItem.shortDescription}">
+                                       <td width="20%">{feedPlanItem.shortDescription}</td>
+                                       <td width="20%">{feedPlanItem.units === "Kgs." && feedPlanItem.dailyIntake < 1 ? (feedPlanItem.dailyIntake*1000) + ' gms.' : (feedPlanItem.dailyIntake + ' ' + feedPlanItem.units)}</td>
+                                       <td width="20%">{'Rs. ' + Math.round(feedPlanItem.costOfIntake)}</td>
+                                   </tr>
+                                   ))}
+                               </tbody>
+                             </Table>
+                          </Col>
+                        </Row>
                         <FormGroup row>
-                          <Col sm="10">{'The daily needs of this animal are: ' + (this.state.nutritionalNeedsDryMatter * 100 )+ 
-                          '% of body weight in Dry Matter (DM), Crude protein of ' + (this.state.nutritionalNeedsCrudeProtein * 100) + 
-                          ' % DM, ' + this.state.nutritionalNeedsMetabloizableEnergy + 
-                          ' MJ Metabolizable Energy and ' + this.state.nutritionalNeedsTDN + ' Kgs. TDN'}</Col>                          
+                          The above feed will provide the following nutrition to the animal:
                         </FormGroup>
+                          <Row>
+                            <Col>
+                             <Table hover bordered striped responsive size="sm">
+                              <tr>
+                                <th>Nutritional Needs</th>
+                                <th>Required</th>
+                                <th>Achieved</th>
+                              </tr> 
+                               <tbody>
+                                 <tr key="weight">
+                                   <td width="20%">Animal Feed Cohort</td>
+                                   <td colspan="2" width="40%">{this.state.feedCohort}</td>
+                                 </tr>
+                                 <tr key="dm">
+                                   <td width="20%">Dry Matter</td>
+                                   <td width="20%">{this.state.nutritionalNeedsDryMatter + ' Kgs.'}</td>
+                                   <td width="20%">{this.state.planAchievedDM + ' Kgs.'}</td>
+                                 </tr>
+                                 <tr key="cp">
+                                   <td width="20%">Crude Protein</td>
+                                   <td width="20%">{this.state.nutritionalNeedsCrudeProtein + ' Kgs.'}</td>
+                                   <td width="20%">{this.state.planAchievedCP + ' Kgs.'}</td>
+                                 </tr>
+                                 <tr key="me">
+                                   <td width="20%">Metabolizable Energy</td>
+                                   <td width="20%">{this.state.nutritionalNeedsMetabloizableEnergy + ' MJ'}</td>
+                                   <td width="20%">{this.state.planAchievedME + ' MJ'}</td>
+                                 </tr>
+                                </tbody>
+                             </Table>
+                          </Col>
+                        </Row>
+                        <FormGroup row>
+                          <FormText color='success'><b>The above plan will cost {'Rs. ' + this.state.planCost}</b></FormText>
+                        </FormGroup>
+                        <FormText color='muted'>Please note that the above analysis relies on the following values to be correctly enetered, else the analysis would be incorrect: <i>animal weight, feed cohort plan, the last three days of milking record for lactating animals, animal lifecycle stage, feed item nutritional values and cost.</i></FormText>
+                        The analysis is mostly based on the following reference:<i>Tropical dairy farming : feeding management for small holder dairy farmers in the humid tropics By John Moran, 312 pp., Landlinks Press, 2005</i>
                       </Form>
                     </CardBody>
                   </Card>

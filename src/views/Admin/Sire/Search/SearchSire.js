@@ -1,19 +1,22 @@
 import React, { Component } from 'react';
 
 import {
-   Card,
-   CardBody,
-   Col,
-   Fade,
-   Row,
-   Table,
-   Nav, 
-   NavItem, 
-   NavLink,
+  Card,
+  CardBody,
+  Col,
+  FormText,
+  Fade,
+  Row,
+  Table,
+  Nav, 
+  NavItem, 
+  NavLink,
 } from 'reactstrap';
 
 import { Link } from 'react-router-dom';
 import classnames from 'classnames';
+import { Redirect } from 'react-router-dom';
+import Cookies from 'universal-cookie';
 var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 
@@ -34,9 +37,10 @@ class SearchSire extends Component {
       isLoaded: true,
       animalTag: "",
       activeOnly: false,
+      authenticated: true,
       messageColor: "muted",
       animaltypelist: [],
-      eventAdditionalMessage: "Enter search fields (you can use % for wild card searches) and press Search button"
+      message: "... loading"
     };
     this.handleAnimalTagValue = this.handleAnimalTagValue.bind(this);
     this.handleActiveOnly = this.handleActiveOnly.bind(this);
@@ -70,19 +74,24 @@ class SearchSire extends Component {
 
         body: JSON.stringify({
           "animalTag": this.state.animalTag,
-          "animalType": "%"
+          "animalType": "%",
+          "loginToken": (new Cookies()).get('authToken')
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({items: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({items: [], isLoaded: true, message: data.message, messageColor: "danger"});
       }
       else {
-         this.setState({items: responseJson, isLoaded: true, eventAdditionalMessage: (responseJson.length === 1 ? responseJson.length + " matching record found" : responseJson.length + " matching records found"), messageColor: "success"});         
+         this.setState({items: data, isLoaded: true, message: (data.length === 1 ? data.length + " matching record found" : data.length + " matching records found"), messageColor: "success"});         
       }
     })
-    .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
+    .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
    }
 
   handleAnimalTagValue(event) {
@@ -109,19 +118,24 @@ class SearchSire extends Component {
 
         body: JSON.stringify({
           "animalTag": this.state.animalTag,
-          "animalType": "%"
+          "animalType": "%",
+          "loginToken": (new Cookies()).get('authToken')
       })
     })
-    .then(response => response.json())
-    .then(responseJson => {
-      if (responseJson.error) {
-         this.setState({items: [], isLoaded: true, eventAdditionalMessage: responseJson.message, messageColor: "danger"});
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({items: [], isLoaded: true, message: data.message, messageColor: "danger"});
       }
       else {
-         this.setState({items: responseJson, isLoaded: true, eventAdditionalMessage: (responseJson.length === 1 ? responseJson.length + " matching record found" : responseJson.length + " matching records found"), messageColor: "success"});         
+         this.setState({items: data, isLoaded: true, message: (data.length === 1 ? data.length + " matching record found" : data.length + " matching records found"), messageColor: "success"});         
       }
     })
-    .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
+    .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
   }
 
 
@@ -130,8 +144,10 @@ class SearchSire extends Component {
   }
 
   render() {
-    var { items } = this.state;
+    var { authenticated, items, messageColor, message } = this.state;
     let recordCount = 0;
+    if (!authenticated)
+      return (<Redirect to='/login'  />);
     return (
       <div className="animated fadeIn">
          <Row>
@@ -174,20 +190,21 @@ class SearchSire extends Component {
                            <tbody>
                              {items.map(item => (
                                  <tr key="{item.animalTag}">
-                                   <td>{++recordCount}</td>
-                                   <td>{item.alias}</td>
-                                   <td>{item.animalTag}</td>
-                                   <td>{isNaN(Math.round((item.semenSuccessCount / item.semenUsageCount) * 100)) ? "-" : Math.round((item.semenSuccessCount / item.semenUsageCount) * 100) + "%"}</td>
-                                   <td>{item.semenSuccessCount}</td>
-                                   <td>{item.semenFailureCount}</td>
-                                   <td>{item.semenTbdCount}</td>
+                                   <td width="5%">{++recordCount}</td>
+                                   <td width="5%"><a  rel="noopener noreferrer" href={'#/admin/sire/viewrecord?alias=' + item.alias +'&sire=' + item.animalTag}>{item.alias}</a></td>
+                                   <td width="5%">{item.animalTag}</td>
+                                   <td width="10%">{isNaN(Math.round((item.semenSuccessCount / item.semenUsageCount) * 100)) ? "-" : Math.round((item.semenSuccessCount / item.semenUsageCount) * 100) + "%"}</td>
+                                   <td width="5%"><a  rel="noopener noreferrer" href={'#/admin/sire/viewrecord?alias=' + item.alias +'&sire=' + item.animalTag + '&outcome=YES'}>{item.semenSuccessCount}</a></td>
+                                   <td width="5%"><a  rel="noopener noreferrer" href={'#/admin/sire/viewrecord?alias=' + item.alias +'&sire=' + item.animalTag + '&outcome=NO'}>{item.semenFailureCount}</a></td>
+                                   <td width="5%"><a  rel="noopener noreferrer" href={'#/admin/sire/viewrecord?alias=' + item.alias +'&sire=' + item.animalTag + '&outcome=TBD'}>{item.semenTbdCount}</a></td>
                                    <td>{item.controller}</td>
-                                   <td width="25%"><a target="_blank" rel="noopener noreferrer" href={item.sireDataSheet}>View Data Sheet</a></td>
-                                   <td><a target="_blank" rel="noopener noreferrer" href={item.sirePhoto} ><img alt='Sire' src={item.sirePhoto} width="100" height="60" /></a></td>
+                                   <td width="40%"><a target="_blank" rel="noopener noreferrer" href={item.sireDataSheet}>Data Sheet</a></td>
+                                   <td width="20%"><a target="_blank" rel="noopener noreferrer" href={item.sirePhoto} ><img alt='Sire' src={item.sirePhoto} width="100" height="60" /></a></td>
                                </tr>
                                ))}
                            </tbody>
                          </Table>
+                        <FormText color={messageColor}>&nbsp;{message}</FormText>
                        </CardBody>
                   </Card>
                </Fade>

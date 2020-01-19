@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Progress, TabContent, TabPane, ListGroup, ListGroupItem } from 'reactstrap';
+import { Badge, Progress, TabContent, TabPane, ListGroup, ListGroupItem } from 'reactstrap';
 import PropTypes from 'prop-types';
 import { AppSwitch } from '@coreui/react'
 import Cookies from 'universal-cookie';
@@ -92,6 +92,7 @@ class DefaultAside extends Component {
 
     // eslint-disable-next-line
     const { children, ...attributes } = this.props;
+    let keyIndex = 0;
     if (!authenticated)
       return (<Redirect to='/login'  />);
 
@@ -100,35 +101,39 @@ class DefaultAside extends Component {
         <TabContent activeTab={this.state.activeTab} >
           <TabPane tabId="1">
             <ListGroup className="list-group-accent" tag={'div'}>
-              <ListGroupItem className="list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">Alerts</ListGroupItem>
+              <ListGroupItem className="list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">Alerts <Badge pill color="danger">{alertList.length}</Badge></ListGroupItem>
                 {alertList.map(alertItem => (
-                <ListGroupItem action tag="a" href="#" className={(alertItem.advisementRule === "THUMBSUP" ? "list-group-item-accent-success list-group-item-divider" : "list-group-item-accent-danger list-group-item-divider")}>
+                <ListGroupItem action tag="a" key={keyIndex++} target="_blank" href={'#/animal/search?animalTags=' + alertItem.animalTags} className={(alertItem.advisementRule === "THUMBSUP" ? "list-group-item-accent-success list-group-item-divider" : "list-group-item-accent-danger list-group-item-divider")}>
                     <div className="avatar float-right">
                       <img className="img-avatar" src={"assets/img/avatars/" + alertItem.advisementRule + ".png"} alt="imddairies@gmail.com"/>
                     </div>
-                    <div>{alertItem.ruleOutcomeMessage + ": "}<a target="_blank" rel="noopener noreferrer" href={'#/animal/search?animalTags=' + alertItem.animalTags}><strong>{alertItem.animalTags}</strong></a></div>
+                    <div>{alertItem.ruleOutcomeMessage + ": "}
+                      <strong>{alertItem.animalTags}</strong>
+                    </div>
                 </ListGroupItem>
                    ))}
-              <ListGroupItem className="list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">Warnings</ListGroupItem>
+              <ListGroupItem className="list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">Warnings <Badge pill color="warning">{warningList.length}</Badge></ListGroupItem>
                 {warningList.map(alertItem => (
-                <ListGroupItem action tag="a" href="#" className={(alertItem.advisementRule === "THUMBSUP" ? "list-group-item-accent-success list-group-item-divider" : "list-group-item-accent-warning list-group-item-divider")} >
+                <ListGroupItem key={keyIndex++} action tag="a" target="_blank" href={'#/animal/search?animalTags=' + alertItem.animalTags} className={(alertItem.advisementRule === "THUMBSUP" ? "list-group-item-accent-success list-group-item-divider" : "list-group-item-accent-warning list-group-item-divider")} >
                     <div className="avatar float-right">
                       <img className="img-avatar" src={"assets/img/avatars/" + alertItem.advisementRule + ".png"} alt="imddairies@gmail.com"/>
                     </div>
-                    <div>{alertItem.ruleOutcomeMessage + ": "}<a target="_blank" rel="noopener noreferrer" href={'#/animal/search?animalTags=' + alertItem.animalTags}><strong>{alertItem.animalTags}</strong></a></div>
+                    <div>{alertItem.ruleOutcomeMessage + ": "}
+                      <strong>{alertItem.animalTags}</strong>
+                    </div>
                 </ListGroupItem>
                    ))}
-
-              <ListGroupItem className="list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">Intimations</ListGroupItem>
+              <ListGroupItem className="list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">Intimations <Badge pill color="info">{infoList.length}</Badge></ListGroupItem>
                 {infoList.map(alertItem => (
-                <ListGroupItem action tag="a" href="#" className={(alertItem.advisementRule === "THUMBSUP" ? "list-group-item-accent-success list-group-item-divider" : "list-group-item-accent-info list-group-item-divider")} >
+                <ListGroupItem key={keyIndex++} action tag="a"  target="_blank" href={'#/animal/search?animalTags=' + alertItem.animalTags} className={(alertItem.advisementRule === "THUMBSUP" ? "list-group-item-accent-success list-group-item-divider" : "list-group-item-accent-info list-group-item-divider")} >
                     <div className="avatar float-right">
                       <img className="img-avatar" src={"assets/img/avatars/" + alertItem.advisementRule + ".png"} alt="imddairies@gmail.com"/>
                     </div>
-                    <div>{alertItem.ruleOutcomeMessage + (alertItem.advisementRule === "THUMBSUP" ? "" : ": ")}<a target="_blank" rel="noopener noreferrer" href={'#/animal/search?animalTags=' + alertItem.animalTags}><strong>{alertItem.animalTags}</strong></a></div>
+                    <div>{alertItem.ruleOutcomeMessage + (alertItem.advisementRule === "THUMBSUP" ? "" : ": ")}
+                    <strong>{alertItem.animalTags}</strong>
+                    </div>
                 </ListGroupItem>
                    ))}
-
             </ListGroup>
           </TabPane>
           <TabPane tabId="2" className="p-3">
@@ -223,7 +228,7 @@ class DefaultAside extends Component {
             <div className="aside-options">
               <div className="clearfix mt-4">
                 <small><b>Option 1</b></small>
-                <AppSwitch className={'float-right'} variant={'pill'} label color={'success'} defaultChecked size={'sm'}/>
+                <AppSwitch className={'float-right'} variant={'pill'} label color={'danger'} defaultChecked size={'sm'}/>
               </div>
               <div>
                 <small className="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod

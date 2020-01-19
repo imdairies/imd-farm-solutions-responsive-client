@@ -244,7 +244,7 @@ class AddFarmDailyMilk extends Component {
 
    fetchMilkingRecordForTheEvent(eventNumber, timestampValue){
     if (timestampValue !== null) {
-      fetch(API_PREFIX + '/imd-farm-management/animals/lactatingcowsmilkrecord', {
+      fetch(API_PREFIX + '/imd-farm-management/milkinginfo/lactatingcowsmilkrecord', {
               method: "POST",
               headers: {
                   'Accept': 'application/json',
@@ -553,7 +553,7 @@ class AddFarmDailyMilk extends Component {
                               {animaltaglist.map(animaltagitem => (
                                 <tr id={animaltagitem.animalTag}>
                                     <td width="9%"><Link  tabindex="-1" to={'/animal/update?animalTag?orgID=IMD&&animalTag=' + animaltagitem.animalTag}>{animaltagitem.animalTag}</Link></td>
-                                    <td width="5%">{parseFloat(Math.round(animaltagitem.DAYS_IN_MILKING /30 * 10)/10)}</td>
+                                    <td width="5%">{animaltagitem.DAYS_IN_MILKING <= 0 ? "" : parseFloat(Math.round(animaltagitem.DAYS_IN_MILKING /30 * 10)/10)}</td>
                                     <td width="8%">{animaltagitem.SEQ_NBR_MONTHLY_AVERAGE}</td>
                                     <td width="8%">{animaltagitem.YESTERDAY_SEQ_NBR_VOL}</td>
                                     <td width="30%">
