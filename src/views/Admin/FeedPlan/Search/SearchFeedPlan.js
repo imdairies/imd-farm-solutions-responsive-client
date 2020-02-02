@@ -490,6 +490,11 @@ class SearchFeedPlan extends Component {
                             <Button type="button" size="md" color="success" disabled={this.state.copiedPlan.length === 0} onClick={this.handlePastePlan}><i className="fa fa-paste"></i>{' '}</Button>
                           </Col>
                         </Row>
+                        <Row>
+                          <Col>
+                            <FormText color={messageColor}>&nbsp;{additionalMessage}</FormText>
+                          </Col>
+                        </Row>
                      </CardBody>
                     <CardFooter>
                       <Button type="button" size="md" color="primary" disabled={!dirty}  onClick={this.handleUpdate}><i className="fa fa-pencil"></i>{' '}Update</Button>

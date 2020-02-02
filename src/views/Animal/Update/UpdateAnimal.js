@@ -4,7 +4,6 @@ import {
   Button, Card, CardBody, CardFooter, CardHeader, Col, Fade, Form,
   FormGroup, FormText, Input, Row,
   Label,  Dropdown, DropdownToggle, DropdownMenu, Table, DropdownItem,
-  UncontrolledCarousel,
 } from 'reactstrap';
 // import ViewMilking  from '../Milking/View';
 import { Redirect } from 'react-router-dom';
@@ -558,20 +557,37 @@ retrieveAnimallWeightGraphData(animalTag){
             performanceRatingMessageColor: "danger"});
         }
         else {
-          //alert(data.length);
           let index = 0;
           let totalRating = 0;
           let divisor = 0;
-          for (index=0; index < data.length; index++) {
-            if (data[index].starRating >=0) {
-              totalRating += data[index].starRating;
+          let perfData = data.performanceInformation;
+          let milkPlusBadge = false;
+          let growthPlusBadge = false;
+          let fertilityPlusBadge = false;
+
+          // alert(perfData.length);
+          for (index=0; index < perfData.length; index++) {
+            if (perfData[index].starRating >=0) {
+              totalRating += perfData[index].starRating;
               divisor++;
             }
           }
           if (divisor > 0) {
             totalRating = totalRating / divisor;
           }
-          this.setState({totalPerformanceRating: Math.round(totalRating*100)/100, performanceRatings: data, performanceRatingMessage: "", performanceRatingMessageColor: "success"});
+          if (data.milkPlusBadge)
+            milkPlusBadge = true;
+          if (data.growthPlusBadge)
+            growthPlusBadge = true;
+          if (data.fertilityPlusBadge)
+            fertilityPlusBadge = true;
+
+          this.setState({milkPlusBadge: milkPlusBadge, 
+            growthPlusBadge: growthPlusBadge, 
+            fertilityPlusBadge:fertilityPlusBadge,
+            totalPerformanceRating: Math.round(totalRating*100)/100, 
+            performanceRatings: perfData, performanceRatingMessage: "", 
+            performanceRatingMessageColor: "success"});
           }
         })
     .catch(error => this.setState({performanceRatingMessage: "Following error occurred while processing the request: " + error.toString(), performanceRatingMessageColor: "danger"}));
@@ -763,14 +779,21 @@ retrieveAnimallWeightGraphData(animalTag){
 
   render() {
     var { feedPlanItems, progneyList, progneyMessageColor, progneyMessage, infoList, warningList, alertList, message, invalidAccess, lifecycleStageList, sireList, feedAnalysisMessageColor, feedAnalysisMessage, eventAdditionalMessage, eventMessageColor, messageColor, eventlist} = this.state;
-    var { totalPerformanceRating, performanceRatingMessage, performanceRatingMessageColor, performanceRatings, authenticated, weightGraphMessageColor, weightGraphMessage, genericMessage1, genericMessage2, month1MilkingRecord, month2MilkingRecord, message1Color, message2Color} = this.state;
+    var { growthPlusBadge, fertilityPlusBadge, milkPlusBadge, performanceRatingMessage, performanceRatingMessageColor, performanceRatings, authenticated, weightGraphMessageColor, weightGraphMessage, genericMessage1, genericMessage2, month1MilkingRecord, month2MilkingRecord, message1Color, message2Color} = this.state;
     let recordCount = 0;
     let eventRecordCount = 0;
+
     if (invalidAccess)
       return (<Redirect to='/animal/search'  />);
     if (!authenticated)
       return (<Redirect to='/login'  />);
-   
+
+    let growthPlusBadgeDisplay  = growthPlusBadge ? {} : {display : 'none'};
+    let fertilityPlusBadgeDisplay  = fertilityPlusBadge ? {} : {display : 'none'};
+    let milkPlusBadgeDisplay  = milkPlusBadge ? {} : {display : 'none'};
+    let badgeRowDisplay = milkPlusBadge || fertilityPlusBadge || growthPlusBadge ? {} : {display : 'none'};
+
+
     return (
       <div className="animated fadeIn">
         <Row>
@@ -797,6 +820,15 @@ retrieveAnimallWeightGraphData(animalTag){
                     <CardHeader><strong>Basic Information</strong></CardHeader>
                     <CardBody>
                       <Form action="" method="post" className="form-horizontal">
+                        <FormGroup row>
+                          <Label sm="4" htmlFor="input-normal"  style={badgeRowDisplay} >Badges</Label>
+                          <Col sm="4">
+                           <img src={"/assets/img/calf-growth-champion.png"}  width="20%" alt={"Fast Growth"} title={"This animal was a fast grower calf"} style={growthPlusBadgeDisplay}  />
+                           <img id='milkPlusBadge' src={"/assets/img/milk-flow.png"}  width="20%" alt={"High Producer"} title={"This animal is a high milk producer"} style={milkPlusBadgeDisplay}  />
+                           <img id='fertilityPlusBadge' src={"/assets/img/fertility-champ.png"}  width="20%" alt={"High Conception"} title={"This animal has a high conception rate"} style={fertilityPlusBadgeDisplay}  />
+                          </Col>
+                        </FormGroup>
+
                         <FormGroup row>
                           <Label sm="4" htmlFor="input-normal">Alias</Label>
                           <Col sm="4">
@@ -904,7 +936,6 @@ retrieveAnimallWeightGraphData(animalTag){
                               </DropdownMenu>
                             </Dropdown>
                           </Col>
-
                         </FormGroup>
                       </Form>
                     </CardBody>

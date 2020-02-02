@@ -154,7 +154,6 @@ class SearchAnimal extends Component {
         }
       })
       .catch(error => this.setState({eventAdditionalMessage: error.toString(), messageColor: "danger"}));
-
     } else if (searchTypeCD != null) {
       fetch(API_PREFIX + '/imd-farm-management/animals/search', {
           method: "POST",
