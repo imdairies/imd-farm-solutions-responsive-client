@@ -105,12 +105,6 @@ var herdSizeHistoryOpts = {
   var data3 = [];
 
 
-  // for (var i = 0; i <= elements; i++) {
-  //   data1.push(random(10, 24));
-  //   data2.push(random(10, 24));
-  //   data3.push(18);
-  // }
-
 var mainChart = {
   labels: [],
   datasets: [
@@ -197,6 +191,75 @@ var mainChartOpts = {
   },
 };
 
+
+var data11 = [];
+var data12 = [];
+
+
+var completeMilkingDataChart = {
+  labels: [],
+  datasets: [
+    {
+      label: 'ltr/day',
+      backgroundColor: hexToRgba(brandSuccess, 0),
+      borderColor: brandSuccess,
+      pointHoverBackgroundColor: '#fff',
+      borderWidth: 1,
+      data: data11
+    },
+    {
+      label: 'lactating',
+      backgroundColor: 'transparent',
+      borderColor: brandDanger,
+      pointHoverBackgroundColor: '#fff',
+      borderWidth: 0.25,
+      data: data12
+    },
+  ],
+};
+
+var completeMilkingDataChartOpts = {
+  tooltips: {
+    enabled: false,
+    custom: CustomTooltips,
+    intersect: true,
+    mode: 'index',
+    position: 'nearest',
+    callbacks: {
+      labelColor: function(tooltipItem, chart) {
+        return { backgroundColor: chart.data.datasets[tooltipItem.datasetIndex].borderColor }
+      }
+    }
+  },
+  maintainAspectRatio: false,
+  legend: {
+    display: false,
+  },
+  scales: {
+    xAxes: [
+      {
+        gridLines: {
+          drawOnChartArea: false,
+        },
+      }],
+    yAxes: [
+      {
+        ticks: {
+          beginAtZero: true,
+        },
+      }],
+  },
+  elements: {
+    point: {
+      radius: 0,
+      hitRadius: 10,
+      hoverRadius: 4,
+      hoverBorderWidth: 3,
+    },
+  },
+};
+
+
 class Dashboard extends Component {
   constructor(props) {
     super(props);
@@ -204,6 +267,7 @@ class Dashboard extends Component {
     this.toggle = this.toggle.bind(this);
     this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
     this.loadCurrentYearData = this.loadCurrentYearData.bind(this);
+    this.loadCompleteMilkProductionData = this.loadCompleteMilkProductionData.bind(this);
     this.loadPreviousYearData = this.loadPreviousYearData.bind(this);
     this.loadCurrentMonthData = this.loadCurrentMonthData.bind(this);
     this.retrieveLactatingCount = this.retrieveLactatingCount.bind(this);
@@ -228,6 +292,7 @@ class Dashboard extends Component {
       activeAnimalWidgetMessage: "",
       lactatingAnimalWidgetMessage: "",
       chartTitle: "Daily Milk Production",
+      completeMilkingDataChartTitle: "Farm Milk Production History",
       previsousMonth: "",
       previsousMonthYear: "",
       previousPreviousMonth : "", 
@@ -321,6 +386,7 @@ class Dashboard extends Component {
       this.retrieveHerdSizeHistory();
       this.retrieveRecentBreedingEvents();
       this.retrieveMilkingRecordOfMonth();
+      this.loadCompleteMilkProductionData();
    }
 
 
@@ -662,6 +728,7 @@ retrieveLactatingCount() {
         })
         .catch(error => this.setState({chartErrorMessage: 'Following error occurred while retrieving the information:' + error.toString()}));
   }
+
   loadPreviousMonthData(){
       let now =  new Date();
       let prevMonth = now.getMonth()+1; // getMonth() returns months in the range of 0-11
@@ -703,6 +770,7 @@ retrieveLactatingCount() {
         })
         .catch(error => this.setState({chartErrorMessage: 'The following error occurred while retrieving the information: ' + error.toString()}));
   }
+
   loadPreviousPreviousMonthData(){
       let now =  new Date();
       let prevMonth = now.getMonth()+1; // getMonth() returns months in the range of 0-11
@@ -745,6 +813,7 @@ retrieveLactatingCount() {
         })
         .catch(error => this.setState({chartErrorMessage: 'The following error occurred while retrieving the information: ' + error.toString()}));
   }
+
   loadCurrentYearData(){
       let now =  new Date();
       fetch(API_PREFIX+ '/imd-farm-management/milkinginfo/milkingrecordofeachdayofyear', {
@@ -824,7 +893,42 @@ retrieveLactatingCount() {
         })
         .catch(error => this.setState({chartErrorMessage: 'The following error occurred while retrieving the information: ' + error.toString()}));
   }
-
+  loadCompleteMilkProductionData(){
+      fetch(API_PREFIX+ '/imd-farm-management/milkinginfo/completemilkingrecord', {
+              method: "POST",
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                "loginToken": (new Cookies()).get('authToken'), 
+            })
+          })
+       .then(response => response.json())
+        .then(responseJson => {
+          if (responseJson.error) {
+             this.setState({completeMilkingDataChartErrorMessage: responseJson.message});
+          }
+          else {
+            completeMilkingDataChart.labels = responseJson[0].dates;
+            completeMilkingDataChart.datasets[0].data = responseJson[0].volumes;
+            completeMilkingDataChart.datasets[1].data = responseJson[0].milkedAnimals;
+            completeMilkingDataChartOpts.scales.yAxes = [{ ticks: {
+                                                      beginAtZero: true,
+                                                      maxTicksLimit: 10,
+                                                      stepSize: 75,
+                                                      max: 750,
+                                                      min: 0,
+                                                    },
+                                                  }]
+             this.setState({completeMilkingDataChartErrorMessage: "", completeMilkingDataChartMonthVolumes: responseJson[0].volumes, completeMilkingDataChartMonthDays:responseJson[0].dates});
+             // alert(responseJson[0].days);
+            this.setState({completeMilkingDataChartTitle: "Farm Milk Production History",
+            completeMilkingDataChartSubTitle: responseJson[0].title});
+          }
+        })
+        .catch(error => this.setState({completeMilkingDataChartErrorMessage: 'The following error occurred while retrieving the information: ' + error.toString()}));
+  }
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
 
   render() {
@@ -832,7 +936,7 @@ retrieveLactatingCount() {
       inseminatedThisMonthList, expectedCalvingThisMonthList, breedingWidgetMessage, abortedThisMonthCount, calvedThisMonthCount, 
       inseminatedThisMonthCount, abortedThisMonthList, calvedThisMonthList, herdSizeTrend, inseminationTrend, 
       expectedCalvingThisMonthLabel, abortedThisMonthLabel, calvedThisMonthLabel, inseminatedThisMonthLabel,
-      previousPreviousMonth, previsousMonth, currentMonth, currentYear, authenticated, previousYear, chartErrorMessage} = this.state;
+      previousPreviousMonth, previsousMonth, currentMonth, currentYear, authenticated, previousYear, chartErrorMessage } = this.state;
     if (!authenticated)
       return (<Redirect to='/login'  />);
 
@@ -899,9 +1003,30 @@ retrieveLactatingCount() {
                     </ButtonToolbar>
                   </Col>
                 </Row>
-                <div className="chart-wrapper" style={{ height: 300 + 'px', marginTop: 40 + 'px' }} >
-                  <Line data={mainChart} options={mainChartOpts} />
-                </div>
+                <Row>
+                  <Col>
+                    <div className="chart-wrapper" style={{ height: 200 + 'px', marginTop: 20 + 'px' }} >
+                      <Line data={mainChart} options={mainChartOpts} />
+                    </div>
+                  </Col>
+                </Row>
+              </CardBody>
+            </Card>
+            <Card>
+              <CardBody>
+                <Row>
+                  <Col sm="5">
+                    <CardTitle className="mb-0">{this.state.completeMilkingDataChartTitle}</CardTitle>
+                    <div className={chartErrorMessage === '' ? 'small text-muted' : 'small text-danger' }>{this.state.completeMilkingDataChartSubTitle}</div>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <div className="chart-wrapper" style={{ height: 250 + 'px', marginTop: 5 + 'px' }} >
+                      <Line data={completeMilkingDataChart} options={completeMilkingDataChartOpts} />
+                    </div>
+                  </Col>
+                </Row>
               </CardBody>
             </Card>
           </Col>

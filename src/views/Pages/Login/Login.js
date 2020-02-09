@@ -148,8 +148,8 @@ class Login extends Component {
                   <CardBody className="text-center">
                     <div>
                       <h2>Sign up</h2>
-                      <p>At IMDairies we use our home grown Farm Solutions software to manage our herd. The existing solutions in the market are either 
-                      butil for large commercial dairies or are overly simplistic to be of any real use to small and medium dairy farms. <i>IMDairies Farm Management Solution</i> is our attempt
+                      <p>At IMDairies, we have developed our own <i>Farm Management Software</i> to manage our herd. The existing solutions in the market are either 
+                      built for large commercial dairies or are overly simplistic to be of any real use to small and medium dairy farms. <i>IMDairies Farm Management Solution</i> is our attempt
                       to provide small and medium dairy farm owners with a simple to use managed software to help them manage their herd effectively. The main focus of this software
                       is herd management. As of now the software is in pilot use and is made freely available to a few pilot users. If you want to be included in the pilot user group press the button below and one of our representatives will
                       get in touch with you. 
