@@ -807,6 +807,11 @@ retrieveAnimallWeightGraphData(animalTag){
                  <a href={this.state.backSideImageURL} target="_blank" rel="noopener noreferrer" ><img src={this.state.backSideImageURLThumb}  width="20%" alt={'back'} /></a>&nbsp;&nbsp;
                  <a href={this.state.rightSideImageURL} target="_blank" rel="noopener noreferrer" ><img src={this.state.rightSideImageURLThumb}  width="20%" alt={'right'} /></a>&nbsp;&nbsp;
                  <a href={this.state.leftSideImageURL} target="_blank" rel="noopener noreferrer" ><img src={this.state.leftSideImageURLThumb}  width="20%" alt={'left'} /></a>
+                  <Row>
+                    <Col><Link to={'/animal/photo/update?animalTag=' + this.state.animalTag + '&orgID=' + this.state.orgID} ><i className="fa icon-camera fa-lg mt-1"></i></Link>
+                    </Col>
+                  </Row>
+
               </CardBody>
             </Card>
           </Col>

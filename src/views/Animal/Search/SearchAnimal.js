@@ -592,19 +592,21 @@ class SearchAnimal extends Component {
                               <th>Dam</th>
                               <th>Sire</th>
                               <th>Age</th>
+                              <th>Photo</th>
                             </tr> 
                          </thead>
                          <tbody>
                            {items.map(item => (
                                <tr key="{item.animalTag}">
                                  <td>{++recordCount}</td>
-                                 <td><Link target='_blank' to={'/animal/update?animalTag=' + item.animalTag + '&orgID=' + item.orgID} >{item.animalTag}</Link></td>
+                                 <td><Link to={'/animal/update?animalTag=' + item.animalTag + '&orgID=' + item.orgID} >{item.animalTag}</Link></td>
                                  <td>{item.gender === 'M' ? 'Male' : item.gender === 'F' ? 'Female' : ''}</td>
                                  <td>{item.animalType}</td>
                                  <td>{item.animalStatus}</td>
                                  <td><Link to={'/animal/update?animalTag=' + item.animalDam + '&orgID=' + item.orgID} >{item.animalDam}</Link></td>
-                                 <td><a target="_blank" rel="noopener noreferrer" href={(item.isBornThroughAI ? item.animalSireURL : '#/animal/update?animalTag=' + item.animalSire + '&orgID=' + item.orgID)} >{item.animalSireAlias + " " + item.animalSire }</a></td>
+                                 <td><a rel="noopener noreferrer" href={(item.isBornThroughAI ? item.animalSireURL : '#/animal/update?animalTag=' + item.animalSire + '&orgID=' + item.orgID)} >{item.animalSireAlias + " " + item.animalSire }</a></td>
                                  <td>{item.currentAge}</td>
+                                 <td><Link to={'/animal/photo/update?animalTag=' + item.animalTag + '&orgID=' + item.orgID} ><i className="fa icon-camera fa-lg mt-1"></i></Link></td>
                              </tr>
                              ))}
                          </tbody>

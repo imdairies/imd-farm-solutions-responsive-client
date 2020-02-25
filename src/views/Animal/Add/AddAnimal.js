@@ -572,8 +572,40 @@ class AddAnimal extends Component {
                             </InputGroup>
                           </Col>
                         </FormGroup>
-                        <FormText color={messageColor}>&nbsp;{message}</FormText>
+                        <FormGroup row>
+                          <Label sm="4" htmlFor="input-normal">Front Photo</Label>
+                          <Col>
+                            <InputGroup>
+                              <input type="file" name="frontPhoto"/>
+                            </InputGroup>
+                          </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                          <Label sm="4" htmlFor="input-normal">Back Photo</Label>
+                          <Col>
+                            <InputGroup>
+                              <input type="file" name="backPhoto"/>
+                            </InputGroup>
+                          </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                          <Label sm="4" htmlFor="input-normal">Right Side Photo</Label>
+                          <Col>
+                            <InputGroup>
+                              <input type="file" name="rightPhoto"/>
+                            </InputGroup>
+                          </Col>
+                        </FormGroup>
                       </Form>
+                        <FormGroup row>
+                          <Label sm="4" htmlFor="input-normal">Left Side Photo</Label>
+                          <Col>
+                            <InputGroup>
+                              <Input type="file" inputProps={{ accept: 'image/*' }} name="LeftPhoto" />
+                            </InputGroup>
+                          </Col>
+                        </FormGroup>
+                        <FormText color={messageColor}>&nbsp;{message}</FormText>
                     </CardBody>
                     <CardFooter>
                       <Button type="button" size="md" color="primary" onClick={this.handleAdd}><i className="fa fa-plus"></i>{' '}Add</Button>

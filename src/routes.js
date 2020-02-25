@@ -61,6 +61,7 @@ const UpdateMessage    = React.lazy(() => import('./views/Admin/MessageCatalog/U
 const SearchAnimalEvent = React.lazy(() => import('./views/Animal/Event/Search'));
 const AddAnimalEvent    = React.lazy(() => import('./views/Animal/Event/Add'));
 const UpdateAnimalEvent = React.lazy(() => import('./views/Animal/Event/Update'));
+const UpdatePhotoGallery = React.lazy(() => import('./views/Animal/Photo/Update'));
 
 
 const ViewMilking = React.lazy(() => import('./views/Animal/Milking/View'));
@@ -156,6 +157,7 @@ const routes = [
   { path: '/animal/event/search', name: 'SearchAnimalEvent', component: SearchAnimalEvent },
   { path: '/animal/event/add', name: 'AddAnimalEvent', component: AddAnimalEvent },
   { path: '/animal/event/update', name: 'UpdateAnimalEvent', component: UpdateAnimalEvent },
+  { path: '/animal/photo/update', name: 'UpdatePhotoGallery', component: UpdatePhotoGallery },  
 
   { path: '/animal/milking/view', name: 'ViewMilking', component: ViewMilking },
   { path: '/animal/milking/add', name: 'AddDailyMilk', component: AddDailyMilk },
