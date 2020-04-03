@@ -294,7 +294,7 @@ class SearchAnimalEvent extends Component {
                              {eventlist.map(item => (
                                  <tr key="{item.animalTag}">
                                    <td>{eventlist.length - ++recordCount + 1}</td>
-                                   <td width="10%" data-toggle="tooltip" title={item.eventTimeStamp.substring(item.eventTimeStamp.length-8).trim()}>{item.eventTimeStamp.substring(0,item.eventTimeStamp.length-8).trim()}</td>
+                                   <td width="10%" data-toggle="tooltip" title={item.eventTimeStamp.substring(item.eventTimeStamp.length-5).trim()}>{item.eventTimeStamp.substring(0,item.eventTimeStamp.length-5).trim()}</td>
                                    <td><Link to={'/animal/event/update?eventTransactionID=' + item.eventTransactionID} >{item.eventShortDescription}</Link></td>
                                    <td>{item.eventOperator}</td>
                                    <td>{item.daysFromToday}</td>

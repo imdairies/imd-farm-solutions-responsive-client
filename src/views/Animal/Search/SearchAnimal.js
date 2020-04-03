@@ -63,7 +63,9 @@ class SearchAnimal extends Component {
       sireList:[],
       damList: [],
       eventAdditionalMessage: "Enter search fields and press Search button",
-      authenticated: true
+      authenticated: true,
+      ageFrom: "",
+      ageTo: "",
     };
     this.handleAnimalTagValueChange = this.handleAnimalTagValueChange.bind(this);
     this.handleActiveOnly = this.handleActiveOnly.bind(this);
@@ -75,6 +77,8 @@ class SearchAnimal extends Component {
     this.handleGenderChange = this.handleGenderChange.bind(this);
     this.handleDobFromChange = this.handleDobFromChange.bind(this);
     this.handleDobToChange = this.handleDobToChange.bind(this);
+    this.handleAgeFromChange = this.handleAgeFromChange.bind(this);
+    this.handleAgeToChange = this.handleAgeToChange.bind(this);
   }
 
   toggle(i) {
@@ -282,9 +286,19 @@ class SearchAnimal extends Component {
       this.setState({gender: event.target.value, genderValue:event.target.id});
   }
 
+  handleAgeFromChange(event) {
+    this.setState({ageFrom: event.target.value});
+  }
+
+  handleAgeToChange(event) {
+    this.setState({ageTo: event.target.value});
+  }
+
+
   handleDobToChange(event) {
     this.setState({dobTo: event.target.value});
   }
+
   handleDobFromChange(event) {
     this.setState({dobFrom: event.target.value});
   }
@@ -321,6 +335,8 @@ class SearchAnimal extends Component {
           "dateOfBirthStr": this.state.dobFrom,
           "dobFrom": this.state.dobFrom,
           "dobTo": this.state.dobTo,
+          "ageInMonthsFrom": this.state.ageTo,
+          "ageInMonthsTo": this.state.ageFrom,
           "activeOnly": this.state.activeOnly,
           "loginToken": (new Cookies()).get('authToken')
       })
@@ -393,7 +409,7 @@ class SearchAnimal extends Component {
                                 <InputGroupText>
                                   <i className="fa icon-tag fa-lg mt-1"></i>
                                 </InputGroupText>
-                              <Input id="animalTag" type="text" maxLength="10" value={this.state.animalTag} onChange={this.handleAnimalTagValueChange} placeholder="Animal Tag"/>
+                              <Input id="animalTag" type="text" maxLength="100" value={this.state.animalTag} onChange={this.handleAnimalTagValueChange} placeholder="Animal Tag"/>
                             </InputGroup>
                           </Col>
                         </FormGroup>
@@ -497,7 +513,7 @@ class SearchAnimal extends Component {
                                 <InputGroupText>
                                   <i className="fa icon-calendar fa-md mt-1"></i>
                                 </InputGroupText>
-                              <Input id="dobFrom" type="text" maxLength="10" value={this.state.dobFrom} onChange={this.handleDobFromChange} placeholder="Date of Birth From"/>
+                              <Input id="dobFrom" type="text" maxLength="10" value={this.state.dobFrom} onChange={this.handleDobFromChange} placeholder="Born After (yyyy-dd-mm)"/>
                             </InputGroup>
                           </Col>
                           <Col>
@@ -505,7 +521,25 @@ class SearchAnimal extends Component {
                                 <InputGroupText>
                                   <i className="fa icon-calendar fa-md mt-1"></i>
                                 </InputGroupText>
-                              <Input id="dobTo" type="text" maxLength="10" value={this.state.dobTo} onChange={this.handleDobToChange} placeholder="Date of Birth To"/>
+                              <Input id="dobTo" type="text" maxLength="10" value={this.state.dobTo} onChange={this.handleDobToChange} placeholder="Born Before (yyyy-dd-mm)"/>
+                            </InputGroup>
+                          </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                          <Col>
+                            <InputGroup>
+                                <InputGroupText>
+                                  <i className="fa icon-question fa-md mt-1"></i>
+                                </InputGroupText>
+                              <Input id="dobFrom" type="number" maxLength="5" value={this.state.ageFrom} onChange={this.handleAgeFromChange} placeholder="Older than XX months"/>
+                            </InputGroup>
+                          </Col>
+                          <Col>
+                            <InputGroup>
+                                <InputGroupText>
+                                  <i className="fa icon-question fa-md mt-1"></i>
+                                </InputGroupText>
+                              <Input id="dobTo" type="number" maxLength="5" value={this.state.ageTo} onChange={this.handleAgeToChange} placeholder="Younger than YY months"/>
                             </InputGroup>
                           </Col>
                         </FormGroup>
@@ -606,7 +640,7 @@ class SearchAnimal extends Component {
                                  <td><Link to={'/animal/update?animalTag=' + item.animalDam + '&orgID=' + item.orgID} >{item.animalDam}</Link></td>
                                  <td><a rel="noopener noreferrer" href={(item.isBornThroughAI ? item.animalSireURL : '#/animal/update?animalTag=' + item.animalSire + '&orgID=' + item.orgID)} >{item.animalSireAlias + " " + item.animalSire }</a></td>
                                  <td>{item.currentAge}</td>
-                                 <td><Link to={'/animal/photo/update?animalTag=' + item.animalTag + '&orgID=' + item.orgID} ><i className="fa icon-camera fa-lg mt-1"></i></Link></td>
+                                 <td><Link to={'/animal/photo/update?animalTag=' + item.animalTag + '&orgID=' + item.orgID} > {item.photoCount} x <i className="fa icon-camera fa-lg mt-1"></i></Link></td>
                              </tr>
                              ))}
                          </tbody>

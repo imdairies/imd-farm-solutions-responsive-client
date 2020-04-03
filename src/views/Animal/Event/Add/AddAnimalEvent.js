@@ -705,6 +705,12 @@ class AddAnimalEvent extends Component {
     } else if (this.state.inventoryUpdateLabel !== "" && this.state.shouldUpdateInventoryValue === "") {
       this.setState({messageColor: "danger", eventAdditionalMessage: "Please specify \"" + this.state.inventoryUpdateLabel + "\""});
     } else {
+      let formattedTimestamp = this.state.timestamp.getFullYear() + "-" + 
+        (this.state.timestamp.getMonth() +1 ) + "-" + 
+        this.state.timestamp.getDate() + " " + 
+        this.state.timestamp.getHours() + ":" + 
+        this.state.timestamp.getMinutes();
+
       this.setState({eventAdditionalMessage: "Processing ..."
       });
       fetch(API_PREFIX + '/imd-farm-management/animalevent/add', {
@@ -716,7 +722,7 @@ class AddAnimalEvent extends Component {
           body: JSON.stringify({
             "animalTag": this.state.animalTag,
             "eventCode": this.state.eventCodeID,
-            "eventTimeStamp": this.state.timestamp.toLocaleString(),
+            "eventTimeStamp": formattedTimestamp,
             "shouldUpdateInventory": this.state.shouldUpdateInventoryValue,
             "eventComments": this.state.commentsValue,
             "auxField1Value": this.state.field1Value,
@@ -741,7 +747,7 @@ class AddAnimalEvent extends Component {
           if (data.message.indexOf("ERROR") >= 0)
            this.setState({isLoaded: true, eventAdditionalMessage: data.message, messageColor: "warning"});
           else
-           this.setState({isLoaded: true, eventAdditionalMessage: data.message, messageColor: "success"});
+           this.setState({nextLifecycleStageValue: "", shouldUpdateInventoryValue: "", isLoaded: true, eventAdditionalMessage: data.message, messageColor: "success"});
            document.getElementById("addButton").disabled = true;
         }
       })

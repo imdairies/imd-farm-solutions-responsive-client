@@ -14,9 +14,9 @@ import {
   FormText,
   Input,
   InputGroup,
-  InputGroupText,
   Row,
   Table,
+  Label,
   Nav, 
   NavItem, 
   NavLink,
@@ -41,7 +41,7 @@ class SearchMessage extends Component {
     this.toggle = this.toggle.bind(this);
     this.toggleFade = this.toggleFade.bind(this);
     this.state = {
-      dropdownOpen: new Array(2).fill(false),
+      dropdownOpen: new Array(3).fill(false),
       collapse: true,
       warning: false,
       fadeIn: true,
@@ -52,10 +52,13 @@ class SearchMessage extends Component {
       authenticated: true,
       lookupValueCode : "" ,
       languageCD: "",
-      languageValue: "",
+      languageValue: "--Select Language--",
       messageCD: "",
       messageColor: "muted",
       languageList: [],
+      categoryList: [],
+      messageCategoryCD:"",
+      messageCategoryValue:"--Select Category--",
       message: "Enter search fields and press Search button"
     };
     this.handleChange = this.handleChange.bind(this); 
@@ -64,9 +67,42 @@ class SearchMessage extends Component {
     this.retrieveLanguageCode = this.retrieveLanguageCode.bind(this);
     this.collapseResults = this.collapseResults.bind(this);
     this.handleLanguageSelected = this.handleLanguageSelected.bind(this);
+    this.handleMessageCategorySelected = this.handleMessageCategorySelected.bind(this);
+    this.retrieveMessageCategory = this.retrieveMessageCategory.bind(this);
   }
+
+  retrieveMessageCategory() {
+
+    fetch(API_PREFIX + '/imd-farm-management/lookupvalues/search', {
+        method: "POST",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          "categoryCode": "MSG_CTGRY",
+          "loginToken": (new Cookies()).get('authToken')
+      })
+    })
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({categoryList: [], isLoaded: true, message: data.message, messageColor: "danger"});
+      }
+      else {
+        //alert(data.length);
+        this.setState({categoryList: data, isLoaded: true, message: "", messageColor: "success"});         
+      }
+    })
+    .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
+
+  }
+
   retrieveLanguageCode() {
-    // retrieve Operator Dropdown values  
     fetch(API_PREFIX + '/imd-farm-management/lookupvalues/search', {
         method: "POST",
         headers: {
@@ -98,7 +134,15 @@ class SearchMessage extends Component {
 
   componentDidMount() {
     this.retrieveLanguageCode();
+    this.retrieveMessageCategory();
    }
+
+   handleMessageCategorySelected(event) {
+    if (event.target.id === "%")
+      this.setState({messageCategoryCD: "", messageCategoryValue: event.target.value});
+    else
+      this.setState({messageCategoryCD: event.target.id, messageCategoryValue: event.target.value});    
+  }
 
   handleLanguageSelected(event) {
     if (event.target.id === "%")
@@ -126,6 +170,7 @@ class SearchMessage extends Component {
         },
         body: JSON.stringify({
           "languageCD": this.state.languageCD,
+          "messageCategoryCD": this.state.messageCategoryCD,
           "messageCD": this.state.messageCD,
           "loginToken": (new Cookies()).get('authToken')
       })
@@ -163,7 +208,7 @@ class SearchMessage extends Component {
   }
 
   render() {
-    var { authenticated, languageList, isLoaded, items, message, messageColor } = this.state;
+    var { authenticated, categoryList, languageList, isLoaded, items, message, messageColor } = this.state;
     let recordCount = 0;
     if (!authenticated)
       return (<Redirect to='/login'  />);
@@ -175,7 +220,7 @@ class SearchMessage extends Component {
               <Col md="8">
                 <Card>
                   <CardHeader>
-                    <i className="fa fa-align-justify"></i><strong>Lookup Maintenance</strong>
+                    <i className="fa fa-align-justify"></i><strong>Message Catalog Maintenance</strong>
                   </CardHeader>
                   <CardBody>
                     <Nav tabs>
@@ -201,11 +246,9 @@ class SearchMessage extends Component {
                           </Col>
                         </FormGroup>
                         <FormGroup row>
+                          <Label sm="4" htmlFor="input-normal">Language</Label>
                           <Col md ="8">
                             <InputGroup>
-                              <InputGroupText>
-                                <i className="fa icon-list fa-lg mt-1"></i>
-                              </InputGroupText>
                               <Dropdown isOpen={this.state.dropdownOpen[1]} toggle={() => {
                                 this.toggle(1);
                               }}>
@@ -239,11 +282,45 @@ class SearchMessage extends Component {
                           </Col>
                         </FormGroup>
                         <FormGroup row>
+                          <Label sm="4" htmlFor="input-normal">Category</Label>
+                          <Col md ="8">
+                            <InputGroup>
+                              <Dropdown isOpen={this.state.dropdownOpen[2]} toggle={() => {
+                                this.toggle(2);
+                              }}>
+                                <DropdownToggle caret>
+                                  {this.state.messageCategoryValue}
+                                </DropdownToggle>
+                                <DropdownMenu id="messageCategory" onClick={this.handleMessageCategorySelected}
+                                modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}>
+                                  <DropdownItem id="%" value="--Select Category--" >--Select Category--</DropdownItem>                                  
+                                  {categoryList.map(item => (
+                                  <DropdownItem id={item.lookupValueCode} value={item.shortDescription} >{item.longDescription}</DropdownItem>
+                               ))}
+                                  </DropdownMenu>
+                                </Dropdown> 
+                            </InputGroup>
+                          </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                          <Label sm="4" htmlFor="input-normal">Code</Label>
                           <Col md="6">
                             <InputGroup>
-                                <InputGroupText>
-                                  <i className="fa fa-file-code-o fa-lg mt-1"></i>
-                                </InputGroupText>
                               <Input id="messageCD" type="number" maxLength="6" value={this.state.messageCD} onChange={this.handleChange} placeholder="Message Code"/>
                             </InputGroup>
                           </Col>
@@ -278,6 +355,7 @@ class SearchMessage extends Component {
                                 <th>Org</th>
                                 <th>Language</th>
                                 <th>Message Code</th>
+                                <th>Message Ctgry</th>
                                 <th>Message Test</th>
                                 <th>Updated By</th>
                                 <th>Updated Date</th>
@@ -290,6 +368,7 @@ class SearchMessage extends Component {
                                    <td>{item.orgID}</td>
                                    <td>{item.languageCD}</td>
                                    <td><Link to={'/admin/messagecatalog/update?languageCD=' + item.languageCD + '&messageCD=' + item.messageCD} >{item.messageCD}</Link></td>
+                                   <td>{item.messageCategoryDescription}</td>
                                    <td>{item.messageText}</td>
                                    <td>{item.updatedBy}</td>
                                    <td>{item.updatedDTTM}</td>

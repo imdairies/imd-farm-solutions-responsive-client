@@ -560,6 +560,12 @@ handleField1DropdownValueChanged(event) {
     } else if (this.state.field2Label !== "" && this.state.field2Value === "") {
       this.setState({messageColor: "danger", eventAdditionalMessage: "Please enter " + this.state.field2Label});
     } else {
+      let formattedTimestamp = this.state.timestamp.getFullYear() + "-" + 
+        (this.state.timestamp.getMonth() +1 ) + "-" + 
+        this.state.timestamp.getDate() + " " + 
+        this.state.timestamp.getHours() + ":" + 
+        this.state.timestamp.getMinutes();
+
       this.setState({eventAdditionalMessage: "Processing ..."
       });
       fetch(API_PREFIX + '/imd-farm-management/animalevent/addbatch', {
@@ -571,7 +577,7 @@ handleField1DropdownValueChanged(event) {
           body: JSON.stringify({
             "animalTag": this.getSelectedTags(),
             "eventCode": this.state.eventCodeID,
-            "eventTimeStamp": this.state.timestamp.toLocaleString(),
+            "eventTimeStamp": formattedTimestamp,
             "eventComments": this.state.commentsValue,
             "auxField1Value": this.state.field1Value,
             "auxField2Value": this.state.field2Value,

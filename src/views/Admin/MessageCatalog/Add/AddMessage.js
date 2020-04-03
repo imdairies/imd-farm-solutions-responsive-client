@@ -35,7 +35,7 @@ class AddMessage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      dropdownOpen: new Array(1).fill(false),
+      dropdownOpen: new Array(2).fill(false),
       collapse: true,
       warning: false,
       fadeIn: true,
@@ -44,11 +44,14 @@ class AddMessage extends Component {
       timeout: 300,
       isActive: false,
       langCodeList:[],
+      categoryList: [],
       messageCD: "",
       languageCD: "",
-      languageValue: "",
       messageText: "",
       authenticated: true,
+      messageCategoryCD:"",
+      languageValue: "--Select Language--",
+      messageCategoryValue:"--Select Category--",
       messageColor: "muted",
       message: "Specify desired values and press Add button"
     };
@@ -56,14 +59,25 @@ class AddMessage extends Component {
     this.handleAdd = this.handleAdd.bind(this);
     this.handleTabClick = this.handleTabClick.bind(this);    
     this.handleLanguageCodeChange = this.handleLanguageCodeChange.bind(this);
+    this.handleMessageCategorySelected = this.handleMessageCategorySelected.bind(this);
+    this.retrieveMessageCategory = this.retrieveMessageCategory.bind(this);
+    this.retrieveLanguageCode = this.retrieveLanguageCode.bind(this);
   }
 
   handleLanguageCodeChange(event) {
     this.setState({languageCD: this.state.langCodeList[event.target.id].lookupValueCode,
       languageValue:this.state.langCodeList[event.target.id].shortDescription});
-
   }
 
+  handleMessageCategorySelected(event) {
+    alert(event.target.id);
+    if (event.target.id == "-1")
+      this.setState({messageCategoryCD: "",
+        messageCategoryValue: "--Select Category--"});
+    else
+      this.setState({messageCategoryCD: this.state.categoryList[event.target.id].lookupValueCode,
+        messageCategoryValue:this.state.categoryList[event.target.id].shortDescription});
+  }
 
   toggle(i) {
     const newArray = this.state.dropdownOpen.map((element, index) => {
@@ -74,9 +88,37 @@ class AddMessage extends Component {
     });
   }
 
+  retrieveMessageCategory() {
 
-  componentDidMount() {
+    fetch(API_PREFIX + '/imd-farm-management/lookupvalues/search', {
+        method: "POST",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          "categoryCode": "MSG_CTGRY",
+          "loginToken": (new Cookies()).get('authToken')
+      })
+    })
+    .then(response => {
+      if (response.status === 401)
+        this.setState({authenticated : false});
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+         this.setState({categoryList: [], isLoaded: true, message: data.message, messageColor: "danger"});
+      }
+      else {
+        //alert(data.length);
+        this.setState({categoryList: data, isLoaded: true, message: "", messageColor: "success"});         
+      }
+    })
+    .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
 
+  }
+    retrieveLanguageCode() {
     fetch(API_PREFIX + '/imd-farm-management/lookupvalues/search', {
         method: "POST",
         headers: {
@@ -98,12 +140,18 @@ class AddMessage extends Component {
          this.setState({langCodeList: [], isLoaded: true, message: data.message, messageColor: "danger"});
       }
       else {
-         this.setState({langCodeList: data, isLoaded: true, message: "", messageColor: "success"});         
+        //alert(data.length);
+        this.setState({langCodeList: data, isLoaded: true, message: "", messageColor: "success"});         
       }
     })
     .catch(error => this.setState({message: error.toString(), messageColor: "danger"}));
 
+  }
 
+
+  componentDidMount() {
+    this.retrieveLanguageCode();
+    this.retrieveMessageCategory();
    }
 
   handleTabClick(targetID) {
@@ -121,6 +169,7 @@ class AddMessage extends Component {
     let messageCD = this.state.messageCD; 
     let languageCD = this.state.languageCD;
     let messageText = this.state.messageText;
+    let messageCategoryCD = this.state.messageCategoryCD;
 //    alert("[" + languageCD + "] [" + messageCD + "] [" + messageText + "]");
 
     if (languageCD.length === 0) {
@@ -144,8 +193,9 @@ class AddMessage extends Component {
               'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            "messageCD": messageCD,
             "languageCD": languageCD,
+            "messageCD": messageCD,
+            "categoryCode": messageCategoryCD,
             "messageText": messageText,
             "loginToken": (new Cookies()).get('authToken')
         })
@@ -168,8 +218,9 @@ class AddMessage extends Component {
   }
 
   render() {
-    var { authenticated, message, langCodeList, messageColor} = this.state;
+    var { authenticated, message, categoryList, langCodeList, messageColor} = this.state;
     let itemCount = 0;
+    let categoryCount = 0;
     if (!authenticated)
       return (<Redirect to='/login'  />);
     return (
@@ -181,7 +232,7 @@ class AddMessage extends Component {
                 <Col md="8">
                 <Card>
                   <CardHeader>
-                    <i className="fa fa-align-justify"></i><strong>Lookup Maintenance</strong>
+                    <i className="fa fa-align-justify"></i><strong>Message Catalog Maintenance</strong>
                   </CardHeader>
                   <CardBody>
                     <Nav tabs>
@@ -204,7 +255,7 @@ class AddMessage extends Component {
                         <FormGroup row>
                           <Col>&nbsp;
                           </Col>
-                        </FormGroup>                      
+                        </FormGroup>
                         <FormGroup row>
                           <Label sm="4" htmlFor="input-normal">Language Code</Label>
                           <Col sm="8">
@@ -237,6 +288,42 @@ class AddMessage extends Component {
                                ))}
                                   </DropdownMenu>
                                 </Dropdown>
+                            </InputGroup>
+                          </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                          <Label sm="4" htmlFor="input-normal">Message Category</Label>
+                          <Col md ="8">
+                            <InputGroup>
+                              <Dropdown isOpen={this.state.dropdownOpen[1]} toggle={() => {
+                                this.toggle(1);
+                              }}>
+                                <DropdownToggle caret>
+                                  {this.state.messageCategoryValue}
+                                </DropdownToggle>
+                                <DropdownMenu id="messageCategory" onClick={this.handleMessageCategorySelected}
+                                modifiers={{
+                                  setMaxHeight: {
+                                    enabled: true,
+                                    order: 890,
+                                    fn: (data) => {
+                                      return {
+                                        ...data,
+                                        styles: {
+                                          ...data.styles,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        },
+                                      };
+                                    },
+                                  },
+                                }}>
+                                  <DropdownItem id="-1" value="--Select Category--" >--Select Category--</DropdownItem>                                  
+                                  {categoryList.map(item => (
+                                  <DropdownItem id={categoryCount++} value={item.shortDescription} >{item.longDescription}</DropdownItem>
+                               ))}
+                                  </DropdownMenu>
+                                </Dropdown> 
                             </InputGroup>
                           </Col>
                         </FormGroup>

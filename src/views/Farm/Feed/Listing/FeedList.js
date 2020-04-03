@@ -15,6 +15,7 @@ import { Link } from 'react-router-dom';
 import { Redirect } from 'react-router-dom';
 import Cookies from 'universal-cookie';
 
+var API_PREFIX = window.location.protocol + '//' + window.location.hostname + ':8080';
 
 
 class FeedList extends Component {
@@ -61,7 +62,7 @@ class FeedList extends Component {
 
   componentDidMount() {
     this.setState({items: [], isLoaded: false}); 
-    fetch('http://localhost:8080/imd-farm-management/feed/farmactiveanimalfeedlisting', {
+    fetch(API_PREFIX + '/imd-farm-management/feed/farmactiveanimalfeedlisting', {
         method: "POST",
         headers: {
             'Accept': 'application/json',

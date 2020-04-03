@@ -1,7 +1,7 @@
 import React, { Component} from 'react';
 
 import {
-  Button, Card, CardBody, CardFooter, CardHeader, Col, Fade, Form,
+  Button, Card, Collapse, CardBody, CardFooter, CardHeader, Col, Fade, Form,
   FormGroup, FormText, Input, Row,
   Label,  Dropdown, DropdownToggle, DropdownMenu, Table, DropdownItem,
 } from 'reactstrap';
@@ -108,9 +108,16 @@ class UpdateAnimal extends Component {
     super(props);
     this.state = {
       dropdownOpen: new Array(3).fill(false),
+      collapseEvents: false,
+      collapseMilkInformation: false,
+      collapseGrowthInformation: false,
+      collapseFeedInformation: true,
+      collapsePerformanceIndicatorInformation: false,
+      collapseAdvisementInformation: false,
+      collapseLactationInformation: false,
+      collapseProgneyInformation: false,
       activeIndex: 0,
       invalidAccess: false,
-      collapse: true,
       warning: false,
       fadeIn: true,
       items: [],
@@ -165,7 +172,9 @@ class UpdateAnimal extends Component {
       progneyList: [],
       progneyMessageColor: "",
       progneyMessage: "",
-      authenticated: true
+      authenticated: true,
+      photoCount: 0,
+      lactationMilkInfo: [],
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleUpdate = this.handleUpdate.bind(this);
@@ -180,8 +189,49 @@ class UpdateAnimal extends Component {
     this.retrieveAnimalProgney = this.retrieveAnimalProgney.bind(this);
     this.handleGenderChange = this.handleGenderChange.bind(this);
     this.createThumbnailURL = this.createThumbnailURL.bind(this);
+    this.retrieveLactationProductionSummary = this.retrieveLactationProductionSummary.bind(this);
+    this.collapseEvents = this.collapseEvents.bind(this);
+    this.collapseMilkInformation = this.collapseMilkInformation.bind(this);
+    this.collapseProgneyInformation = this.collapseProgneyInformation.bind(this);
+    this.collapseLactationInformation = this.collapseLactationInformation.bind(this);
+    this.collapseAdvisementInformation = this.collapseAdvisementInformation.bind(this);
+    this.collapsePerformanceIndicatorInformation = this.collapsePerformanceIndicatorInformation.bind(this);
+    this.collapseFeedInformation = this.collapseFeedInformation.bind(this);
+    this.collapseGrowthInformation = this.collapseGrowthInformation.bind(this);
 
   }
+
+
+retrieveLactationProductionSummary(animalTag) {
+
+    fetch(API_PREFIX + '/imd-farm-management/animals/lactationinformation', {
+        method: "POST",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          "animalTag": animalTag,
+          "loginToken": (new Cookies()).get('authToken'),
+        })
+      })
+      .then(response => {
+        if (response.status === 401)
+          this.setState({authenticated : false});
+        return response.json();
+      })
+      .then(data => {
+        if (data.error) {
+         this.setState({lactationMilkInfoMessage: data.message, lactationMilkInfoMessageColor: "danger"});
+      }
+      else {
+         this.setState({lactationMilkInfo: data,
+                        lactationMilkInfoMessage: "", lactationMilkInfoMessageColor: "success"});         
+      }
+    })
+    .catch(error => this.setState({lactationMilkInfoMessage: error.toString(), lactationMilkInfoMessageColor: "danger"}));
+
+}
 
 handleGenderChange(event) {
   this.setState({gender: event.target.value});
@@ -312,12 +362,46 @@ retrieveAnimallWeightGraphData(animalTag){
         return thumbnail;
   }
 
+  collapseEvents() {
+      this.setState({ collapseEvents: !this.state.collapseEvents });
+  }
+
+  collapseMilkInformation() {
+      this.setState({ collapseMilkInformation: !this.state.collapseMilkInformation });
+  }
+
+  collapseProgneyInformation(){
+      this.setState({ collapseProgneyInformation: !this.state.collapseProgneyInformation });
+  }
+
+  collapseLactationInformation(){
+      this.setState({ collapseLactationInformation: !this.state.collapseLactationInformation });
+  }
+
+  collapseAdvisementInformation(){
+      this.setState({ collapseAdvisementInformation: !this.state.collapseAdvisementInformation });
+  }
+
+  collapsePerformanceIndicatorInformation(){
+      this.setState({ collapsePerformanceIndicatorInformation: !this.state.collapsePerformanceIndicatorInformation });
+  }
+
+  collapseFeedInformation(){
+      this.setState({ collapseFeedInformation: !this.state.collapseFeedInformation });
+  }
+
+  collapseGrowthInformation(){
+      this.setState({ collapseGrowthInformation: !this.state.collapseGrowthInformation });
+  }
+
+
   handleTabClick(targetID) {
    //alert(targetID + " was clicked");
   }
   componentDidMount() {
     images = [];
     const parsed = queryString.parse(this.props.location.search);
+    this.setState({collapse: false});
     this.setState({animalTag: parsed.animalTag, lifecycleStageList: [], orgID: parsed.orgID, invalidAccess: (parsed.animalTag ? false : true)});
     this.setState({month1MilkingRecord: [], month2MilkingRecord: [], genericMessage1: "Processing...",genericMessage2: "Processing..."}); 
     this.setState({items: [], eventlist: [], isLoaded: false, genericMessage: "Processing...", eventAdditionalMessage: "Loading events ..."}); 
@@ -375,6 +459,7 @@ retrieveAnimallWeightGraphData(animalTag){
                         isDateOfBirthEstimated: responseJson[0].isDateOfBirthEstimated,
                         isActive: responseJson[0].isActive, 
                         isLoaded: true,
+                        photoCount: responseJson[0].photoCount,
                         animalDam: responseJson[0].animalDam,
                         gender: (responseJson[0].gender === "F" ? "Female" : responseJson[0].gender === "M" ? "Male":""),
                         animalSire: responseJson[0].animalSire,
@@ -531,6 +616,7 @@ retrieveAnimallWeightGraphData(animalTag){
     this.retrieveAnimalAdvisement(parsed.animalTag);
     this.retrieveAnimalProgney(parsed.animalTag);
     this.retrievePerformanceRating(parsed.animalTag);
+    this.retrieveLactationProductionSummary(parsed.animalTag);
   }
 
   retrievePerformanceRating(animalTag) {
@@ -672,6 +758,7 @@ retrieveAnimallWeightGraphData(animalTag){
         })
     .catch(error => this.setState({progneyMessage: "Following error occurred while processing the request: " + error.toString(), progneyMessageColor: "danger"}));
   }
+
   loadMilkingData(prevDate, recordDate, animalTag){
     // milking information month 1
     fetch(API_PREFIX+ '/imd-farm-management/animals/monthlymilkingrecord', {
@@ -778,8 +865,9 @@ retrieveAnimallWeightGraphData(animalTag){
   }
 
   render() {
+    var { collapsePerformanceIndicatorInformation, collapseProgneyInformation, collapseLactationInformation, collapseAdvisementInformation, collapseFeedInformation, collapseGrowthInformation, collapseEvents, collapseMilkInformation } = this.state;
     var { feedPlanItems, progneyList, progneyMessageColor, progneyMessage, infoList, warningList, alertList, message, invalidAccess, lifecycleStageList, sireList, feedAnalysisMessageColor, feedAnalysisMessage, eventAdditionalMessage, eventMessageColor, messageColor, eventlist} = this.state;
-    var { growthPlusBadge, fertilityPlusBadge, milkPlusBadge, performanceRatingMessage, performanceRatingMessageColor, performanceRatings, authenticated, weightGraphMessageColor, weightGraphMessage, genericMessage1, genericMessage2, month1MilkingRecord, month2MilkingRecord, message1Color, message2Color} = this.state;
+    var { lactationMilkInfo, lactationMilkInfoMessage, lactationMilkInfoMessageColor, growthPlusBadge, fertilityPlusBadge, milkPlusBadge, performanceRatingMessage, performanceRatingMessageColor, performanceRatings, authenticated, weightGraphMessageColor, weightGraphMessage, genericMessage1, genericMessage2, month1MilkingRecord, month2MilkingRecord, message1Color, message2Color} = this.state;
     let recordCount = 0;
     let eventRecordCount = 0;
 
@@ -797,32 +885,14 @@ retrieveAnimallWeightGraphData(animalTag){
     return (
       <div className="animated fadeIn">
         <Row>
-          <Col xs="8" xl="6">
-            <Card>
-              <CardHeader>
-                <strong>{'# ' + this.state.animalTag + ' - TPI: ' + this.state.totalPerformanceRating} </strong>
-              </CardHeader>
-              <CardBody>
-                 <a href={this.state.frontSideImageURL} target="_blank" rel="noopener noreferrer" ><img src={this.state.frontSideImageURLThumb}  width="20%" alt={'front'} /></a>&nbsp;&nbsp;
-                 <a href={this.state.backSideImageURL} target="_blank" rel="noopener noreferrer" ><img src={this.state.backSideImageURLThumb}  width="20%" alt={'back'} /></a>&nbsp;&nbsp;
-                 <a href={this.state.rightSideImageURL} target="_blank" rel="noopener noreferrer" ><img src={this.state.rightSideImageURLThumb}  width="20%" alt={'right'} /></a>&nbsp;&nbsp;
-                 <a href={this.state.leftSideImageURL} target="_blank" rel="noopener noreferrer" ><img src={this.state.leftSideImageURLThumb}  width="20%" alt={'left'} /></a>
-                  <Row>
-                    <Col><Link to={'/animal/photo/update?animalTag=' + this.state.animalTag + '&orgID=' + this.state.orgID} ><i className="fa icon-camera fa-lg mt-1"></i></Link>
-                    </Col>
-                  </Row>
-
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-        <Row>
-          <Col xs="16">
+          <Col xs="8">
             <Fade timeout={this.state.timeout} in={this.state.fadeIn}>
               <Row>
                 <Col md="8">
                   <Card>
-                    <CardHeader><strong>Basic Information</strong></CardHeader>
+                    <CardHeader>
+                      <strong>{'# ' + this.state.animalTag + ' - TPI: ' + this.state.totalPerformanceRating} </strong>
+                    </CardHeader>
                     <CardBody>
                       <Form action="" method="post" className="form-horizontal">
                         <FormGroup row>
@@ -833,6 +903,12 @@ retrieveAnimallWeightGraphData(animalTag){
                            <img id='fertilityPlusBadge' src={"/assets/img/fertility-champ.png"}  width="20%" alt={"High Conception"} title={"This animal has a high conception rate"} style={fertilityPlusBadgeDisplay}  />
                           </Col>
                         </FormGroup>
+                        <FormGroup row>
+                          <Label sm="4">Photos</Label>
+                          <Col>
+                            <Link to={'/animal/photo/update?animalTag=' + this.state.animalTag + '&orgID=' + this.state.orgID} >{this.state.photoCount} x <i className="fa icon-camera fa-lg mt-1"></i></Link>
+                          </Col>                        
+                        </FormGroup>
 
                         <FormGroup row>
                           <Label sm="4" htmlFor="input-normal">Alias</Label>
@@ -840,6 +916,7 @@ retrieveAnimallWeightGraphData(animalTag){
                               <Input id="alias" type="text" maxLength="75" value={this.state.alias} onChange={this.handleChange} placeholder="Animal Alias"  />
                           </Col>
                         </FormGroup>
+
                         <FormGroup row>
                           <Label sm="4" htmlFor="input-normal">Gender</Label>
                           <Col sm="4">
@@ -947,13 +1024,16 @@ retrieveAnimallWeightGraphData(animalTag){
                   </Card>
                 </Col>
               </Row>
-
               <Row>
                 <Col md="8">
                   <Card>
                       <CardHeader>
-                        <i className="fa fa-align-justify"></i><strong>Progney</strong><FormText color={progneyMessageColor}>&nbsp;{progneyMessage}</FormText>
+                        <i className="fa fa-align-justify"></i><strong>Progney Information # {this.state.animalTag}</strong><FormText color={progneyMessageColor}>&nbsp;{progneyMessage}</FormText>
+                         <div className="card-header-actions">
+                           <Button color="link" className="card-header-action btn-minimize" data-target="#progneydata" onClick={this.collapseProgneyInformation}><i className="icon-arrow-up"></i></Button>
+                         </div>
                       </CardHeader>
+                    <Collapse isOpen={collapseProgneyInformation} id="progneydata">
                       <CardBody>
                          <Table hover bordered striped responsive size="sm">
                           <thead>
@@ -976,32 +1056,89 @@ retrieveAnimallWeightGraphData(animalTag){
                           </tbody>
                          </Table>
                     </CardBody>
+                  </Collapse>
                   </Card>
                 </Col>
               </Row>
+
+              <Row size="sm">
+                <Col md="8">
+                  <Card>
+                    <CardHeader><strong>Lactation Information # {this.state.animalTag}</strong>
+                       <div className="card-header-actions">
+                         <Button color="link" className="card-header-action btn-minimize" data-target="#lactationdata" onClick={this.collapseLactationInformation}><i className="icon-arrow-up"></i></Button>
+                       </div>
+                    </CardHeader>
+                    <Collapse isOpen={collapseLactationInformation} id="lactationdata">
+                    <CardBody>
+                      <FormText color={lactationMilkInfoMessageColor}>{lactationMilkInfoMessage}</FormText>
+                      <Row>
+                        <Col>
+                         <Table hover bordered striped responsive size="sm">
+                          <thead>
+                              <tr>
+                                <th>Lac#</th>
+                                <th>Duration</th>
+                                <th>Insemination Count</th>
+                                <th>Calf Tag</th>
+                                <th>Total Milk</th>
+                                <th>Max</th>
+                                <th>Milking Duration</th>
+                                <th>lpd</th>
+                              </tr> 
+                          </thead>
+                          <tbody>
+                             {lactationMilkInfo.map(item => (
+                                 <tr key="{item.animalTag}">
+                                   <td>{item.lactationNumber}</td>
+                                   <td>{(new Date(item.lactationStartTimestamp)).getFullYear() + "-" + ((new Date(item.lactationStartTimestamp)).getMonth()+1) + "-" + (new Date(item.lactationStartTimestamp)).getDate()}&nbsp;⇔&nbsp; 
+                                   {(new Date(item.lactationEndTimestamp)).getFullYear() + "-" + ((new Date(item.lactationEndTimestamp)).getMonth()+1) + "-" + (new Date(item.lactationEndTimestamp)).getDate()}</td>
+                                   <td>{item.inseminationAttemptCount}</td>
+                                   <td>{item.calfTag}</td>
+                                   <td>{item.milkingProduction}</td>
+                                   <td>{item.maxDailyProduction}</td>
+                                   <td>{item.daysInMilking + ' days'}</td>
+                                   <td>{item.lpd}</td>
+                               </tr>
+                               ))}
+                          </tbody>
+                         </Table>
+                        </Col>
+                      </Row>
+                      </CardBody>
+                    </Collapse>
+                  </Card>
+                </Col>
+              </Row>
+
 
               <Row>
                 <Col md="8">
                   <Card>
                     <CardHeader>
                       <i className="fa fa-align-justify"></i><strong>Advisement</strong>
+                       <div className="card-header-actions">
+                         <Button color="link" className="card-header-action btn-minimize" data-target="#advisementdata" onClick={this.collapseAdvisementInformation}><i className="icon-arrow-up"></i></Button>
+                       </div>
                     </CardHeader>
+                    <Collapse isOpen={collapseAdvisementInformation} id="advisementdata">
                     <CardBody>
-                    <ol>
-                      {alertList.map(alertItem => (
-                        <li><font color="red">{alertItem.ruleOutcomeMessage}</font></li>
-                       ))}
-                      {warningList.map(warningItem => (
-                        <li><font color="orange">{warningItem.ruleOutcomeMessage}</font></li>
-                       ))}
-                      
-                      {infoList.map(infoItem => (
-                        <li><font color="blue">{infoItem.ruleOutcomeMessage}</font></li>
-                       ))}
-                      </ol>
+                      <ol>
+                        {alertList.map(alertItem => (
+                          <li><font color="red">{alertItem.ruleOutcomeMessage}</font></li>
+                         ))}
+                        {warningList.map(warningItem => (
+                          <li><font color="orange">{warningItem.ruleOutcomeMessage}</font></li>
+                         ))}
+                        
+                        {infoList.map(infoItem => (
+                          <li><font color="blue">{infoItem.ruleOutcomeMessage}</font></li>
+                         ))}
+                        </ol>
                     </CardBody>
-                  </Card>
-                </Col>
+                  </Collapse>
+                </Card>
+              </Col>
               </Row>
 
               <Row>
@@ -1009,7 +1146,11 @@ retrieveAnimallWeightGraphData(animalTag){
                   <Card>
                     <CardHeader>
                       <i className="fa fa-align-justify"></i><strong>Performance Indicator</strong>
+                       <div className="card-header-actions">
+                         <Button color="link" className="card-header-action btn-minimize" data-target="#performancedata" onClick={this.collapsePerformanceIndicatorInformation}><i className="icon-arrow-up"></i></Button>
+                       </div>
                     </CardHeader>
+                    <Collapse isOpen={collapsePerformanceIndicatorInformation} id="performancedata">
                     <CardBody>
                       <FormText color={performanceRatingMessageColor}>&nbsp;{performanceRatingMessage}</FormText>
                       <Table hover bordered striped responsive size="sm">
@@ -1029,9 +1170,10 @@ retrieveAnimallWeightGraphData(animalTag){
                         </tbody>
                       </Table>
                     </CardBody>
-                  </Card>
-                </Col>
-              </Row>
+                  </Collapse>
+                </Card>
+              </Col>
+            </Row>
 
 
 
@@ -1040,7 +1182,11 @@ retrieveAnimallWeightGraphData(animalTag){
                   <Card>
                     <CardHeader>
                       <i className="fa fa-align-justify"></i><strong>Feed Information</strong>{' (' + this.state.feedCohortTypeShortDescr + ')'}<FormText color={feedAnalysisMessageColor}>&nbsp;{feedAnalysisMessage}</FormText>
+                       <div className="card-header-actions">
+                         <Button color="link" className="card-header-action btn-minimize" data-target="#feeddata" onClick={this.collapseFeedInformation}><i className="icon-arrow-up"></i></Button>
+                       </div>
                     </CardHeader>
+                    <Collapse isOpen={collapseFeedInformation} id="feeddata">
                     <CardBody>
                       <Form action="" method="post" className="form-horizontal">
                         <FormGroup row>
@@ -1134,8 +1280,9 @@ retrieveAnimallWeightGraphData(animalTag){
                         The analysis is mostly based on the following reference:<i>Tropical dairy farming : feeding management for small holder dairy farmers in the humid tropics By John Moran, 312 pp., Landlinks Press, 2005</i>
                       </Form>
                     </CardBody>
-                  </Card>
-                </Col>
+                  </Collapse>
+                </Card>
+              </Col>
               </Row>
 
               <Row>
@@ -1143,20 +1290,31 @@ retrieveAnimallWeightGraphData(animalTag){
                   <Card>
                     <CardHeader>
                       <i className="fa fa-align-justify"></i><strong>Growth Information</strong><FormText color={weightGraphMessageColor}>&nbsp;{weightGraphMessage}</FormText>
+                       <div className="card-header-actions">
+                         <Button color="link" className="card-header-action btn-minimize" data-target="#growthdata" onClick={this.collapseGrowthInformation}><i className="icon-arrow-up"></i></Button>
+                       </div>
                     </CardHeader>
+                    <Collapse isOpen={collapseGrowthInformation} id="growthdata">
                     <CardBody>
                       <div className="chart-wrapper" style={{ height: 450 + 'px', marginTop: 0 + 'px' }} >
                         <Line data={mainChart} options={mainChartOpts}/>
                       </div>
-                    </CardBody>
-                  </Card>
-                </Col>
-              </Row>
+                     </CardBody>
+                  </Collapse>
+                </Card>
+              </Col>
+            </Row>
 
         <Row size="sm">
           <Col md="8">
             <Card>
-              <CardHeader><strong>Milk Information # {this.state.animalTag}</strong></CardHeader>
+              <CardHeader>
+                <i className="fa fa-align-justify"></i><strong>Milking Information # {this.state.animalTag}</strong>
+                 <div className="card-header-actions">
+                   <Button color="link" className="card-header-action btn-minimize" data-target="#milkingdata" onClick={this.collapseMilkInformation}><i className="icon-arrow-up"></i></Button>
+                 </div>
+              </CardHeader>
+            <Collapse isOpen={collapseMilkInformation} id="milkingdata">
               <CardBody>
                 <Row>
                   <Col sm="6">
@@ -1231,42 +1389,48 @@ retrieveAnimallWeightGraphData(animalTag){
                   </Col>
                 </Row>
               </CardBody>
-            </Card>
-          </Col>
-        </Row>
+            </Collapse>
+          </Card>
+        </Col>
+      </Row>
 
         <Row>
           <Col md="8">
             <Card>
                 <CardHeader>
-                  <i className="fa fa-align-justify"></i>{"Life Events of " + this.state.animalTag}<FormText color={eventMessageColor}>&nbsp;{eventAdditionalMessage}</FormText>
+                  <i className="fa fa-align-justify"></i><strong>{"Life Events of " + this.state.animalTag}</strong><FormText color={eventMessageColor}>&nbsp;{eventAdditionalMessage}</FormText>
+                   <div className="card-header-actions">
+                     <Button color="link" className="card-header-action btn-minimize" data-target="#eventsdata" onClick={this.collapseEvents}><i className="icon-arrow-up"></i></Button>
+                   </div>
                 </CardHeader>
-                <CardBody>
-                   <Table hover bordered striped responsive size="sm">
-                    <thead>
-                        <tr>
-                          <th>#</th>
-                          <th>Timestamp</th>
-                          <th>Type</th>
-                          <th>Day(s) Ago</th>
-                          <th>Age at Event</th>
-                          <th>Comments</th>
-                        </tr> 
-                    </thead>
-                    <tbody>
-                       {eventlist.map(item => (
-                           <tr key="{item.animalTag}">
-                             <td>{eventlist.length - ++eventRecordCount + 1}</td>
-                             <td width="10%" data-toggle="tooltip" title={item.eventTimeStamp.substring(item.eventTimeStamp.length-8).trim()}>{item.eventTimeStamp.substring(0,item.eventTimeStamp.length-8).trim()}</td>
-                             <td><Link target="_blank" to={'/animal/event/update?eventTransactionID=' + item.eventTransactionID} >{item.eventShortDescription}</Link></td>
-                             <td>{item.daysFromToday}</td>
-                             <td>{item.ageWhenOccurred}</td>
-                             <td width="50%">{item.eventComments + " " + item.auxField1Value + " " + item.auxField2Value}</td>
-                         </tr>
-                         ))}
-                    </tbody>
-                   </Table>
-              </CardBody>
+                <Collapse isOpen={collapseEvents} id="eventsdata">
+                  <CardBody>
+                     <Table hover bordered striped responsive size="sm">
+                      <thead>
+                          <tr>
+                            <th>#</th>
+                            <th>Timestamp</th>
+                            <th>Type</th>
+                            <th>Day(s) Ago</th>
+                            <th>Age at Event</th>
+                            <th>Comments</th>
+                          </tr> 
+                      </thead>
+                      <tbody>
+                         {eventlist.map(item => (
+                             <tr key="{item.animalTag}">
+                               <td>{eventlist.length - ++eventRecordCount + 1}</td>
+                               <td width="10%" data-toggle="tooltip" title={item.eventTimeStamp.substring(item.eventTimeStamp.length-5).trim()}>{item.eventTimeStamp.substring(0,item.eventTimeStamp.length-5).trim()}</td>
+                               <td><Link target="_blank" to={'/animal/event/update?eventTransactionID=' + item.eventTransactionID} >{item.eventShortDescription}</Link></td>
+                               <td>{item.daysFromToday}</td>
+                               <td>{item.ageWhenOccurred}</td>
+                               <td width="50%">{item.eventComments + " " + item.auxField1Value + " " + item.auxField2Value}</td>
+                           </tr>
+                           ))}
+                      </tbody>
+                     </Table>
+                </CardBody>
+              </Collapse>
             </Card>
           </Col>
         </Row>
